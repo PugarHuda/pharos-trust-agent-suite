@@ -1,0 +1,16 @@
+{
+  "_comment": "Logistic-regression risk model for an agent spend action. All values are fixed-point integers scaled by 1e6 (SCALE). The same weights are hardcoded in the Stylus contract (contracts-rust/src/lib.rs) so the on-chain score matches this reference exactly.",
+  "scale": 1000000,
+  "features": [
+    "spend_fraction_of_daily_cap (0..1)",
+    "destination_unknown (0 or 1)",
+    "recent_failure_velocity (0..1)",
+    "off_hours_deviation (0..1)"
+  ],
+  "weights": [1500000, 2000000, 1200000, 800000],
+  "bias": -2000000,
+  "defaultThreshold": 500000,
+  "deployed": {
+    "atlantic-testnet": { "address": null, "note": "set after `cargo stylus deploy`" }
+  }
+}

@@ -1,0 +1,22 @@
+# dependencies
+node_modules/
+**/node_modules/
+
+# secrets — never commit keys
+.env
+.env.*
+!.env.example
+*.key
+.private_key
+
+# build output (artifacts are committed intentionally; see note in each skill)
+*.log
+.DS_Store
+
+# Rust / Stylus
+target/
+**/target/
+Cargo.lock
+
+# local tooling config (not part of the submission)
+.claude/

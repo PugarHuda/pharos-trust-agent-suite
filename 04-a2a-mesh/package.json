@@ -1,0 +1,26 @@
+{
+  "name": "a2a-mesh",
+  "version": "1.0.0",
+  "description": "Agent-to-agent discovery + x402 payment + payment-gated on-chain reputation on Pharos.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "mesh": "./scripts/mesh.mjs"
+  },
+  "scripts": {
+    "build": "node scripts/compile.mjs",
+    "test": "node --test tests/mesh.test.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "ethers": "^6.13.0"
+  },
+  "devDependencies": {
+    "solc": "^0.8.26",
+    "@ethereumjs/evm": "^3.1.0",
+    "@ethereumjs/common": "^4.4.0",
+    "@ethereumjs/util": "^9.1.0"
+  }
+}

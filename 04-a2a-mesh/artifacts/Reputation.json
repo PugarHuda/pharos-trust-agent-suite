@@ -1,0 +1,324 @@
+{
+  "contractName": "Reputation",
+  "compiler": "0.8.35+commit.47b9dedd.Emscripten.clang",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_recorder",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [],
+      "name": "AlreadyRated",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "BadScore",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "NotPayer",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "NotRecorder",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "UnknownInteraction",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "ref",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "payer",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "provider",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "PaymentRecorded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "ref",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "provider",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint8",
+          "name": "score",
+          "type": "uint8"
+        }
+      ],
+      "name": "Rated",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "PAIR_CAP",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "lastRatedAt",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "pairCount",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "name": "payments",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "payer",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "provider",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "rated",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "ref",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint8",
+          "name": "score",
+          "type": "uint8"
+        }
+      ],
+      "name": "rate",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "ratingCount",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "ratingSum",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "ref",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "address",
+          "name": "payer",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "provider",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "recordPayment",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "recorder",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "provider",
+          "type": "address"
+        }
+      ],
+      "name": "scoreOf",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "volume",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x6080604052348015600e575f5ffd5b50604051610827380380610827833981016040819052602b91604e565b5f80546001600160a01b0319166001600160a01b03929092169190911790556079565b5f60208284031215605d575f5ffd5b81516001600160a01b03811681146072575f5ffd5b9392505050565b6107a1806100865f395ff3fe608060405234801561000f575f5ffd5b50600436106100a6575f3560e01c80638c7dca801161006e5780638c7dca8014610189578063adeabba9146101b3578063bacca527146101d2578063c7141518146101e7578063e8cce115146101fa578063f33930d914610219575f5ffd5b80630716326d146100aa578063133af456146101225780632404165e1461014357806355011bde146101625780636e3a5a171461016a575b5f5ffd5b6100f06100b8366004610611565b600160208190525f918252604090912080549181015460028201546003909201546001600160a01b0393841693909116919060ff1684565b604080516001600160a01b03958616815294909316602085015291830152151560608201526080015b60405180910390f35b610135610130366004610643565b610243565b604051908152602001610119565b610135610151366004610643565b60026020525f908152604090205481565b610135600a81565b610135610178366004610643565b60056020525f908152604090205481565b610135610197366004610663565b600660209081525f928352604080842090915290825290205481565b6101356101c1366004610643565b60046020525f908152604090205481565b6101e56101e0366004610694565b6102e5565b005b6101e56101f53660046106c7565b6104ef565b610135610208366004610643565b60036020525f908152604090205481565b5f5461022b906001600160a01b031681565b6040516001600160a01b039091168152602001610119565b6001600160a01b0381165f9081526002602052604081205480820361026a57505f92915050565b6001600160a01b0383165f90815260036020526040812054829061028f90601461071c565b6102999190610739565b90505f60148310156102c15760146102b284606461071c565b6102bc9190610739565b6102c4565b60645b905060646102d2828461071c565b6102dc9190610739565b95945050505050565b60018160ff1610806102fa575060058160ff16115b1561031857604051639c9cef3960e01b815260040160405180910390fd5b5f82815260016020526040902080546001600160a01b031661034d5760405163153f920760e21b815260040160405180910390fd5b80546001600160a01b0316331461037757604051631435e35760e01b815260040160405180910390fd5b600381015460ff161561039d57604051630894b2e960e31b815260040160405180910390fd5b60038101805460ff1916600190811790915581546001600160a01b039081165f90815260066020908152604080832094860154909316825292909252902054600a111561048b5780546001600160a01b039081165f908152600660209081526040808320600186810154909516845290915281208054909190610421908490610758565b90915550506001818101546001600160a01b03165f9081526002602052604081208054909190610452908490610758565b909155505060018101546001600160a01b03165f908152600360205260408120805460ff85169290610485908490610758565b90915550505b6001810180546001600160a01b039081165f908152600560209081526040918290204290559254905160ff8616815291169185917f458ee194760fd51b70e1f2e5dd79734a3776c1c915f1eec786a2e2191d72eab9910160405180910390a3505050565b5f546001600160a01b031633146105195760405163787a22eb60e01b815260040160405180910390fd5b604080516080810182526001600160a01b03808616825284811660208084018281528486018781525f606087018181528c82526001808652898320985189549089166001600160a01b0319918216178a559451908901805491909816941693909317909555516002860155516003909401805494151560ff19909516949094179093558152600490915290812080548392906105b6908490610758565b92505081905550816001600160a01b0316836001600160a01b0316857fe71f2d4fc99f7d557282a41e699063e3ff6752f44a7e31aae25bd2666740c5138460405161060391815260200190565b60405180910390a450505050565b5f60208284031215610621575f5ffd5b5035919050565b80356001600160a01b038116811461063e575f5ffd5b919050565b5f60208284031215610653575f5ffd5b61065c82610628565b9392505050565b5f5f60408385031215610674575f5ffd5b61067d83610628565b915061068b60208401610628565b90509250929050565b5f5f604083850312156106a5575f5ffd5b82359150602083013560ff811681146106bc575f5ffd5b809150509250929050565b5f5f5f5f608085870312156106da575f5ffd5b843593506106ea60208601610628565b92506106f860408601610628565b9396929550929360600135925050565b634e487b7160e01b5f52601160045260245ffd5b808202811582820484141761073357610733610708565b92915050565b5f8261075357634e487b7160e01b5f52601260045260245ffd5b500490565b808201808211156107335761073361070856fea2646970667358221220621ab6d6c18fd56230bbfccf6163a94b2c4b7a42792788b1c60997a01133f90e64736f6c63430008230033"
+}

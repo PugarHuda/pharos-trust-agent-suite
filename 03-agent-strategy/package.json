@@ -1,0 +1,19 @@
+{
+  "name": "agent-strategy",
+  "version": "1.0.0",
+  "description": "Autonomous DeFi strategy engine for Pharos agents: oracle read -> rule DSL -> policy-bounded swap.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "strategy": "./scripts/strategy.mjs"
+  },
+  "scripts": {
+    "test": "node --test tests/strategy.test.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "ethers": "^6.13.0"
+  }
+}

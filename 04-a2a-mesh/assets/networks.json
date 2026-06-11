@@ -1,0 +1,25 @@
+{
+  "_comment": "Network + x402 config for a2a-mesh. Default atlantic-testnet.",
+  "atlantic-testnet": {
+    "name": "Pharos Atlantic Testnet",
+    "chainId": 688689,
+    "caip2": "eip155:688689",
+    "rpcUrl": "https://atlantic.dplabs-internal.com",
+    "explorer": "https://atlantic.pharosscan.xyz",
+    "nativeToken": "PHRS",
+    "default": true,
+    "x402": {
+      "network": "eip155:688689",
+      "scheme": "exact",
+      "settlementToken": "USDC",
+      "usdc": "0xE0BE08c77f415F577A1B3A9aD7a1Df1479564ec8",
+      "usdcNote": "x402 demo USDC; distinct from the token-registry USDC at 0xcfC8...Fc8B",
+      "facilitatorUrl": ""
+    },
+    "contracts": {
+      "ServiceRegistry": "",
+      "Reputation": ""
+    }
+  },
+  "gasPolicy": { "rule": "Set gas limit 10-20% above estimate; Pharos charges by gas_limit." }
+}

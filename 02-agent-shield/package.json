@@ -1,0 +1,17 @@
+{
+  "name": "agent-shield",
+  "version": "1.0.0",
+  "description": "Pre-flight security gate for agent transactions on Pharos. 100% read-only, zero dependencies.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "shield": "./scripts/shield.mjs"
+  },
+  "scripts": {
+    "test": "node --test tests/shield.test.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {}
+}

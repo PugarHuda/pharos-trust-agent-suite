@@ -1,0 +1,19 @@
+{
+  "name": "stylus-compute",
+  "version": "1.0.0",
+  "description": "On-chain verifiable risk classifier in Rust/WASM (Stylus) for Pharos, with a JS reference and EVM-callable gate.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "compute": "./scripts/compute.mjs"
+  },
+  "scripts": {
+    "test": "node --test tests/score.test.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "ethers": "^6.13.0"
+  }
+}

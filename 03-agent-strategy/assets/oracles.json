@@ -1,0 +1,18 @@
+{
+  "_comment": "Pharos Chainlink Push Engine feeds. NOTE: Atlantic proxies are SelfManagedFeedsCacheProxy contracts that expose latestAnswer()/latestTimestamp()/decimals() but REVERT on latestRoundData(). The oracle adapter tries latestRoundData first (standard Chainlink) then falls back to these legacy getters.",
+  "atlantic-testnet": {
+    "cache": "0x5456fD07A1622d33969f833d52aA5AD2c68C3Fa2",
+    "feeds": {
+      "BTC/USD": { "address": "0x82d0e03ea6d94120B92EA4Ea236DcFA273D42994", "decimals": 18 },
+      "ETH/USD": { "address": "0xCd47D1843f3D6313836303fE1434BA26D257d500", "decimals": 18 }
+    },
+    "heartbeatSeconds": 3600,
+    "deviationBps": 50
+  },
+  "pacific-mainnet": {
+    "cache": "0xc71f7d98d3d9a000Fdfe307fBdb9d94AbD56424B",
+    "feeds": {},
+    "heartbeatSeconds": 3600,
+    "deviationBps": 50
+  }
+}

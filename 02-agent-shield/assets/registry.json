@@ -1,0 +1,36 @@
+{
+  "_comment": "Official Pharos addresses used by agent-shield for verification and poisoning detection. Any address not in 'official' or 'knownGood' is treated as unknown.",
+  "atlantic-testnet": {
+    "chainId": 688689,
+    "rpcUrl": "https://atlantic.dplabs-internal.com",
+    "official": {
+      "0xcfC8330f4BCAB529c625D12781b1C19466A9Fc8B": "USDC (testnet)",
+      "0xE7E84B8B4f39C507499c40B4ac199B050e2882d5": "USDT (testnet)",
+      "0x838800b758277CC111B2d48Ab01e5E164f8E9471": "WPHRS (testnet)",
+      "0x7d211F77525ea39A0592794f793cC1036eEaccD5": "WETH (testnet)",
+      "0x0c64F03EEa5c30946D5c55B4b532D08ad74638a4": "WBTC (testnet)",
+      "0x0000000071727De22E5E9d8BAf0edAc6f37da032": "EntryPoint v0.7",
+      "0xcA11bde05977b3631167028862bE2a173976CA11": "Multicall3",
+      "0x000000000022D473030F116dDEE9F6B43aC78BA3": "Permit2",
+      "0x13b0D85CcB8bf860b6b79AF3029fCA081AE9beF2": "Create2Deployer"
+    },
+    "knownGood": {
+      "_note": "Add audited DEX routers / x402 facilitators here as you verify them."
+    }
+  },
+  "pacific-mainnet": {
+    "chainId": 1672,
+    "rpcUrl": "https://rpc.pharos.xyz",
+    "official": {
+      "0xc879c018db60520f4355c26ed1a6d572cdac1815": "USDC (Circle, mainnet)",
+      "0x52c48d4213107b20bc583832b0d951fb9ca8f0b0": "WPROS (mainnet)",
+      "0x1f4b7011Ee3d53969bb67F59428a9ec0477856E9": "WETH (mainnet)",
+      "0x51e2A24742Db77604B881d6781Ee16B5b8fcBE29": "LINK (mainnet)"
+    }
+  },
+  "rules": {
+    "unlimitedApproval": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+    "poisoningMinPrefixSuffixMatch": 6,
+    "severityWeights": { "high": 40, "medium": 20, "low": 10, "info": 0 }
+  }
+}

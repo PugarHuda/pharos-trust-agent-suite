@@ -1,0 +1,27 @@
+{
+  "name": "agent-treasury",
+  "version": "1.0.0",
+  "description": "Smart-account treasury enforcing an on-chain spending policy for AI agents on Pharos.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "treasury": "./scripts/treasury.mjs"
+  },
+  "scripts": {
+    "build": "node scripts/compile.mjs",
+    "test": "node --test tests/policy.test.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "ethers": "^6.13.0"
+  },
+  "devDependencies": {
+    "solc": "^0.8.26",
+    "@ethereumjs/evm": "^3.1.0",
+    "@ethereumjs/common": "^4.4.0",
+    "@ethereumjs/statemanager": "^2.4.0",
+    "@ethereumjs/util": "^9.1.0"
+  }
+}
