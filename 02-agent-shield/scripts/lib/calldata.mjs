@@ -11,6 +11,17 @@ export const SELECTORS = {
   '0xd505accf': { name: 'permit', args: ['address', 'address', 'uint256', 'uint256', 'uint8', 'bytes32', 'bytes32'] },
   // Permit2 approve(address token, address spender, uint160 amount, uint48 expiration)
   '0x87517c45': { name: 'permit2.approve', args: ['address', 'address', 'uint160', 'uint48'] },
+  // ERC-721/1155 operator approval — a common NFT-drain vector
+  '0xa22cb465': { name: 'setApprovalForAll', args: ['address', 'bool'] },
+};
+
+// Bit-width of an approval amount param, used to judge "effectively unlimited"
+// against the right ceiling (uint256 max vs Permit2's uint160 max).
+export const APPROVAL_AMOUNT_BITS = {
+  approve: 256,
+  increaseAllowance: 256,
+  permit: 256,
+  'permit2.approve': 160,
 };
 
 export function isHexString(value) {
@@ -28,9 +39,8 @@ export function normalizeAddress(value) {
 
 function decodeWord(word, type) {
   if (type === 'address') return '0x' + word.slice(24);
-  if (type.startsWith('uint') || type === 'uint8' || type === 'uint48' || type === 'uint160') {
-    return BigInt('0x' + word);
-  }
+  if (type === 'bool') return BigInt('0x' + word) !== 0n;
+  if (type.startsWith('uint')) return BigInt('0x' + word);
   return '0x' + word; // bytes32 and anything else: raw
 }
 
@@ -52,6 +62,11 @@ export function decodeCalldata(data) {
 // Scan all 32-byte words of calldata for things shaped like addresses
 // (12 zero bytes followed by 20 non-zero bytes). Used to feed the
 // registry/poisoning detector with every address a tx touches.
+//
+// A small uint (e.g. a transfer amount like 1_000_000) ABI-encodes to mostly
+// zero bytes and would match the address shape, producing a bogus address with
+// a long zero run. We skip words whose 20-byte tail has > 30 leading zero
+// nibbles, which are far more likely to be small integers than real addresses.
 export function extractAddresses(data) {
   const found = new Set();
   if (!isHexString(data) || data.length <= 10) return [];
@@ -59,7 +74,10 @@ export function extractAddresses(data) {
   for (let i = 0; i + 64 <= body.length; i += 64) {
     const word = body.slice(i, i + 64);
     if (/^0{24}[0-9a-fA-F]{40}$/.test(word) && !/^0+$/.test(word)) {
-      found.add('0x' + word.slice(24).toLowerCase());
+      const tail = word.slice(24); // 40 hex chars = the candidate address
+      const leadingZeros = tail.length - tail.replace(/^0+/, '').length;
+      if (leadingZeros > 30) continue; // looks like a small integer, not an address
+      found.add('0x' + tail.toLowerCase());
     }
   }
   return [...found];

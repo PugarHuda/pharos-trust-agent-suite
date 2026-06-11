@@ -109,8 +109,9 @@ async function main() {
       const token = resolveToken(net, args.token || die('--token required (budget denomination)'));
       const budget = parseAmount(args.budget ?? die('--budget required'), token.decimals);
       const expiry = parseExpiry(args.expires ?? die('--expires required (e.g. 7d)'));
-      console.log(`Grant session ${key}: budget ${args.budget} (${budget} units), expires ${new Date(expiry * 1000).toISOString()}`);
-      await sendTx(ownerContract(), 'grantSession', [key, budget, expiry], net, 'grantSession');
+      if (expiry <= Math.floor(Date.now() / 1000)) die(`--expires resolves to ${new Date(expiry * 1000).toISOString()}, which is not in the future`);
+      console.log(`Grant session ${key}: token ${token.address}, budget ${args.budget} (${budget} units), expires ${new Date(expiry * 1000).toISOString()}`);
+      await sendTx(ownerContract(), 'grantSession', [key, token.address, budget, expiry], net, 'grantSession');
       break;
     }
 
@@ -164,7 +165,12 @@ async function main() {
       }
       if (args.key) {
         const s = await c.sessions(args.key);
-        console.log(`  session ${args.key}: budgetRemaining=${s.budgetRemaining} expiry=${s.expiry} active=${s.active}`);
+        const tokenLabel = Object.entries(net.tokens || {}).find(([, t]) => t.address.toLowerCase() === s.token.toLowerCase())?.[0];
+        const decimals = tokenLabel ? net.tokens[tokenLabel].decimals : 18;
+        console.log(`  session ${args.key}:`);
+        console.log(`    token: ${s.token}${tokenLabel ? ` (${tokenLabel})` : ''}`);
+        console.log(`    budgetRemaining: ${formatUnits(s.budgetRemaining, decimals)}`);
+        console.log(`    expiry: ${s.expiry} (${new Date(Number(s.expiry) * 1000).toISOString()})  active: ${s.active}`);
       }
       break;
     }

@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build": "node scripts/compile.mjs",
-    "test": "node --test tests/policy.test.mjs"
+    "test": "node --test tests/policy.test.mjs tests/config.test.mjs"
   },
   "engines": {
     "node": ">=18"

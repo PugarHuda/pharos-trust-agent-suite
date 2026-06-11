@@ -81,7 +81,7 @@ the on-chain spending policy and a runaway strategy still can't exceed the daily
 > code works on real Chainlink) and falls back to `latestAnswer()`/`latestTimestamp()`, which is what
 > Pharos actually supports. Either way it enforces freshness (`age <= heartbeat`) and `answer > 0`.
 
-Run `npm test` for the 17-case suite (rule compiler, evaluator branches, slippage math, calldata
+Run `npm test` for the 25-case suite (rule compiler + misparse regressions, evaluator branches, oracle precision, slippage math, calldata
 encoding) — all offline and deterministic.
 
 ## Composability

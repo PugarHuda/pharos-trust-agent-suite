@@ -47,12 +47,20 @@ export function gate(features, model, threshold) {
   return { allow: s <= BigInt(threshold), score: s, threshold: BigInt(threshold) };
 }
 
-// Helpers to convert between human floats and fixed-point integers (CLI use only;
-// the contract never sees floats).
-export function toFixed(human) {
-  // round-half-away-from-zero to match a plain *1e6 then round
-  const v = Math.round(Number(human) * 1e6);
-  return BigInt(v);
+// Helpers to convert between human decimals and fixed-point integers (CLI use only;
+// the contract never sees floats). Parsing is done on the decimal STRING — no float
+// arithmetic — so there is no rounding ambiguity at the 6-dp boundary, keeping the
+// "no floats anywhere near the contract" promise literal.
+export function toFixed(human, decimals = 6) {
+  const m = String(human).trim().match(/^(-?)(\d*)(?:\.(\d+))?$/);
+  if (!m || (m[2] === '' && (m[3] ?? '') === '')) throw new ModelError(`bad number: ${human}`);
+  const [, sign, whole = '', frac = ''] = m;
+  if (frac.length > decimals) {
+    throw new ModelError(`${human} has more than ${decimals} decimal places`);
+  }
+  const fracPadded = (frac + '0'.repeat(decimals)).slice(0, decimals);
+  const v = BigInt((whole || '0') + fracPadded);
+  return sign === '-' ? -v : v;
 }
 export function fromFixed(fixed) {
   return Number(BigInt(fixed)) / 1e6;

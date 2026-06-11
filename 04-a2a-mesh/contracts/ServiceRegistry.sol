@@ -60,4 +60,25 @@ contract ServiceRegistry {
         uint256 j;
         for (uint256 i; i < all.length; ++i) if (services[all[i]].active) active[j++] = all[i];
     }
+
+    /// @notice Number of ids registered under a tag (for pagination).
+    function tagCount(bytes32 tag) external view returns (uint256) {
+        return _byTag[tag].length;
+    }
+
+    /// @notice Paginated id slice for a tag. As a popular tag grows, the unbounded
+    ///         getActiveByTag view can exceed an eth_call gas cap; consumers should page
+    ///         through with this (or index the Registered/ActiveSet events off-chain).
+    function getByTagPaged(bytes32 tag, uint256 offset, uint256 limit)
+        external
+        view
+        returns (uint256[] memory ids)
+    {
+        uint256[] memory all = _byTag[tag];
+        if (offset >= all.length) return new uint256[](0);
+        uint256 end = offset + limit;
+        if (end > all.length) end = all.length;
+        ids = new uint256[](end - offset);
+        for (uint256 i = offset; i < end; ++i) ids[i - offset] = all[i];
+    }
 }

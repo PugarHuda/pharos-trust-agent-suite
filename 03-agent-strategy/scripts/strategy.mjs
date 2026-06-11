@@ -107,6 +107,27 @@ async function main() {
       break;
     }
 
+    case 'quote': {
+      // Live getAmountsOut from a v2-style router, so `plan --quote-out` isn't a guess.
+      const { Contract } = await import('ethers');
+      const router = args.router || die('--router 0x.. required');
+      const tokenIn = tokenAddress(net, args.tokenIn || die('--token-in required')).address;
+      const tokenOut = tokenAddress(net, args.tokenOut || die('--token-out required')).address;
+      const amountIn = BigInt(args.amountIn ?? die('--amount-in <baseUnits> required'));
+      const abi = ['function getAmountsOut(uint256,address[]) view returns (uint256[])'];
+      const c = new Contract(router, abi, getProvider(net));
+      try {
+        const amounts = await c.getAmountsOut(amountIn, [tokenIn, tokenOut]);
+        const out = amounts[amounts.length - 1];
+        console.log(`quote: ${amountIn} ${args.tokenIn} -> ${out} ${args.tokenOut} (router ${router})`);
+        console.log(`pass this to plan as --quote-out ${out}`);
+        if (args.json) out && console.log(JSON.stringify({ amountIn: amountIn.toString(), quoteOut: out.toString(), path: [tokenIn, tokenOut] }));
+      } catch (err) {
+        die(`getAmountsOut failed: ${err.shortMessage || err.message} (is ${router} a v2-style router with this pair?)`);
+      }
+      break;
+    }
+
     case 'plan': {
       const rule = compileRule(args.rule || die('--rule "..." required'));
       const router = args.router || die('--router 0x.. required');
@@ -134,7 +155,7 @@ async function main() {
     }
 
     default:
-      console.error('commands: compile price eval plan');
+      console.error('commands: compile price eval quote plan');
       console.error('example: node scripts/strategy.mjs price --feed BTC/USD');
       process.exit(2);
   }

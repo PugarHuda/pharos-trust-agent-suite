@@ -26,7 +26,15 @@ export async function simulateTx({ from, to, data = '0x', value = 0n }, rpc, { t
 
   // 1. Calldata to a codeless address is almost always a mistake or a trap.
   if (isHexString(data) && data.length > 2) {
-    const code = await rpc.getCode(to);
+    let code;
+    try {
+      code = await rpc.getCode(to);
+    } catch (err) {
+      // A transient RPC failure on getCode should degrade gracefully, not crash the command.
+      findings.push(makeFinding('medium', 'Could not fetch contract code',
+        `${to}: ${err.message} — code/simulation checks skipped.`));
+      return findings;
+    }
     if (!code || code === '0x') {
       findings.push(makeFinding('high', 'Calldata sent to an address with no code',
         `${to} has no contract code on this network — the call would silently succeed and do nothing (or you are on the wrong network).`));
@@ -52,8 +60,12 @@ export async function simulateTx({ from, to, data = '0x', value = 0n }, rpc, { t
   }
 
   // 4. Honeypot heuristic: simulate selling/moving the token back out.
+  // Only auto-derive the token for a plain `transfer` (where `to` is the token the
+  // caller is interacting with). For `transferFrom` the reverse check would falsely
+  // fire (the caller may hold none of that token), so require an explicit
+  // --check-sell-token there. See FP notes in SPEC.
   const token = tokenForSellCheck
-    || (decoded && (decoded.name === 'transfer' || decoded.name === 'transferFrom') ? to : null);
+    || (decoded && decoded.name === 'transfer' ? to : null);
   if (token && from) {
     try {
       await rpc.call({ from, to: token, data: encodeTransfer(from, 1n) });

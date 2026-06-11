@@ -36,6 +36,10 @@ contract Reputation {
     error UnknownInteraction();
     error NotPayer();
     error AlreadyRated();
+    error AlreadyRecorded();
+    error SelfDeal();
+    error PairCapReached();
+    error ZeroAddress();
     error BadScore();
 
     constructor(address _recorder) {
@@ -48,27 +52,35 @@ contract Reputation {
     }
 
     /// @notice Record a settled payment so its payer may later rate it.
+    /// @dev    Guards make reputation expensive to fake: a ref can be recorded only once (no
+    ///         re-record to reset the once-only rating), payer and provider must be distinct
+    ///         (no self-dealing), and neither may be the zero address (which is the "unset"
+    ///         sentinel and would make a payment permanently unrateable).
     function recordPayment(bytes32 ref, address payer, address provider, uint256 amount) external onlyRecorder {
+        if (payer == address(0) || provider == address(0)) revert ZeroAddress();
+        if (payer == provider) revert SelfDeal();
+        if (payments[ref].payer != address(0)) revert AlreadyRecorded();
         payments[ref] = Payment({payer: payer, provider: provider, amount: amount, rated: false});
         volume[provider] += amount;
         emit PaymentRecorded(ref, payer, provider, amount);
     }
 
     /// @notice Rate a paid interaction. Only the payer can call, once per interaction.
+    /// @dev    Reverts once a payer→provider pair reaches PAIR_CAP counted ratings, so a single
+    ///         counterparty can't dominate a score and every emitted Rated event is one that
+    ///         actually counted (no silent no-ops, no indexer over-count).
     function rate(bytes32 ref, uint8 score) external {
         if (score < 1 || score > 5) revert BadScore();
         Payment storage p = payments[ref];
         if (p.payer == address(0)) revert UnknownInteraction();
         if (msg.sender != p.payer) revert NotPayer();
         if (p.rated) revert AlreadyRated();
+        if (pairCount[p.payer][p.provider] >= PAIR_CAP) revert PairCapReached();
         p.rated = true;
 
-        // Per-counterparty cap: only the first PAIR_CAP ratings from a payer to a provider count.
-        if (pairCount[p.payer][p.provider] < PAIR_CAP) {
-            pairCount[p.payer][p.provider] += 1;
-            ratingCount[p.provider] += 1;
-            ratingSum[p.provider] += score;
-        }
+        pairCount[p.payer][p.provider] += 1;
+        ratingCount[p.provider] += 1;
+        ratingSum[p.provider] += score;
         lastRatedAt[p.provider] = block.timestamp;
         emit Rated(ref, p.provider, score);
     }

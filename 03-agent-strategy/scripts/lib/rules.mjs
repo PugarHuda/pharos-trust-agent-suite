@@ -11,15 +11,50 @@ export class RuleError extends Error {
   constructor(message) { super(message); this.name = 'RuleError'; }
 }
 
+// Remove the slippage clause so its percentage isn't mistaken for a drop/band/price.
+function stripSlippageClause(text) {
+  return text.replace(/,?\s*(?:\d+(?:\.\d+)?\s*%?\s*slippage|slippage\s*(?:of\s*)?\d+(?:\.\d+)?\s*%?|\d+(?:\.\d+)?\s*bps\s*slippage)/ig, '');
+}
+
+// First percentage/number-with-percent in the (slippage-stripped) text. Accepts %, "percent", "pct".
 function pct(str) {
-  const m = String(str).match(/(-?\d+(?:\.\d+)?)\s*%/);
+  const m = String(str).match(/(-?\d+(?:\.\d+)?)\s*(?:%|percent|pct)/i);
   return m ? Number(m[1]) : null;
 }
 
+// Parse a number that may use comma grouping (e.g. "4,000.50").
+function parseNum(s) {
+  return Number(String(s).replace(/,/g, ''));
+}
+
 function slippageBpsFrom(text) {
-  const m = text.match(/(\d+(?:\.\d+)?)\s*%?\s*slippage/i) || text.match(/slippage\s*(\d+(?:\.\d+)?)\s*%/i);
+  const m = text.match(/(\d+(?:\.\d+)?)\s*%?\s*slippage/i)
+    || text.match(/slippage\s*(?:of\s*)?(\d+(?:\.\d+)?)\s*%?/i)
+    || text.match(/(\d+(?:\.\d+)?)\s*bps\s*slippage/i);
   if (!m) return DEFAULT_SLIPPAGE_BPS;
-  return Math.round(Number(m[1]) * 100);
+  // a "bps slippage" value is already in bps; a "% slippage" value is percent.
+  return /bps/i.test(m[0]) ? Math.round(Number(m[1])) : Math.round(Number(m[1]) * 100);
+}
+
+// Resolve a DCA interval to seconds. Matches full unit words so "months" is never
+// mistaken for "minutes". Returns null for an unrecognized/unsupported interval.
+function parseInterval(text) {
+  const named = { daily: 86400, hourly: 3600, weekly: 604800, monthly: 2592000 };
+  for (const [k, v] of Object.entries(named)) {
+    if (new RegExp(`\\b${k}\\b`, 'i').test(text)) return v;
+  }
+  // longer unit words listed before their prefixes so "minute" wins over "min", etc.
+  const m = text.match(/every\s+(\d+)\s*(seconds?|secs?|minutes?|mins?|hours?|hrs?|days?|weeks?|months?)\b/i);
+  if (!m) return null;
+  const unit = m[2].toLowerCase();
+  const base = /^sec/.test(unit) ? 1
+    : /^min/.test(unit) ? 60
+    : /^h/.test(unit) ? 3600
+    : /^day/.test(unit) ? 86400
+    : /^week/.test(unit) ? 604800
+    : /^month/.test(unit) ? 2592000
+    : null;
+  return base === null ? null : Number(m[1]) * base;
 }
 
 function findToken(text, exclude = []) {
@@ -39,47 +74,46 @@ export function compileRule(text) {
   const lower = t.toLowerCase();
   const slippageBps = slippageBpsFrom(t);
 
-  // stop-loss: "sell WETH if it drops 10%" / "stop-loss WETH -10%"
-  if (/stop[-\s]?loss|drops?\s+\d|falls?\s+\d/.test(lower)) {
+  const stripped = stripSlippageClause(t);
+
+  // stop-loss: "sell WETH if it drops 10%" / "stop-loss WETH -10%" / "drops by 10 percent"
+  if (/stop[-\s]?loss|drops?\s+(?:by\s+|of\s+)?-?\d|falls?\s+(?:by\s+)?-?\d/.test(lower)) {
     const asset = findToken(t, ['USDC', 'USDT']) || findToken(t);
-    const drop = Math.abs(pct(t) ?? NaN);
+    const drop = Math.abs(pct(stripped) ?? NaN); // strip slippage so its % isn't read as the drop
     if (!asset) throw new RuleError('stop-loss: could not identify the asset token');
     if (!Number.isFinite(drop)) throw new RuleError('stop-loss: missing drop percentage');
     return validateRule({ kind: 'stop-loss', asset, quote: 'USDC', dropPct: drop, referencePrice: null, slippageBps });
   }
 
-  // dca: "DCA 1 USDC -> WETH daily" / "dca 5 usdc into weth every day"
+  // dca: "DCA 1 USDC -> WETH daily" / "dca 5 usdc into weth every 2 weeks"
   if (/\bdca\b|dollar.cost/.test(lower)) {
     const amt = (t.match(/(\d+(?:\.\d+)?)\s*(USDC|USDT)/i) || [])[1];
     const tokenIn = (t.match(/(USDC|USDT)/i) || [])[1]?.toUpperCase();
     const tokenOut = findToken(t, [tokenIn]);
-    const interval = /daily|every day/i.test(t) ? 86400 : /hourly|every hour/i.test(t) ? 3600 : (() => {
-      const m = t.match(/every\s+(\d+)\s*(h|hour|hours|d|day|days|m|min|minutes)/i);
-      if (!m) return 86400;
-      const n = Number(m[1]); const u = m[2][0].toLowerCase();
-      return n * ({ h: 3600, d: 86400, m: 60 }[u] || 86400);
-    })();
+    const interval = parseInterval(t);
     if (!amt || !tokenIn) throw new RuleError('dca: missing amount or input stablecoin');
     if (!tokenOut) throw new RuleError('dca: missing output token');
+    if (interval === null) throw new RuleError('dca: unrecognized interval — use daily/hourly/weekly/monthly or "every N seconds/minutes/hours/days/weeks/months"');
     return validateRule({ kind: 'dca', tokenIn, tokenOut, amountIn: Number(amt), intervalSeconds: interval, lastRunAt: null, slippageBps });
   }
 
-  // threshold: "buy WPHRS when PHRS/USD < 0.20" / "sell WETH when ETH/USD > 4000"
+  // threshold: "buy WPHRS when PHRS/USD < 0.20" / "sell WETH when ETH/USD > 4,000"
   if (/\bwhen\b|\bif\b.*[<>]|\bbelow\b|\babove\b|[<>]\s*\$?\d/.test(lower)) {
     const side = /\bsell\b/.test(lower) ? 'sell' : 'buy';
     const comparator = /<|below|drops? below|under/.test(lower) ? 'lt' : 'gt';
-    const priceM = t.match(/\$?\s*(\d+(?:\.\d+)?)/);
+    const priceM = stripped.match(/\$?\s*([\d,]+(?:\.\d+)?)/); // strip slippage, allow comma grouping
     const asset = findToken(t, ['USDC', 'USDT']) || findToken(t);
     if (!asset) throw new RuleError('threshold: could not identify the asset token');
     if (!priceM) throw new RuleError('threshold: missing trigger price');
-    return validateRule({ kind: 'threshold', side, asset, quote: 'USDC', comparator, price: Number(priceM[1]), slippageBps });
+    return validateRule({ kind: 'threshold', side, asset, quote: 'USDC', comparator, price: parseNum(priceM[1]), slippageBps });
   }
 
   // rebalance: "keep PROS/USDC 50/50, rebalance at 5% drift"
   if (/rebalance|50\/50|keep.*\d+\/\d+/.test(lower)) {
     const m = t.match(/(\d+)\s*\/\s*(\d+)/);
     const tokens = (t.toUpperCase().match(/\b(USDC|USDT|WPHRS|WETH|WBTC|PROS|WPROS)\b/g) || []);
-    const band = pct(t.replace(/(\d+)\s*\/\s*(\d+)/, '')) ?? 5;
+    // strip both the ratio (50/50) and the slippage clause before reading the band %
+    const band = pct(stripSlippageClause(t).replace(/(\d+)\s*\/\s*(\d+)/, '')) ?? 5;
     if (tokens.length < 2) throw new RuleError('rebalance: need two tokens (e.g. PROS/USDC)');
     return validateRule({
       kind: 'rebalance', tokenA: tokens[0], tokenB: tokens[1],
@@ -117,7 +151,8 @@ export function validateRule(rule) {
       break;
     case 'rebalance':
       checkToken(rule.tokenA, 'tokenA'); checkToken(rule.tokenB, 'tokenB');
-      if (rule.targetA + rule.targetB !== 100) throw new RuleError('rebalance: targets must sum to 100');
+      // tolerant compare so float targets like 33.33/66.67 aren't rejected by FP error
+      if (Math.abs(rule.targetA + rule.targetB - 100) > 0.01) throw new RuleError('rebalance: targets must sum to 100');
       if (!(rule.bandPct > 0)) throw new RuleError('rebalance: bandPct must be > 0');
       break;
   }

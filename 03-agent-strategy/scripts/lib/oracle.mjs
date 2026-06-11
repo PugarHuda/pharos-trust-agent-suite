@@ -42,12 +42,26 @@ export async function readPrice(provider, feedAddress, {
 
   if (answer <= 0n) throw new OracleError(`non-positive oracle answer (${answer})`);
   const ageSeconds = now - updatedAt;
+  if (ageSeconds < 0) {
+    // Future timestamp = bad feed or skewed local clock; treat as unusable, not "fresh".
+    throw new OracleError(`oracle timestamp is in the future by ${-ageSeconds}s (clock skew or bad feed)`, { stale: true });
+  }
   if (ageSeconds > maxStalenessSeconds) {
     throw new OracleError(`oracle stale: ${ageSeconds}s old > ${maxStalenessSeconds}s max`, { stale: true });
   }
 
-  const price = Number(answer) / 10 ** decimals;
-  return { price, raw: answer, decimals, updatedAt, ageSeconds, source };
+  const { price, micro } = scalePrice(answer, decimals);
+  return { price, raw: answer, micro, decimals, updatedAt, ageSeconds, source };
+}
+
+// Scale a raw oracle answer to a float price WITHOUT precision loss. Pharos feeds
+// are 18 decimals, so the raw int256 (BTC ~ 6e22) exceeds Number.MAX_SAFE_INTEGER;
+// converting before scaling would corrupt the low digits. We divide in BigInt down
+// to a 6-dp "micro" integer first, then convert that small number to a float.
+export function scalePrice(answer, decimals, microDecimals = 6) {
+  const a = BigInt(answer);
+  const micro = (a * (10n ** BigInt(microDecimals))) / (10n ** BigInt(decimals));
+  return { price: Number(micro) / 10 ** microDecimals, micro };
 }
 
 // Cross-check two prices; returns true if they agree within toleranceBps.

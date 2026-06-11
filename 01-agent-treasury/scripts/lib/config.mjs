@@ -53,24 +53,35 @@ export function resolveToken(net, tokenArg) {
 }
 
 // "10" + 6 decimals -> 10000000n. Also accepts "10usdc" with a known token.
+// Rejects more fractional precision than the token supports (rather than silently
+// truncating dust or rounding a tiny amount down to 0).
 export function parseAmount(amountArg, decimals) {
   const m = String(amountArg).match(/^([0-9]*\.?[0-9]+)\s*([a-zA-Z]*)$/);
   if (!m) throw new Error(`bad amount: ${amountArg}`);
   const [, num] = m;
   const [whole, frac = ''] = num.split('.');
+  if (frac.length > decimals) {
+    throw new Error(`amount ${num} has ${frac.length} decimal places but the token supports only ${decimals} — refusing to truncate`);
+  }
   const fracPadded = (frac + '0'.repeat(decimals)).slice(0, decimals);
   return BigInt(whole + fracPadded);
 }
 
-// Parse "7d", "24h", "3600s", or a raw unix-seconds number -> absolute unix expiry.
+// Parse a DURATION ("7d", "24h", "30m", "3600s", or a bare number = seconds) into an
+// absolute unix expiry. Use the "@<ts>" form for an explicit absolute timestamp. This
+// avoids the old footgun where a bare number near 1e9 was ambiguously a duration or a date.
 export function parseExpiry(arg, now = Math.floor(Date.now() / 1000)) {
-  const m = String(arg).match(/^(\d+)([dhsm]?)$/);
-  if (!m) throw new Error(`bad expiry: ${arg}`);
+  const s = String(arg).trim();
+  if (s.startsWith('@')) {
+    const ts = Number(s.slice(1));
+    if (!Number.isFinite(ts) || ts <= 0) throw new Error(`bad absolute expiry: ${arg}`);
+    if (ts <= now) throw new Error(`absolute expiry ${new Date(ts * 1000).toISOString()} is not in the future`);
+    return ts;
+  }
+  const m = s.match(/^(\d+)([dhms]?)$/);
+  if (!m) throw new Error(`bad expiry: ${arg} (use 7d / 24h / 30m / 3600s, or @<unix-ts> for absolute)`);
   const n = Number(m[1]);
-  const unit = m[2];
-  const secs = { d: 86400, h: 3600, m: 60, s: 1, '': 1 }[unit];
-  // a bare large number is treated as an absolute timestamp
-  if (unit === '' && n > 1_000_000_000) return n;
+  const secs = { d: 86400, h: 3600, m: 60, s: 1, '': 1 }[m[2]];
   return now + n * secs;
 }
 

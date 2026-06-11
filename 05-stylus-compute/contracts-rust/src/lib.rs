@@ -58,13 +58,15 @@ fn fast_sigmoid(z: i128) -> i128 {
     SCALE / 2 + frac / 2
 }
 
-/// dot(weights, features)/SCALE + bias, then sigmoid. Bounded loop (<= 4 here,
-/// generalised to the provided length, capped at WEIGHTS.len()).
+/// dot(weights, features)/SCALE + bias, then sigmoid.
+/// Requires exactly WEIGHTS.len() features and reverts otherwise, so the on-chain
+/// result matches the JS reference (which throws on a length mismatch) EXACTLY —
+/// a short vector can't silently pass the gate, and `verify` covers every input.
 fn compute_score(features: &[i64]) -> i128 {
-    let n = core::cmp::min(features.len(), WEIGHTS.len());
+    assert!(features.len() == WEIGHTS.len(), "expected exactly 4 features");
     let mut dot: i128 = 0;
     let mut i = 0;
-    while i < n {
+    while i < WEIGHTS.len() {
         dot += (WEIGHTS[i] * (features[i] as i128)) / SCALE;
         i += 1;
     }

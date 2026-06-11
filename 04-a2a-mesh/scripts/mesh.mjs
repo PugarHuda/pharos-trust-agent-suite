@@ -16,7 +16,7 @@
 // Keys: $RECORDER_PRIVATE_KEY (record-payment), $PAYER_PRIVATE_KEY (register/rate).
 // Global: --network atlantic-testnet. Exit: 0 ok, 2 error.
 
-import { Contract, formatUnits, keccak256, toUtf8Bytes } from 'ethers';
+import { Contract, formatUnits, keccak256, toUtf8Bytes, isAddress } from 'ethers';
 import {
   loadNetworks, loadArtifact, pickNetwork, getProvider, getSigner,
   tag, withGasBuffer, explorerTx,
@@ -110,8 +110,13 @@ async function main() {
     case 'record-payment': {
       const c = new Contract(args.reputation || die('--reputation required'), REP.abi, getSigner('RECORDER_PRIVATE_KEY', provider));
       const ref = args.ref || die('--ref 0x.. required (settlement tx hash or unique id)');
-      console.log(`Record payment ref ${ref}: payer ${args.payer} -> provider ${args.provider}, amount ${args.amount}`);
-      await sendTx(c, 'recordPayment', [ref, args.payer || die('--payer'), args.provider || die('--provider'), BigInt(args.amount ?? die('--amount'))], net, 'recordPayment');
+      const payer = args.payer || die('--payer 0x.. required');
+      const providerAddr = args.provider || die('--provider 0x.. required');
+      if (!isAddress(payer)) die(`--payer is not a valid address: ${payer}`);
+      if (!isAddress(providerAddr)) die(`--provider is not a valid address: ${providerAddr}`);
+      if (payer.toLowerCase() === providerAddr.toLowerCase()) die('--payer and --provider must differ (self-dealing is rejected on-chain)');
+      console.log(`Record payment ref ${ref}: payer ${payer} -> provider ${providerAddr}, amount ${args.amount}`);
+      await sendTx(c, 'recordPayment', [ref, payer, providerAddr, BigInt(args.amount ?? die('--amount'))], net, 'recordPayment');
       break;
     }
 

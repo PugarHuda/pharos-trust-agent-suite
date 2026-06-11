@@ -3,9 +3,9 @@ pragma solidity ^0.8.24;
 
 /// @title AgentTreasury
 /// @notice A minimal smart-account-style treasury that enforces spending policy ON-CHAIN.
-///         An owner configures a policy (daily cap per token, token allowlist, destination-contract
-///         allowlist, session keys with budgets + expiry). A session key (the agent) may execute
-///         calls only within that policy. The owner retains a kill-switch and full control.
+///         An owner configures a policy (daily cap per token, token/contract allowlist, session keys
+///         bound to a single token with a budget + expiry, kill-switch). A session key (the agent)
+///         may execute calls only within that policy. The owner retains a kill-switch and full control.
 ///
 /// @dev    Designed for Pharos Atlantic Testnet (chainId 688689). This is the policy core; it can be
 ///         used standalone (owner/session ECDSA auth) or adapted behind an ERC-4337 account by moving
@@ -14,8 +14,9 @@ contract AgentTreasury {
     // --- Types ---------------------------------------------------------------
 
     struct Session {
-        uint96  budgetRemaining; // total budget left for this session (in token units, single token model below)
-        uint48  expiry;          // unix seconds; 0 = revoked/none
+        address token;           // the single token this session may spend (0 = no session)
+        uint96  budgetRemaining; // total budget left for this session, in `token` units
+        uint48  expiry;          // unix seconds; spends allowed while block.timestamp <= expiry
         bool    active;
     }
 
@@ -42,9 +43,11 @@ contract AgentTreasury {
 
     event PolicySet(address indexed token, uint256 dailyCap);
     event ContractAllowed(address indexed target, bool allowed);
-    event SessionGranted(address indexed key, uint256 budget, uint48 expiry);
+    event SessionGranted(address indexed key, address indexed token, uint256 budget, uint48 expiry);
     event SessionRevoked(address indexed key);
     event Spent(address indexed key, address indexed token, address indexed to, uint256 amount);
+    event OwnerWithdrew(address indexed token, address indexed to, uint256 amount);
+    event NativeWithdrew(address indexed to, uint256 amount);
     event Killed(bool killed);
     event OwnerTransferred(address indexed newOwner);
 
@@ -58,7 +61,11 @@ contract AgentTreasury {
     error DailyCapExceeded();
     error SessionExpired();
     error SessionBudgetExceeded();
+    error SessionTokenMismatch();
+    error SpendExceedsAccounted();
     error CallFailed();
+    error ZeroAddress();
+    error BadExpiry();
 
     // --- Modifiers -----------------------------------------------------------
 
@@ -73,6 +80,7 @@ contract AgentTreasury {
     }
 
     constructor(address _owner) {
+        if (_owner == address(0)) revert ZeroAddress();
         owner = _owner;
     }
 
@@ -80,20 +88,26 @@ contract AgentTreasury {
 
     /// @notice Allow a token and set its per-day spend cap. Cap of 0 disables the token.
     function setPolicy(address token, uint256 cap) external onlyOwner {
+        if (token == address(0)) revert ZeroAddress();
         dailyCap[token] = cap;
         emit PolicySet(token, cap);
     }
 
     /// @notice Allow or disallow a destination contract the agent may call.
     function setAllowedContract(address target, bool allowed) external onlyOwner {
+        if (target == address(0)) revert ZeroAddress();
         allowedContract[target] = allowed;
         emit ContractAllowed(target, allowed);
     }
 
-    /// @notice Grant a session key (the agent) a total budget and an expiry.
-    function grantSession(address key, uint96 budget, uint48 expiry) external onlyOwner {
-        sessions[key] = Session({budgetRemaining: budget, expiry: expiry, active: true});
-        emit SessionGranted(key, budget, expiry);
+    /// @notice Grant a session key (the agent) a budget in a single token, with an expiry.
+    /// @dev    Binding the session to one token means a 5-USDC budget cannot be spent as 5 of some
+    ///         other allow-listed token.
+    function grantSession(address key, address token, uint96 budget, uint48 expiry) external onlyOwner {
+        if (key == address(0) || token == address(0)) revert ZeroAddress();
+        if (expiry <= block.timestamp) revert BadExpiry();
+        sessions[key] = Session({token: token, budgetRemaining: budget, expiry: expiry, active: true});
+        emit SessionGranted(key, token, budget, expiry);
     }
 
     /// @notice Revoke a session key immediately.
@@ -110,6 +124,7 @@ contract AgentTreasury {
     }
 
     function transferOwnership(address newOwner) external onlyOwner {
+        if (newOwner == address(0)) revert ZeroAddress();
         owner = newOwner;
         emit OwnerTransferred(newOwner);
     }
@@ -117,17 +132,14 @@ contract AgentTreasury {
     // --- Agent: policy-bounded execution -------------------------------------
 
     /// @notice Execute an ERC-20 token transfer within policy, called by an active session key.
-    /// @dev    `token` must be allow-listed (dailyCap > 0), `to` (the destination contract) must be
-    ///         allow-listed, the amount must fit today's remaining cap and the session budget.
+    /// @dev    `token` must match the session's bound token and be allow-listed (dailyCap > 0), `to`
+    ///         (the destination contract) must be allow-listed, the amount must fit today's remaining
+    ///         cap and the session budget.
     function spendToken(address token, address to, uint256 amount)
         external
         notKilled
     {
-        Session storage s = sessions[msg.sender];
-        if (!s.active) revert NotSession();
-        if (block.timestamp > s.expiry) revert SessionExpired();
-        if (amount > s.budgetRemaining) revert SessionBudgetExceeded();
-
+        Session storage s = _checkSession(token, amount);
         uint256 cap = dailyCap[token];
         if (cap == 0) revert TokenNotAllowed();
         if (!allowedContract[to]) revert ContractNotAllowed();
@@ -143,19 +155,19 @@ contract AgentTreasury {
         emit Spent(msg.sender, token, to, amount);
     }
 
-    /// @notice Execute an arbitrary call to an allow-listed contract, with a token-denominated
-    ///         spend accounted against policy (e.g. an approve+swap or an x402 settlement).
+    /// @notice Execute an arbitrary call to an allow-listed contract, with a token-denominated spend
+    ///         accounted against policy (e.g. an approve+swap or an x402 settlement).
+    /// @dev    The actual movement of `token` out of the treasury is measured by a balance delta and
+    ///         must not exceed `spendAmount`, so the budget is a real bound — not advisory — even
+    ///         though `data` is arbitrary. (Approvals move 0 tokens and so are always within budget;
+    ///         the destination allowlist is what bounds an approved spender's future pull.)
     function executeCall(
         address token,
         address target,
         uint256 spendAmount,
         bytes calldata data
     ) external notKilled returns (bytes memory) {
-        Session storage s = sessions[msg.sender];
-        if (!s.active) revert NotSession();
-        if (block.timestamp > s.expiry) revert SessionExpired();
-        if (spendAmount > s.budgetRemaining) revert SessionBudgetExceeded();
-
+        Session storage s = _checkSession(token, spendAmount);
         uint256 cap = dailyCap[token];
         if (cap == 0) revert TokenNotAllowed();
         if (!allowedContract[target]) revert ContractNotAllowed();
@@ -163,8 +175,12 @@ contract AgentTreasury {
         _accrueDaily(token, spendAmount, cap);
         s.budgetRemaining -= uint96(spendAmount);
 
+        uint256 balBefore = _balanceOf(token);
         (bool ok, bytes memory ret) = target.call(data);
         if (!ok) revert CallFailed();
+        uint256 balAfter = _balanceOf(token);
+        // Enforce that the call moved no more `token` out than was accounted against policy.
+        if (balBefore > balAfter && (balBefore - balAfter) > spendAmount) revert SpendExceedsAccounted();
 
         emit Spent(msg.sender, token, target, spendAmount);
         return ret;
@@ -183,6 +199,15 @@ contract AgentTreasury {
 
     // --- Internal ------------------------------------------------------------
 
+    /// @dev Shared session validation for spendToken/executeCall.
+    function _checkSession(address token, uint256 amount) internal view returns (Session storage s) {
+        s = sessions[msg.sender];
+        if (!s.active) revert NotSession();
+        if (block.timestamp > s.expiry) revert SessionExpired();
+        if (token != s.token) revert SessionTokenMismatch();
+        if (amount > s.budgetRemaining) revert SessionBudgetExceeded();
+    }
+
     function _accrueDaily(address token, uint256 amount, uint256 cap) internal {
         uint32 today = uint32(block.timestamp / 1 days);
         DaySpend storage d = _day[token];
@@ -195,11 +220,27 @@ contract AgentTreasury {
         d.spent = uint224(newSpent);
     }
 
-    /// @notice Owner can withdraw any token from the treasury at will.
+    function _balanceOf(address token) internal view returns (uint256) {
+        (bool ok, bytes memory ret) =
+            token.staticcall(abi.encodeWithSelector(0x70a08231, address(this))); // balanceOf(address)
+        if (!ok || ret.length < 32) revert CallFailed();
+        return abi.decode(ret, (uint256));
+    }
+
+    /// @notice Owner can withdraw any ERC-20 from the treasury at will.
     function ownerWithdraw(address token, address to, uint256 amount) external onlyOwner {
         (bool ok, bytes memory ret) =
             token.call(abi.encodeWithSelector(0xa9059cbb, to, amount));
         if (!ok || (ret.length != 0 && !abi.decode(ret, (bool)))) revert CallFailed();
+        emit OwnerWithdrew(token, to, amount);
+    }
+
+    /// @notice Owner can withdraw native PHRS (e.g. gas top-ups sent to the treasury).
+    function ownerWithdrawNative(address to, uint256 amount) external onlyOwner {
+        if (to == address(0)) revert ZeroAddress();
+        (bool ok, ) = to.call{value: amount}("");
+        if (!ok) revert CallFailed();
+        emit NativeWithdrew(to, amount);
     }
 
     receive() external payable {}

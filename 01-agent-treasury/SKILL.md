@@ -88,7 +88,8 @@ node scripts/treasury.mjs status         --treasury 0xTREASURY --token USDC --ke
 node scripts/treasury.mjs kill           --treasury 0xTREASURY
 ```
 
-Run `npm test` to execute the 12-case policy suite (cap, budget, expiry, allowlist, kill-switch,
+Run `npm test` to execute the 25-case suite (cap, budget, expiry, allowlist, kill-switch,
+session-token binding, executeCall over-spend guard, zero-address guards, CLI helpers,
 owner-guard) against an in-memory EVM — no network or funded key required.
 
 ## Composability

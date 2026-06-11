@@ -15,8 +15,12 @@ export const erc20Iface = new Interface(ERC20_ABI);
 export const treasuryIface = new Interface(TREASURY_ABI);
 
 // minAmountOut = quote * (10000 - slippageBps) / 10000, all in token base units.
+// Refuses a non-positive quote or an out-of-range slippage so a swap can never be
+// built with no (or negative) downside protection.
 export function applySlippage(quoteOut, slippageBps) {
   const q = BigInt(quoteOut);
+  if (q <= 0n) throw new Error('quoteOut must be > 0 (need a real getAmountsOut quote)');
+  if (!(slippageBps > 0 && slippageBps <= 10000)) throw new Error('slippageBps must be in (0, 10000]');
   return (q * BigInt(10000 - slippageBps)) / 10000n;
 }
 
@@ -44,15 +48,18 @@ export function buildSwapPlan({ tokenIn, tokenOut, router, amountIn, quoteOut, s
   const swapData = buildSwapCalldata({ amountIn, minAmountOut, path: [tokenIn, tokenOut], to: recipient, deadline });
   return {
     minAmountOut,
+    // Step 1: exact-amount approve, run as treasury.executeCall(tokenIn, tokenIn, 0, approve(router, amountIn)).
+    // spendAmount is 0 because an approval moves no balance (the treasury's balance-delta guard allows it).
     approve: {
       via: 'treasury.executeCall',
       token: tokenIn, target: tokenIn, spendAmount: 0n,
-      data: wrapAsTreasuryCall({ tokenIn, router: tokenIn, amountIn: 0n, swapData: buildApproveCalldata(router, amountIn) }),
+      data: treasuryIface.encodeFunctionData('executeCall', [tokenIn, tokenIn, 0n, buildApproveCalldata(router, amountIn)]),
     },
+    // Step 2: the swap, run as treasury.executeCall(tokenIn, router, amountIn, swap(...)).
     swap: {
       via: 'treasury.executeCall',
       token: tokenIn, target: router, spendAmount: amountIn,
-      data: wrapAsTreasuryCall({ tokenIn, router, amountIn, swapData }),
+      data: treasuryIface.encodeFunctionData('executeCall', [tokenIn, router, BigInt(amountIn), swapData]),
     },
     router, path: [tokenIn, tokenOut],
   };

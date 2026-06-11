@@ -68,7 +68,7 @@ node scripts/shield.mjs check-approval --token $USDC --spender $ROUTER --amount 
 node scripts/shield.mjs scan-skill ./some-skill/
 # -> FAIL: private key flows toward a network call (file:line)
 
-# Run the test suite (20 tests, no network needed)
+# Run the test suite (30 tests, no network needed)
 npm test
 ```
 

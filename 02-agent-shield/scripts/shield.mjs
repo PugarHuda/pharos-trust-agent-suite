@@ -13,7 +13,7 @@
 import { loadRegistry, classifyAddress } from './lib/registry.mjs';
 import { createRpcClient } from './lib/rpc.mjs';
 import { aggregate, render, exitCode, makeFinding } from './lib/report.mjs';
-import { checkApproval } from './lib/detectors/approval.mjs';
+import { checkApproval, checkApprovalFromDecoded } from './lib/detectors/approval.mjs';
 import { checkAddresses } from './lib/detectors/addresses.mjs';
 import { simulateTx } from './lib/detectors/simulate.mjs';
 import { scanSkill } from './lib/detectors/skillscan.mjs';
@@ -92,12 +92,16 @@ async function main() {
       const touched = [{ address: to, role: 'to' }];
       const decoded = decodeCalldata(data);
       if (decoded) {
-        const roleNames = { approve: ['spender'], transfer: ['recipient'], transferFrom: ['sender', 'recipient'] };
+        const roleNames = { approve: ['spender'], transfer: ['recipient'], transferFrom: ['sender', 'recipient'], setApprovalForAll: ['operator'] };
         decoded.params.forEach((p, i) => {
           if (typeof p === 'string' && isAddress(p)) {
             touched.push({ address: p, role: roleNames[decoded.name]?.[i] || `param${i}` });
           }
         });
+        // Run the approval guard on approval-shaped calls (this is the whole point of
+        // check-tx for an approve/permit/setApprovalForAll — without it the headline
+        // "unlimited approval" detector never fires on a real transaction).
+        findings.push(...checkApprovalFromDecoded(decoded, to, registry, network));
       }
       for (const addr of extractAddresses(data)) {
         if (!touched.some((t) => t.address.toLowerCase() === addr)) {
@@ -127,7 +131,7 @@ async function main() {
       const spender = requireAddress(args.spender, 'spender');
       if (args.token) requireAddress(args.token, 'token');
       if (args.amount === undefined) usage();
-      findings = checkApproval({ token: args.token, spender, amount: args.amount }, registry, network);
+      findings = checkApproval({ token: args.token, spender, amount: args.amount, kind: args.kind || 'approve' }, registry, network);
       break;
     }
 

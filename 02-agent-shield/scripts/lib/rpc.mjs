@@ -38,7 +38,14 @@ export function createRpcClient(rpcUrl, { fetchImpl = fetch, timeoutMs = 15000 }
         signal: controller.signal,
       });
       if (!res.ok) throw new RpcError(`RPC HTTP ${res.status}`);
-      const body = await res.json();
+      let body;
+      try {
+        body = await res.json();
+      } catch {
+        // An HTML error page / proxy response with HTTP 200 must NOT be reported as a
+        // transaction revert — surface it as a distinct transport error.
+        throw new RpcError('non-JSON response from RPC (transport/proxy error, not a revert)');
+      }
       if (body.error) {
         throw new RpcError(body.error.message || 'RPC error', {
           code: body.error.code,

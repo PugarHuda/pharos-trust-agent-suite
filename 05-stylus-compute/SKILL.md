@@ -59,7 +59,7 @@ the score off-chain and confirm the on-chain WASM result — `compute verify` do
 npm install   # ethers only, for ABI encoding + eth_call
 
 # Score locally with the JS reference (no chain needed)
-node scripts/compute.mjs score --features 0.2,1,0.1,0      # -> local score 0.49...
+node scripts/compute.mjs score --features 0.2,1,0.1,0      # -> local score 0.647887
 node scripts/compute.mjs gate  --features 1,1,1,1          # -> BLOCK (exit 1)
 
 # After deploying the Stylus contract, call it on-chain (read-only eth_call, no key/gas)
@@ -68,7 +68,7 @@ node scripts/compute.mjs score  --onchain --address 0xSTYLUS --features 0.2,1,0.
 # Prove the on-chain WASM result matches the JS reference exactly
 node scripts/compute.mjs verify --address 0xSTYLUS --features 0.2,1,0.1,0   # -> MATCH ✓
 
-npm test   # 9 tests: bounds, monotonicity, gate, determinism, exact known-vector
+npm test   # 15 tests: bounds, monotonicity, gate, determinism, negative-z parity, 1000-vector parity fuzz
 ```
 
 ### Building & deploying the Stylus contract

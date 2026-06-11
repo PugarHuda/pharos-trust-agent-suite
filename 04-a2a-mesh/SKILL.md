@@ -76,7 +76,7 @@ x402 payment itself uses the official Pharos stack (`@x402/fetch` client, `@x402
 the spending policy — see `references/x402-and-reputation.md`. The settlement tx hash becomes the
 `--ref` that gates the rating.
 
-Run `npm test` for the 11-case suite (discovery, owner-guards, and the anti-sybil reputation core:
+Run `npm test` for the 15-case suite (discovery, pagination, owner-guards, and the anti-sybil reputation core:
 non-payer can't rate, double-rate reverts, per-counterparty collusion cap) against an in-memory EVM.
 
 ## Reputation model (anti-gaming)

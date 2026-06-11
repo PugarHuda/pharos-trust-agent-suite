@@ -7,15 +7,17 @@ official Pharos Skill format (`SKILL.md` + `references/` + `assets/`). The suite
 > Hackathon: Skill-to-Agent Dual Cascade (Phase 1) · Prize pool 50,000 PROS (Phase 1: 20,000 PROS / 40 winners)
 > Network: Pharos Atlantic Testnet (chainId **688689**) · Submission deadline **2026-06-15**
 
-## Status: all five skills implemented · 69 passing tests
+## Status: all five skills implemented · 110 passing tests
 
 | # | Skill | One-liner | Status | Tests |
 |---|-------|-----------|--------|-------|
-| 1 | **agent-treasury** | Smart-account wallet with on-chain spending policy, session keys, kill-switch | Contract compiles; CLI on ethers; policy proven on in-memory EVM | 12 |
-| 2 | **agent-shield** | Pre-flight security: simulate, balance-diff, registry/poisoning verify, approval & skill scanning | Zero-dependency CLI; live-tested vs Atlantic RPC | 20 |
-| 3 | **agent-strategy** | Autonomous DeFi: oracle read → rule DSL → policy-bounded swap, one NL instruction | Live Chainlink read on Atlantic; full evaluator | 17 |
-| 4 | **a2a-mesh** | Agent-to-agent discovery + x402 payment + payment-gated on-chain reputation | Two contracts compile; anti-sybil core tested | 11 |
-| 5 | **stylus-compute** | Rust/WASM risk classifier gating a treasury spend, with a bit-identical verifiable JS reference | Source + JS reference + CLI done (WASM deploy pending a build host) | 9 |
+| 1 | **agent-treasury** | Smart-account wallet with on-chain spending policy, session keys, kill-switch | Contract compiles; CLI on ethers; policy proven on in-memory EVM | 25 |
+| 2 | **agent-shield** | Pre-flight security: simulate, balance-diff, registry/poisoning verify, approval & skill scanning | Zero-dependency CLI; live-tested vs Atlantic RPC | 30 |
+| 3 | **agent-strategy** | Autonomous DeFi: oracle read → rule DSL → policy-bounded swap, one NL instruction | Live Chainlink read on Atlantic; full evaluator | 25 |
+| 4 | **a2a-mesh** | Agent-to-agent discovery + x402 payment + payment-gated on-chain reputation | Two contracts compile; anti-sybil core tested | 15 |
+| 5 | **stylus-compute** | Rust/WASM risk classifier gating a treasury spend, with a bit-identical verifiable JS reference | Source + JS reference + CLI done (WASM deploy pending a build host) | 15 |
+
+A multi-agent adversarial QA pass hardened every skill against real findings — see [`QA.md`](QA.md).
 
 Each skill is a standalone Node package: `npm install && npm test`. No skill hardcodes a key or a
 network — keys come from env vars, networks from `assets/networks.json`. See `DEPLOY.md` for putting

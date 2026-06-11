@@ -51,9 +51,14 @@ export function classifyAddress(address, registry, network = 'atlantic-testnet')
   const body = addr.slice(2);
   for (const k of known) {
     const { prefix, suffix } = matchLengths(body, k.address.slice(2));
-    // Classic poisoning copies the visible ends of a trusted address:
-    // both ends match but the middle differs.
-    if (prefix >= minMatch && suffix >= minMatch) {
+    // Leading-zero runs carry NO anti-poisoning signal: canonical addresses like
+    // Permit2 (0x000000000022..) and EntryPoint (0x0000000071..) start with many
+    // zeros, so any zero-padded vanity/CREATE2 address would share a long zero
+    // prefix by coincidence. Require the shared prefix to contain real (non-zero)
+    // hex so the match reflects a deliberate look-alike, not zero padding.
+    const sharedPrefix = body.slice(0, prefix);
+    const nonZeroPrefix = sharedPrefix.replace(/0/g, '').length;
+    if (prefix >= minMatch && suffix >= minMatch && nonZeroPrefix >= 3) {
       return {
         status: 'poisoning-suspect',
         lookalike: { address: k.address, label: k.label, prefix, suffix },

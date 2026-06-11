@@ -130,14 +130,57 @@ test('confidence ramps with sample size (20 ratings = full weight)', async () =>
   assert.equal(score[0], 80n);
 });
 
-test('per-counterparty cap limits collusion (PAIR_CAP=10)', async () => {
+test('per-counterparty cap limits collusion: 11th rating reverts PairCapReached', async () => {
   const { chain, reputation, REP } = await setup();
-  // same payer rates the same provider 12 times; only first 10 count
-  for (let i = 0; i < 12; i++) {
+  // 10 distinct paid refs from the same payer→provider all count...
+  for (let i = 0; i < 10; i++) {
     const ref = id('collude-' + i);
     await chain.send(REP, reputation, RECORDER, 'recordPayment', [ref, CONSUMER, PROVIDER_A, 1000n]);
     await chain.send(REP, reputation, CONSUMER, 'rate', [ref, 5]);
   }
+  // ...the 11th reverts rather than silently no-op'ing (so every Rated event counted).
+  const ref11 = id('collude-10');
+  await chain.send(REP, reputation, RECORDER, 'recordPayment', [ref11, CONSUMER, PROVIDER_A, 1000n]);
+  await assert.rejects(chain.send(REP, reputation, CONSUMER, 'rate', [ref11, 5]), /PairCapReached/);
   const count = await chain.call(REP, reputation, 'ratingCount', [PROVIDER_A]);
-  assert.equal(count[0], 10n); // capped
+  assert.equal(count[0], 10n);
+});
+
+test('recordPayment rejects re-recording a ref (no resetting the once-only rating)', async () => {
+  const { chain, reputation, REP } = await setup();
+  await chain.send(REP, reputation, RECORDER, 'recordPayment', [REF1, CONSUMER, PROVIDER_A, 1000n]);
+  await chain.send(REP, reputation, CONSUMER, 'rate', [REF1, 5]);
+  // attacker can't re-record REF1 to clear `rated` and rate again
+  await assert.rejects(
+    chain.send(REP, reputation, RECORDER, 'recordPayment', [REF1, CONSUMER, PROVIDER_A, 1000n]),
+    /AlreadyRecorded/,
+  );
+});
+
+test('recordPayment rejects self-dealing (payer == provider)', async () => {
+  const { chain, reputation, REP } = await setup();
+  await assert.rejects(
+    chain.send(REP, reputation, RECORDER, 'recordPayment', [REF1, PROVIDER_A, PROVIDER_A, 1000n]),
+    /SelfDeal/,
+  );
+});
+
+test('recordPayment rejects zero-address payer/provider', async () => {
+  const { chain, reputation, REP } = await setup();
+  const ZERO = '0x' + '00'.repeat(20);
+  await assert.rejects(
+    chain.send(REP, reputation, RECORDER, 'recordPayment', [REF1, ZERO, PROVIDER_A, 1000n]),
+    /ZeroAddress/,
+  );
+});
+
+test('getByTagPaged returns a bounded slice', async () => {
+  const { chain, registry, R } = await setup();
+  for (let i = 0; i < 5; i++) {
+    await chain.send(R, registry, PROVIDER_A, 'register', [TAG_COMPUTE, `https://svc${i}.example`, 100n]);
+  }
+  const page = await chain.call(R, registry, 'getByTagPaged', [TAG_COMPUTE, 1n, 2n]);
+  assert.equal(page[0].length, 2);
+  const count = await chain.call(R, registry, 'tagCount', [TAG_COMPUTE]);
+  assert.equal(count[0], 5n);
 });

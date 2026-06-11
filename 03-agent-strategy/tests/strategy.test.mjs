@@ -2,8 +2,61 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { compileRule, validateRule, RuleError } from '../scripts/lib/rules.mjs';
 import { evaluate } from '../scripts/lib/strategy.mjs';
-import { readPrice, OracleError, agrees } from '../scripts/lib/oracle.mjs';
+import { readPrice, OracleError, agrees, scalePrice } from '../scripts/lib/oracle.mjs';
 import { applySlippage, buildSwapCalldata, buildSwapPlan, routerIface, treasuryIface } from '../scripts/lib/swap.mjs';
+
+// ---- rule compiler: misparse regressions (from QA) ----
+
+test('slippage % is NOT mistaken for the stop-loss drop %', () => {
+  // QA #1 / B6: "0.5% slippage" must not become dropPct.
+  const r = compileRule('sell WETH with 0.5% slippage if it drops 10%');
+  assert.equal(r.kind, 'stop-loss');
+  assert.equal(r.dropPct, 10);
+  assert.equal(r.slippageBps, 50);
+});
+
+test('stop-loss accepts "percent" word and negative drop', () => {
+  assert.equal(compileRule('sell WBTC if it falls 10 percent').dropPct, 10);
+  assert.equal(compileRule('stop-loss WETH -15%').dropPct, 15);
+});
+
+test('DCA "every 2 months" is months, not minutes (QA #10)', () => {
+  const r = compileRule('DCA 5 USDC into WETH every 2 months');
+  assert.equal(r.intervalSeconds, 2 * 2592000);
+});
+
+test('DCA supports weekly and rejects unknown intervals', () => {
+  assert.equal(compileRule('DCA 5 USDC into WETH weekly').intervalSeconds, 604800);
+  assert.equal(compileRule('DCA 5 USDC into WETH every 30 minutes').intervalSeconds, 1800);
+  assert.throws(() => compileRule('DCA 5 USDC into WETH every fortnight'), RuleError);
+});
+
+test('threshold price accepts comma grouping (QA #13)', () => {
+  const r = compileRule('sell WBTC when price > 4,000');
+  assert.equal(r.kind, 'threshold');
+  assert.equal(r.price, 4000);
+});
+
+test('rebalance tolerates fractional targets that sum to ~100', () => {
+  const r = validateRule({ kind: 'rebalance', tokenA: 'PROS', tokenB: 'USDC', targetA: 33.33, targetB: 66.67, bandPct: 5, slippageBps: 50 });
+  assert.equal(r.kind, 'rebalance');
+});
+
+test('applySlippage refuses zero quote or out-of-range slippage', () => {
+  assert.throws(() => applySlippage(0n, 50), /quoteOut/);
+  assert.throws(() => applySlippage(1000n, 0), /slippageBps/);
+  assert.throws(() => applySlippage(1000n, 20000), /slippageBps/);
+});
+
+test('scalePrice keeps precision for 18-decimal feeds (no Number() corruption)', () => {
+  // BTC/USD ~ $62,409.97133 reported as an 18-decimal int256.
+  const raw = 62_409_971_330_000_000_000_000n; // 6.24e22, far above MAX_SAFE_INTEGER
+  const { price, micro } = scalePrice(raw, 18);
+  assert.equal(micro, 62_409_971_330n); // exact 6-dp integer
+  assert.ok(Math.abs(price - 62_409.97133) < 0.001);
+  // 8-decimal feeds (standard Chainlink) still work
+  assert.equal(scalePrice(6_000_000_000n, 8).price, 60);
+});
 
 // ---- rule compiler ----
 

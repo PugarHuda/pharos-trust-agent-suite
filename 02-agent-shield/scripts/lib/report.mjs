@@ -7,9 +7,12 @@ export function makeFinding(severity, title, detail) {
   return { severity, title, detail };
 }
 
-export function aggregate(findings, weights = DEFAULT_WEIGHTS) {
+export function aggregate(findings, weights = {}) {
+  // Merge any caller/registry-supplied weights OVER the defaults, so a custom
+  // registry that specifies only some severities doesn't silently zero the rest.
+  const w = { ...DEFAULT_WEIGHTS, ...weights };
   let score = 100;
-  for (const f of findings) score -= weights[f.severity] ?? 0;
+  for (const f of findings) score -= w[f.severity] ?? 0;
   score = Math.max(0, score);
 
   const hasHigh = findings.some((f) => f.severity === 'high');
