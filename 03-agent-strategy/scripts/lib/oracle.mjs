@@ -34,7 +34,11 @@ export async function readPrice(provider, feedAddress, {
     answer = ans; updatedAt = Number(upd); source = 'latestRoundData';
   } catch (err) {
     if (err instanceof OracleError) throw err;
-    // Fallback to Pharos SelfManagedFeedsCacheProxy legacy getters.
+    // Only fall back when latestRoundData is genuinely unsupported (the call reverts),
+    // which is the Pharos SelfManagedFeedsCacheProxy case. A transient transport error
+    // should surface, not silently switch to a possibly-different read path.
+    const isRevert = err?.code === 'CALL_EXCEPTION' || /revert|not.*support|missing revert data|execution reverted/i.test(err?.message || '');
+    if (!isRevert) throw new OracleError(`oracle read failed: ${err.shortMessage || err.message}`);
     answer = await feed.latestAnswer();
     updatedAt = Number(await feed.latestTimestamp());
     source = 'latestAnswer';

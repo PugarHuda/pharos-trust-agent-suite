@@ -67,15 +67,34 @@ export function createRpcClient(rpcUrl, { fetchImpl = fetch, timeoutMs = 15000 }
   };
 }
 
-// Decode a Solidity Error(string) revert payload into readable text.
+// Common Solidity Panic(uint256) codes (0x4e487b71).
+const PANIC_CODES = {
+  '0x01': 'assert(false)',
+  '0x11': 'arithmetic overflow/underflow',
+  '0x12': 'division or modulo by zero',
+  '0x21': 'invalid enum value',
+  '0x31': 'pop on empty array',
+  '0x32': 'array index out of bounds',
+  '0x41': 'out of memory',
+  '0x51': 'call to an invalid/uninitialized function',
+};
+
+// Decode a Solidity revert payload — Error(string) or Panic(uint256) — into readable text.
 export function decodeRevertReason(data) {
-  if (typeof data !== 'string' || !data.startsWith('0x08c379a0')) return null;
-  try {
-    const hex = data.slice(10); // strip selector
-    const len = parseInt(hex.slice(64, 128), 16);
-    const strHex = hex.slice(128, 128 + len * 2);
-    return Buffer.from(strHex, 'hex').toString('utf8');
-  } catch {
-    return null;
+  if (typeof data !== 'string') return null;
+  if (data.startsWith('0x08c379a0')) {
+    try {
+      const hex = data.slice(10); // strip selector
+      const len = parseInt(hex.slice(64, 128), 16);
+      const strHex = hex.slice(128, 128 + len * 2);
+      return Buffer.from(strHex, 'hex').toString('utf8');
+    } catch {
+      return null;
+    }
   }
+  if (data.startsWith('0x4e487b71')) {
+    const code = '0x' + parseInt(data.slice(10), 16).toString(16).padStart(2, '0');
+    return `Panic(${code}): ${PANIC_CODES[code] || 'unknown panic'}`;
+  }
+  return null;
 }

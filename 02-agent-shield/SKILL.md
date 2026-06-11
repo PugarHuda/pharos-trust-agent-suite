@@ -75,15 +75,18 @@ npm test
 ## Output format
 
 ```
-verdict: warn            # pass | warn | fail
-score: 62                # 0-100, mirrors CertiK-style scoring
+verdict: fail            # pass | warn | fail
+score: 20                # 0-100, mirrors CertiK-style scoring
 findings:
-  - severity: high
-    title: Unlimited approval to unverified spender
-    detail: approve(0xRouter, type(uint256).max); spender not in registry
   - severity: info
-    title: Balance diff
-    detail: -1.0 USDC, +0.0 (no token received)
+    title: Decoded intent
+    detail: approve(0xRouter, 115792089237316195423570985008687907853269984665640564039457584007913129639935)
+  - severity: high
+    title: Unlimited approval
+    detail: approve grants an effectively unlimited allowance (>= 2^255) — use an exact amount
+  - severity: high
+    title: Approval to unverified spender
+    detail: spender 0xRouter is not in the official/known-good registry for atlantic-testnet
 recommendation: do-not-sign
 ```
 

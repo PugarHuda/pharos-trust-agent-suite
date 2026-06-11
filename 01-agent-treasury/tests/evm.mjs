@@ -131,17 +131,12 @@ export class Chain {
 function decodeError(iface, returnValue) {
   if (!returnValue || returnValue.length === 0) return null;
   const hex = bytesToHex(returnValue);
-  // Error(string) selector 0x08c379a0
-  if (hex.startsWith('0x08c379a0')) {
-    try {
-      return iface.constructor.from ? null : null;
-    } catch { /* fallthrough */ }
-  }
+  // Try a known custom error first (the contract uses these).
   try {
     const parsed = iface.parseError(hex);
     if (parsed) return parsed.name + (parsed.args.length ? `(${parsed.args.join(',')})` : '');
   } catch { /* not a known custom error */ }
-  // generic Error(string)
+  // Fall back to a standard Error(string) (selector 0x08c379a0).
   if (hex.startsWith('0x08c379a0')) {
     try {
       const len = parseInt(hex.slice(10 + 64, 10 + 128), 16);
