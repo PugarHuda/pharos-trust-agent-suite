@@ -72,6 +72,19 @@ async function main() {
   const readContract = () => new Contract(args.treasury, artifact.abi, provider);
 
   switch (cmd) {
+    case 'address': {
+      // Show the address + native balance for a key WITHOUT ever printing the key.
+      const which = args.session ? 'SESSION_PRIVATE_KEY' : 'OWNER_PRIVATE_KEY';
+      const signer = getSigner(which, provider);
+      const addr = await signer.getAddress();
+      const bal = await provider.getBalance(addr);
+      console.log(`${which.replace('_PRIVATE_KEY', '')} address: ${addr}`);
+      console.log(`  balance: ${formatUnits(bal, 18)} ${net.nativeToken} on ${net.name}`);
+      console.log(`  ${net.explorer}/address/${addr}`);
+      if (bal === 0n) console.error('  !! zero balance — fund this address from a faucet before deploying.');
+      break;
+    }
+
     case 'deploy': {
       const signer = getSigner('OWNER_PRIVATE_KEY', provider);
       const owner = args.owner || (await signer.getAddress());
@@ -177,7 +190,7 @@ async function main() {
 
     default:
       console.error(`unknown command "${cmd}". Run with no args for usage.`);
-      console.error('commands: deploy set-policy allow-contract grant-session revoke kill unkill spend status');
+      console.error('commands: address deploy set-policy allow-contract grant-session revoke kill unkill spend status');
       process.exit(2);
   }
 }

@@ -1,11 +1,25 @@
 // Shared config for the mesh CLI: networks, artifacts, signer, helpers.
 
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { Wallet, JsonRpcProvider, id } from 'ethers';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
+
+// Minimal zero-dependency .env loader (keys stay in a gitignored file).
+function loadEnv() {
+  const p = join(ROOT, '.env');
+  if (!existsSync(p)) return;
+  for (const line of readFileSync(p, 'utf8').split(/\r?\n/)) {
+    if (line.trim().startsWith('#')) continue;
+    const m = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$/);
+    if (!m) continue;
+    const val = m[2].trim().replace(/^['"]|['"]$/g, '');
+    if (!(m[1] in process.env)) process.env[m[1]] = val;
+  }
+}
+loadEnv();
 
 export function loadNetworks() {
   return JSON.parse(readFileSync(join(ROOT, 'assets', 'networks.json'), 'utf8'));

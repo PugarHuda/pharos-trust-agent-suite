@@ -56,6 +56,18 @@ async function main() {
   const REP = loadArtifact('Reputation');
 
   switch (cmd) {
+    case 'address': {
+      const which = args.payer ? 'PAYER_PRIVATE_KEY' : 'RECORDER_PRIVATE_KEY';
+      const signer = getSigner(which, provider);
+      const addr = await signer.getAddress();
+      const bal = await provider.getBalance(addr);
+      console.log(`${which.replace('_PRIVATE_KEY', '')} address: ${addr}`);
+      console.log(`  balance: ${formatUnits(bal, 18)} ${net.nativeToken} on ${net.name}`);
+      console.log(`  ${net.explorer}/address/${addr}`);
+      if (bal === 0n) console.error('  !! zero balance — fund this address from a faucet before deploying.');
+      break;
+    }
+
     case 'deploy': {
       const { ContractFactory } = await import('ethers');
       const signer = getSigner('RECORDER_PRIVATE_KEY', provider);
@@ -152,7 +164,7 @@ async function main() {
       break;
 
     default:
-      console.error('commands: deploy register discover record-payment rate score ref tag');
+      console.error('commands: address deploy register discover record-payment rate score ref tag');
       process.exit(2);
   }
 }

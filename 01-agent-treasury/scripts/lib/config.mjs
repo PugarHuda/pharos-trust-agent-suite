@@ -1,11 +1,27 @@
 // Shared config: networks, artifact ABI, key + amount helpers.
 
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { Wallet, JsonRpcProvider } from 'ethers';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
+
+// Minimal zero-dependency .env loader. Reads ROOT/.env (gitignored) into
+// process.env without overriding anything already set. Keeps private keys in a
+// local file, never on the command line.
+function loadEnv() {
+  const p = join(ROOT, '.env');
+  if (!existsSync(p)) return;
+  for (const line of readFileSync(p, 'utf8').split(/\r?\n/)) {
+    const m = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$/);
+    if (!m || line.trim().startsWith('#')) continue;
+    const key = m[1];
+    const val = m[2].trim().replace(/^['"]|['"]$/g, '');
+    if (!(key in process.env)) process.env[key] = val;
+  }
+}
+loadEnv();
 
 export function loadNetworks() {
   return JSON.parse(readFileSync(join(ROOT, 'assets', 'networks.json'), 'utf8'));
