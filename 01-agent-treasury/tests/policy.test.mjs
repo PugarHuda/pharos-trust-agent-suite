@@ -236,6 +236,52 @@ test('executeCall CANNOT drain a different policy token (cross-token guard)', as
   assert.equal(bBal[0], 0n);
 });
 
+test('executeCall sweep blocks an INDIRECT drain of another policy token (transferFrom via a router)', async () => {
+  // The guard only blocks targeting a different policy token directly; this exercises the
+  // balance-delta SWEEP: a non-policy router pulls token B out of the treasury via an
+  // allowance, and the post-call sweep must revert because B (not the bound token) dropped.
+  const { chain, treasury, T, M, tokenHex } = await setup(); // session bound to token A (tokenHex)
+  const tokenB = await chain.deploy(ARTIFACTS.MockERC20, OWNER);
+  const tokenBHex = bytesToHex(tokenB.bytes);
+  await chain.send(M, tokenB, OWNER, 'mint', [bytesToHex(treasury.bytes), 20_000_000n]);
+  await chain.send(T, treasury, OWNER, 'setPolicy', [tokenBHex, CAP]); // B is a policy token (swept)
+  const router = await chain.deploy(ARTIFACTS.DrainRouter, OWNER);
+  const routerHex = bytesToHex(router.bytes);
+  await chain.send(T, treasury, OWNER, 'setAllowedContract', [routerHex, true]);   // router allow-listed (non-policy)
+  await chain.send(T, treasury, OWNER, 'setAllowedContract', [tokenBHex, true]);   // allow approving B
+
+  // Treasury approves the router to spend its token B (session bound to B for this step).
+  await chain.send(T, treasury, OWNER, 'grantSession', [AGENT, tokenBHex, BUDGET, BigInt(chain.now + DAY)]);
+  const approveData = new Interface(M.abi).encodeFunctionData('approve', [routerHex, 10_000_000n]);
+  await chain.send(T, treasury, AGENT, 'executeCall', [tokenBHex, tokenBHex, 0n, approveData]);
+
+  // Re-bind the session to token A, then try to drain B through the router.
+  await chain.send(T, treasury, OWNER, 'grantSession', [AGENT, tokenHex, BUDGET, BigInt(chain.now + DAY)]);
+  const pullData = new Interface(ARTIFACTS.DrainRouter.abi).encodeFunctionData('pull',
+    [tokenBHex, bytesToHex(treasury.bytes), ATTACKER, 5_000_000n]);
+  await assert.rejects(
+    chain.send(T, treasury, AGENT, 'executeCall', [tokenHex, routerHex, 0n, pullData]),
+    /SpendExceedsAccounted/,
+  );
+  const stolen = await chain.call(M, tokenB, 'balanceOf', [ATTACKER]);
+  assert.equal(stolen[0], 0n); // sweep reverted the whole tx, nothing moved
+});
+
+test('setPolicy enforces MAX_POLICY_TOKENS', async () => {
+  const { chain, treasury, T } = await setup(); // already has 1 policy token (the demo token)
+  // add up to the cap, then expect the next to revert
+  let added = 1;
+  for (let i = 0; added < 32; i++) {
+    const t = '0x' + (i + 0x100).toString(16).padStart(40, '0');
+    await chain.send(T, treasury, OWNER, 'setPolicy', [t, CAP]);
+    added++;
+  }
+  await assert.rejects(
+    chain.send(T, treasury, OWNER, 'setPolicy', ['0x' + 'fe'.repeat(20), CAP]),
+    /TooManyPolicyTokens/,
+  );
+});
+
 test('executeCall allows an approval (moves 0 tokens, within any budget)', async () => {
   // Approvals move no balance, so delta 0 <= spendAmount always — the strategy skill relies on this.
   const { chain, token, treasury, T, M, tokenHex } = await setup();

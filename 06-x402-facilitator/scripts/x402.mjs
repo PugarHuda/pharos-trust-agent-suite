@@ -10,9 +10,9 @@
 // Global: --network atlantic-testnet --rpc-url URL --json
 
 import { readFileSync } from 'node:fs';
-import { JsonRpcProvider, Wallet, Contract, hexlify, randomBytes } from 'ethers';
-import { tokenDomain, buildAuthorization, signPayment, verifyPayment } from './lib/scheme.mjs';
-import { settle } from './lib/facilitator.mjs';
+import { JsonRpcProvider, Wallet, getAddress, hexlify, randomBytes } from 'ethers';
+import { buildAuthorization, signPayment, verifyPayment } from './lib/scheme.mjs';
+import { settle, resolveTokenDomain } from './lib/facilitator.mjs';
 import { loadNetworks } from './lib/config.mjs';
 
 function parseArgs(argv) {
@@ -32,11 +32,6 @@ function loadPayment(arg) {
   try { return JSON.parse(raw); } catch { die('--payment is not valid JSON'); }
 }
 
-async function tokenName(token, provider, fallback) {
-  try { return await new Contract(token, ['function name() view returns (string)'], provider).name(); }
-  catch { return fallback || 'USD Coin'; }
-}
-
 async function main() {
   const [cmd, ...rest] = process.argv.slice(2);
   const args = parseArgs(rest);
@@ -45,6 +40,8 @@ async function main() {
   const net = networks[netName] || die(`unknown network ${netName}`);
   const rpcUrl = args.rpcUrl || net.rpcUrl;
   const provider = new JsonRpcProvider(rpcUrl, net.chainId, { staticNetwork: true });
+  const regEntry = (t) => Object.values(net.tokens || {}).find((x) => getAddress(x.address) === getAddress(t));
+  const domainFor = (t) => resolveTokenDomain(t, net.chainId, { provider, registryEntry: regEntry(t), version: args.version, name: args.name });
 
   switch (cmd) {
     case 'supported':
@@ -56,8 +53,7 @@ async function main() {
       const to = args.to || die('--to 0x.. required');
       const amount = BigInt(args.amount ?? die('--amount <baseUnits> required'));
       const pk = process.env.PAYER_PRIVATE_KEY || die('set PAYER_PRIVATE_KEY');
-      const name = args.name || await tokenName(token, provider);
-      const domain = tokenDomain({ name, version: args.version || '1', chainId: net.chainId, token });
+      const domain = await domainFor(token);
       const now = Math.floor(Date.now() / 1000);
       const auth = buildAuthorization({
         from: new Wallet(pk.startsWith('0x') ? pk : '0x' + pk).address,
@@ -73,8 +69,7 @@ async function main() {
     case 'verify': {
       const payment = loadPayment(args.payment);
       const token = args.token || die('--token required');
-      const name = args.name || await tokenName(token, provider);
-      const domain = tokenDomain({ name, version: args.version || '1', chainId: net.chainId, token });
+      const domain = await domainFor(token);
       const requirements = {
         scheme: 'exact-evm', network: `eip155:${net.chainId}`,
         maxAmountRequired: BigInt(args.amount ?? die('--amount required')).toString(),
@@ -90,8 +85,7 @@ async function main() {
       const payment = loadPayment(args.payment);
       const token = args.token || die('--token required');
       const pk = process.env.FACILITATOR_PRIVATE_KEY || die('set FACILITATOR_PRIVATE_KEY (gas payer)');
-      const name = args.name || await tokenName(token, provider);
-      const domain = tokenDomain({ name, version: args.version || '1', chainId: net.chainId, token });
+      const domain = await domainFor(token);
       const signer = new Wallet(pk.startsWith('0x') ? pk : '0x' + pk, provider);
       const res = await settle(payment, domain, signer);
       if (res.success) console.log(`SETTLED — ${res.txHash}  ${net.explorer}/tx/${res.txHash}`);

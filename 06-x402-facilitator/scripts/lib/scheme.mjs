@@ -81,7 +81,9 @@ export function verifyPayment(payment, requirements, domain, { now = Math.floor(
     if (getAddress(domain.verifyingContract).toLowerCase() !== getAddress(requirements.asset).toLowerCase()) {
       return fail('asset (token) does not match the signing domain');
     }
-    if (now < auth.validAfter) return fail('authorization not yet valid (validAfter in the future)');
+    // EIP-3009 on-chain requires now > validAfter (strict) and now < validBefore.
+    // Match it exactly so verify never passes a payment that settle would revert.
+    if (now <= auth.validAfter) return fail('authorization not yet valid (validAfter not yet passed)');
     if (now >= auth.validBefore) return fail('authorization expired (validBefore passed)');
 
     const recovered = verifyTypedData(domain, EIP3009_TYPES, auth, payment.payload.signature);

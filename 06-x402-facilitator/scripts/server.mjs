@@ -11,9 +11,9 @@
 // Env: FACILITATOR_PRIVATE_KEY (gas payer for settle). Flags: --port 4021 --network atlantic-testnet
 
 import { createServer } from 'node:http';
-import { JsonRpcProvider, Wallet, Contract } from 'ethers';
-import { tokenDomain, verifyPayment } from './lib/scheme.mjs';
-import { settle } from './lib/facilitator.mjs';
+import { JsonRpcProvider, Wallet, getAddress } from 'ethers';
+import { verifyPayment } from './lib/scheme.mjs';
+import { settle, resolveTokenDomain } from './lib/facilitator.mjs';
 import { loadNetworks } from './lib/config.mjs';
 
 const args = {};
@@ -25,16 +25,20 @@ const net = networks[netName];
 const provider = new JsonRpcProvider(args.rpcUrl || net.rpcUrl, net.chainId, { staticNetwork: true });
 const PORT = Number(args.port || 4021);
 
-async function domainFor(token, name, version) {
-  let n = name;
-  if (!n) { try { n = await new Contract(token, ['function name() view returns (string)'], provider).name(); } catch { n = 'USD Coin'; } }
-  return tokenDomain({ name: n, version: version || '1', chainId: net.chainId, token });
+// The facilitator owns the signing domain (registry + on-chain name), NOT the client.
+function registryEntryFor(token) {
+  return Object.values(net.tokens || {}).find((t) => getAddress(t.address) === getAddress(token));
+}
+async function domainFor(token) {
+  return resolveTokenDomain(token, net.chainId, { provider, registryEntry: registryEntryFor(token) });
 }
 
 function readBody(req) {
   return new Promise((resolve, reject) => {
-    let b = ''; req.on('data', (c) => { b += c; if (b.length > 1e6) req.destroy(); });
+    let b = '';
+    req.on('data', (c) => { b += c; if (b.length > 1e6) { req.destroy(); reject(new Error('request body too large')); } });
     req.on('end', () => { try { resolve(b ? JSON.parse(b) : {}); } catch (e) { reject(e); } });
+    req.on('error', reject);
   });
 }
 const send = (res, code, obj) => { res.writeHead(code, { 'content-type': 'application/json' }); res.end(JSON.stringify(obj)); };
@@ -46,9 +50,11 @@ const server = createServer(async (req, res) => {
     }
     if (req.method === 'POST' && (req.url === '/verify' || req.url === '/settle')) {
       const body = await readBody(req);
-      const { payment, requirements, token, tokenName, version } = body;
+      const { payment, requirements, token } = body;
       if (!payment || !token) return send(res, 400, { error: 'payment and token are required' });
-      const domain = await domainFor(token, tokenName, version);
+      // Domain is resolved server-side (registry + on-chain name) — client-supplied
+      // name/version are intentionally ignored so a client can't forge the domain.
+      const domain = await domainFor(token);
 
       if (req.url === '/verify') {
         if (!requirements) return send(res, 400, { error: 'requirements required' });

@@ -232,6 +232,37 @@ test('recordPaymentSigned: self-deal (signer == provider) is rejected', async ()
   );
 });
 
+test('recordPaymentSigned: a signature for a DIFFERENT chainId does not credit the real payer (replay binding)', async () => {
+  const { chain, reputation, REP } = await setup();
+  const repHex = bytesToHex(reputation.bytes);
+  // sign with the wrong chainId (999) — the on-chain domain uses chainId 1, so the
+  // recovered signer differs from the real payer, who therefore can't rate it.
+  const wrongDomain = { name: 'AnvitaMeshReputation', version: '1', chainId: 999, verifyingContract: repHex };
+  const types = { PaymentAuth: [{ name: 'ref', type: 'bytes32' }, { name: 'provider', type: 'address' }, { name: 'amount', type: 'uint256' }] };
+  const sig = await PAYER_WALLET.signTypedData(wrongDomain, types, { ref: REF1, provider: PROVIDER_A, amount: 1000n });
+  await chain.send(REP, reputation, RECORDER, 'recordPaymentSigned', [REF1, PROVIDER_A, 1000n, sig]);
+  const p = await chain.call(REP, reputation, 'payments', [REF1]);
+  assert.notEqual(p.payer.toLowerCase(), PAYER_WALLET.address.toLowerCase()); // real payer NOT credited
+});
+
+test('recordPaymentSigned: a malleable (high-s) signature is rejected', async () => {
+  const { chain, reputation, REP } = await setup();
+  const repHex = bytesToHex(reputation.bytes);
+  const sig = await signAuth(repHex, REF1, PROVIDER_A, 1000n);
+  // Flip s to its high-s equivalent (N - s) and toggle v — the canonical malleability transform.
+  const N = 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141n;
+  const r = sig.slice(2, 66);
+  const s = BigInt('0x' + sig.slice(66, 130));
+  const vByte = parseInt(sig.slice(130, 132), 16);
+  const s2 = (N - s).toString(16).padStart(64, '0');
+  const v2 = (vByte === 27 ? 28 : 27).toString(16).padStart(2, '0');
+  const malleable = '0x' + r + s2 + v2;
+  await assert.rejects(
+    chain.send(REP, reputation, RECORDER, 'recordPaymentSigned', [REF1, PROVIDER_A, 1000n, malleable]),
+    /BadSignature/,
+  );
+});
+
 test('getByTagPaged returns a bounded slice', async () => {
   const { chain, registry, R } = await setup();
   for (let i = 0; i < 5; i++) {

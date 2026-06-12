@@ -92,6 +92,11 @@ contract Reputation {
     ///         anyone (a relayer/facilitator), because the signature — not the caller — is the
     ///         authorization. This is the trustless path: a relayer cannot fabricate a payment for a
     ///         payer whose key it does not hold.
+    /// @dev    `ref` is the anti-replay key (one record per ref) and the EIP-712 domain binds this
+    ///         contract + chainId, so a signature can't be replayed on another deployment/chain.
+    ///         A third party could front-run a known `ref` to block it (AlreadyRecorded) — a liveness
+    ///         grief, not a forgery (they still can't rate as someone else). Use the settlement tx
+    ///         hash as `ref` and relay promptly.
     function recordPaymentSigned(bytes32 ref, address provider, uint256 amount, bytes calldata signature) external {
         if (provider == address(0)) revert ZeroAddress();
         if (payments[ref].payer != address(0)) revert AlreadyRecorded();

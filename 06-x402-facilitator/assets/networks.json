@@ -8,9 +8,10 @@
     "nativeToken": "PHRS",
     "default": true,
     "tokens": {
-      "USDC_x402": { "address": "0xE0BE08c77f415F577A1B3A9aD7a1Df1479564ec8", "decimals": 6, "note": "x402 demo USDC (docs: not an official address)" },
-      "USDC": { "address": "0xcfC8330f4BCAB529c625D12781b1C19466A9Fc8B", "decimals": 6 }
-    }
+      "USDC_x402": { "address": "0xE0BE08c77f415F577A1B3A9aD7a1Df1479564ec8", "decimals": 6, "note": "x402 demo USDC (docs: not an official address)", "eip712": { "version": "2" } },
+      "USDC": { "address": "0xcfC8330f4BCAB529c625D12781b1C19466A9Fc8B", "decimals": 6, "eip712": { "version": "2" } }
+    },
+    "_eip712_note": "version defaults to '2' (USDC EIP-3009 standard). name is read from the token's name() on-chain. If a token uses a different EIP-712 version, set it here, or verify will pass payments that settle would revert."
   },
   "pacific-mainnet": {
     "name": "Pharos Pacific Mainnet",

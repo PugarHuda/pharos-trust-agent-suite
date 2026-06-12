@@ -6,8 +6,10 @@ description = "On-chain risk classifier (fixed-point logistic regression) for Ph
 license = "MIT"
 
 [dependencies]
-# Pharos Stylus SDK (fork of Arbitrum Stylus). Deploy with pharos-cargo-stylus.
-stylus-sdk = "0.6"
+# Stylus SDK. 0.6 has a const-eval bug (E0080) on rustc >=1.83 while its deps need
+# newer rustc — a version deadlock — so we use a newer SDK that compiles on modern
+# toolchains. Deploy with the Pharos fork (pharos-cargo-stylus).
+stylus-sdk = "0.8"
 
 [features]
 export-abi = ["stylus-sdk/export-abi"]

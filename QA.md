@@ -80,6 +80,25 @@ it does not hold. Proven on-chain (`recordPaymentSigned` tx in DEPLOYMENTS.md) a
 (valid record + payer rates; bogus signature rejected; amount-tamper changes the recovered payer;
 signer==provider self-deal rejected).
 
+## Round 3 (new-code review: x402 facilitator + EIP-712 mesh + cross-token treasury)
+
+A third pass focused on code added after round 2. Test count 110 → **132**.
+
+| Skill | Finding | Resolution |
+|-------|---------|-----------|
+| **x402** (new skill) | **Client controlled the EIP-712 signing domain** (server took `tokenName`/`version` from the request body) — verify was only as trustworthy as a client-supplied domain. | The facilitator now owns the domain: `resolveTokenDomain` reads the token `name()` on-chain + `version` from a server-side registry (`networks.json` `eip712`); the server ignores client `tokenName`/`version`. |
+| x402 | Docs claimed malleable (high-`s`) / bad-`v` signatures were rejected, but `splitSignature` didn't. | Implemented the high-`s` (EIP-2) + `v∈{27,28}` rejection; now matches the docs. +test. |
+| x402 | `validAfter` boundary used `<` (accepts `now == validAfter`) but on-chain EIP-3009 is strict `>` — a 1-second verify/settle divergence. | Changed to `<=` to match on-chain exactly. +test. |
+| x402 | Default EIP-712 `version` was `'1'`; USDC-family EIP-3009 uses `'2'` → verify-pass/settle-revert. | Default is now `'2'`, overridable per-token in the registry. |
+| x402 | `readBody` size guard called `req.destroy()` without rejecting → hung request. | Now rejects on oversize / `error`. |
+| **mesh** | EIP-712 replay-binding, typehash↔CLI match, `_recover` guards all **confirmed correct**. `ref` front-running is a liveness grief (not forgery). | Documented the `ref` tradeoff in the contract; added cross-chain replay-rejection + high-`s` malleability tests. |
+| **treasury** | Cross-token guard + balance-delta sweep **confirmed sound** (sweep backstops the indirect `transferFrom` drain). `policyTokens` loop was unbounded (owner-inflicted DoS). | Added `MAX_POLICY_TOKENS = 32` cap in `setPolicy`. Added the load-bearing indirect-drain sweep test + the cap test. |
+| **stylus** | WASM build attempted across 5 toolchains/SDK combos; root-caused to a `ruint`-vs-rustc const-eval deadlock (not the contract). | Documented precisely in the skill; build needs the Pharos fork's matched toolchain. |
+
+> Round-3 reviewers for the unchanged skills (shield/strategy/stylus-JS) were not re-run (already
+> hardened in rounds 1–2); the new x402 skill and the new mesh/treasury code were reviewed in depth, and
+> shield/strategy/stylus were re-probed directly for regressions.
+
 ## Notes
 
 - All findings above were verified and fixed against the in-memory EVM / live Atlantic RPC, then locked

@@ -40,6 +40,7 @@ export function compile(files) {
 export const ARTIFACTS = compile([
   { name: 'AgentTreasury.sol', path: join(ROOT, 'contracts', 'AgentTreasury.sol') },
   { name: 'MockERC20.sol', path: join(ROOT, 'tests', 'fixtures', 'MockERC20.sol') },
+  { name: 'DrainRouter.sol', path: join(ROOT, 'tests', 'fixtures', 'DrainRouter.sol') },
 ]);
 
 export function addr(hex) {

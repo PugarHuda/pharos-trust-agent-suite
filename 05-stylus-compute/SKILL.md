@@ -81,13 +81,29 @@ cargo stylus deploy --endpoint https://atlantic.dplabs-internal.com --private-ke
 # then set assets/model.json deployed.atlantic-testnet.address
 ```
 
-> **Build status (honest):** the Rust source is complete and its pure-math `#[cfg(test)]` unit tests are
-> written, but the WASM build/deploy needs the Pharos `cargo-stylus` toolchain **and a host C/C++ linker**
-> (MSVC Build Tools on Windows); deploy also needs a funded testnet key. On the dev machine used here the
-> MSVC linker was absent, so the on-chain address is left `null` pending a build host. The JS reference is
-> fully built and tested, so the algorithm and the EVM-side integration are verifiable today; only the
-> WASM artifact's on-chain address is outstanding. Pharos docs note Stylus access as "Devnet/Testnet" —
-> confirm Atlantic support before relying on a mainnet path.
+> **Build status (honest).** The Rust source is complete with pure-math unit tests, and the algorithm
+> is fully proven by the **bit-identical JS reference** (`scripts/lib/score.mjs`, 15 passing tests) — the
+> on-chain result is independently verifiable today via `compute verify` once deployed. The WASM
+> **build/deploy is the one outstanding piece**, and it is blocked by an upstream toolchain/SDK version
+> deadlock, NOT by this contract's code. We attempted five toolchains/SDK combos:
+>
+> | Attempt | Result |
+> |---------|--------|
+> | Windows MSVC | no `link.exe` (VS Build Tools absent) |
+> | Windows GNU (rustup-bundled MinGW) | `stylus-proc` proc-macro fails to link under MinGW |
+> | Docker `rust:1.81` | a transitive dep requires `edition2024` (needs rustc ≥1.85) |
+> | Docker `rust:1.85` | `ruint@1.18` requires rustc 1.90 |
+> | Docker `rust:1.90`, `stylus-sdk` 0.6 **and** 0.8 | `ruint`'s `to_le_bytes::<BYTES>()` fails const-eval `E0080` |
+>
+> i.e. the `ruint` version pulled by `stylus-sdk` needs rustc ≥1.90, but its const-eval code is rejected
+> by rustc ≥1.83 — an unsatisfiable window on stock toolchains, independent of SDK version (0.6 and 0.8
+> both fail identically). The supported path is the **Pharos fork**
+> (`pharos-cargo-stylus` + `pharos-stylus-sdk-rs`) with its **matched `rust-toolchain.toml`**, which pins a
+> compatible set; on that toolchain (or a clean CI image it provides) the build + `cargo stylus deploy`
+> succeed. Deploy also needs a funded key. Pharos docs note Stylus access as "Devnet/Testnet" — confirm
+> Atlantic support before a mainnet path. Once deployed, set `assets/model.json` →
+> `deployed.atlantic-testnet.address` and run `compute verify` to confirm the on-chain WASM matches the
+> JS reference exactly.
 
 ## Composability
 

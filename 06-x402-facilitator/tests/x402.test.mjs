@@ -107,3 +107,24 @@ test('splitSignature round-trips a 65-byte signature', async () => {
   assert.match(s, /^0x[0-9a-f]{64}$/i);
   assert.throws(() => splitSignature('0x1234'), /65 bytes/);
 });
+
+test('splitSignature rejects malleable (high-s) and bad-v signatures', () => {
+  const r = 'a'.repeat(64);
+  // s just above N/2 (high-s) -> malleable, must reject
+  const highS = 'fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe';
+  assert.throws(() => splitSignature('0x' + r + highS + '1b'), /malleable/);
+  // a low-s with a bad v
+  const lowS = '1'.padStart(64, '0');
+  assert.throws(() => splitSignature('0x' + r + lowS + '05'), /invalid signature v/);
+  // v=0/1 (EIP-2098 yParity) is normalized, not rejected
+  assert.doesNotThrow(() => splitSignature('0x' + r + lowS + '00'));
+});
+
+test('validAfter boundary matches on-chain strict > (now == validAfter is NOT yet valid)', async () => {
+  const p = await makePayment({ validAfter: NOW });
+  const res = verifyPayment(p, requirements(), domain, { now: NOW });
+  assert.equal(res.isValid, false);
+  assert.match(res.reason, /not yet valid/);
+  // one second later it is valid
+  assert.equal(verifyPayment(await makePayment({ validAfter: NOW }), requirements(), domain, { now: NOW + 1 }).isValid, true);
+});

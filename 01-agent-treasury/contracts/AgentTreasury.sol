@@ -43,6 +43,9 @@ contract AgentTreasury {
     // every treasury asset's balance delta — not just the session's bound token.
     address[] public policyTokens;
     mapping(address => bool) private _isPolicyToken;
+    // Bound the sweep loop in executeCall so the owner can't (accidentally or otherwise)
+    // grow it until executeCall exceeds the block gas limit.
+    uint256 public constant MAX_POLICY_TOKENS = 32;
 
     // --- Events --------------------------------------------------------------
 
@@ -69,6 +72,7 @@ contract AgentTreasury {
     error SessionTokenMismatch();
     error SpendExceedsAccounted();
     error CrossTokenCall();
+    error TooManyPolicyTokens();
     error CallFailed();
     error ZeroAddress();
     error BadExpiry();
@@ -97,6 +101,7 @@ contract AgentTreasury {
         if (token == address(0)) revert ZeroAddress();
         dailyCap[token] = cap;
         if (cap > 0 && !_isPolicyToken[token]) {
+            if (policyTokens.length >= MAX_POLICY_TOKENS) revert TooManyPolicyTokens();
             _isPolicyToken[token] = true;
             policyTokens.push(token);
         }

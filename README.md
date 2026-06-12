@@ -7,16 +7,16 @@ official Pharos Skill format (`SKILL.md` + `references/` + `assets/`). The suite
 > Hackathon: Skill-to-Agent Dual Cascade (Phase 1) · Prize pool 50,000 PROS (Phase 1: 20,000 PROS / 40 winners)
 > Network: Pharos Atlantic Testnet (chainId **688689**) · Submission deadline **2026-06-15**
 
-## Status: six skills implemented · 126 passing tests
+## Status: six skills implemented · 132 passing tests
 
 | # | Skill | One-liner | Status | Tests |
 |---|-------|-----------|--------|-------|
-| 1 | **agent-treasury** | Smart-account wallet with on-chain spending policy, session keys, kill-switch | Contract compiles; CLI on ethers; policy proven on in-memory EVM | 25 |
+| 1 | **agent-treasury** | Smart-account wallet with on-chain spending policy, session keys, kill-switch | Contract compiles; CLI on ethers; policy proven on in-memory EVM | 28 |
 | 2 | **agent-shield** | Pre-flight security: simulate, balance-diff, registry/poisoning verify, approval & skill scanning | Zero-dependency CLI; live-tested vs Atlantic RPC | 30 |
 | 3 | **agent-strategy** | Autonomous DeFi: oracle read → rule DSL → policy-bounded swap, one NL instruction | Live Chainlink read on Atlantic; full evaluator | 25 |
-| 4 | **a2a-mesh** | Agent-to-agent discovery + x402 payment + payment-gated on-chain reputation | Two contracts compile; anti-sybil core tested | 15 |
+| 4 | **a2a-mesh** | Agent-to-agent discovery + x402 payment + payment-gated on-chain reputation (EIP-712 trustless) | Two contracts compile; anti-sybil core tested | 21 |
 | 5 | **stylus-compute** | Rust/WASM risk classifier gating a treasury spend, with a bit-identical verifiable JS reference | Source + JS reference + CLI done; WASM build via Docker/gnu | 15 |
-| 6 | **x402-facilitator** | Self-hostable x402 facilitator (verify + gasless settle of EIP-3009 payments) — fills the missing-facilitator gap | verify/settle/server/CLI + tests; verify core proven | 11 |
+| 6 | **x402-facilitator** | Self-hostable x402 facilitator (verify + gasless settle of EIP-3009 payments) — fills the missing-facilitator gap | verify/settle/server/CLI + tests; verify core proven | 13 |
 
 A multi-agent adversarial QA pass hardened every skill against real findings — see [`QA.md`](QA.md).
 
