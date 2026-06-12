@@ -20,8 +20,20 @@ contract Reputation {
 
     address public recorder; // address allowed to record settled payments (mesh settlement relayer / facilitator)
 
-    // interactionRef (e.g. settlement tx hash) => payment
+    // keccak256(payer, ref) => payment. Keying by (payer, ref) — not ref alone —
+    // means a third party can't front-run/squat a `ref` to block the real payer:
+    // each payer has its own ref-space, so griefing is impossible.
     mapping(bytes32 => Payment) public payments;
+
+    /// @notice The storage key for a (payer, ref) pair; off-chain readers use this to look up `payments`.
+    function paymentKey(address payer, bytes32 ref) public pure returns (bytes32) {
+        return keccak256(abi.encodePacked(payer, ref));
+    }
+
+    /// @notice Convenience reader: the payment a given payer recorded for `ref`.
+    function getPayment(address payer, bytes32 ref) external view returns (Payment memory) {
+        return payments[paymentKey(payer, ref)];
+    }
 
     // provider => aggregate reputation inputs
     mapping(address => uint256) public ratingCount;
@@ -82,8 +94,9 @@ contract Reputation {
     function recordPayment(bytes32 ref, address payer, address provider, uint256 amount) external onlyRecorder {
         if (payer == address(0) || provider == address(0)) revert ZeroAddress();
         if (payer == provider) revert SelfDeal();
-        if (payments[ref].payer != address(0)) revert AlreadyRecorded();
-        payments[ref] = Payment({payer: payer, provider: provider, amount: amount, rated: false});
+        bytes32 key = paymentKey(payer, ref);
+        if (payments[key].payer != address(0)) revert AlreadyRecorded();
+        payments[key] = Payment({payer: payer, provider: provider, amount: amount, rated: false});
         volume[provider] += amount;
         emit PaymentRecorded(ref, payer, provider, amount);
     }
@@ -92,14 +105,11 @@ contract Reputation {
     ///         anyone (a relayer/facilitator), because the signature — not the caller — is the
     ///         authorization. This is the trustless path: a relayer cannot fabricate a payment for a
     ///         payer whose key it does not hold.
-    /// @dev    `ref` is the anti-replay key (one record per ref) and the EIP-712 domain binds this
+    /// @dev    Payments are keyed by (payer, ref), so a third party CANNOT front-run/squat a `ref` to
+    ///         block the real payer — each payer has its own ref-space. The EIP-712 domain binds this
     ///         contract + chainId, so a signature can't be replayed on another deployment/chain.
-    ///         A third party could front-run a known `ref` to block it (AlreadyRecorded) — a liveness
-    ///         grief, not a forgery (they still can't rate as someone else). Use the settlement tx
-    ///         hash as `ref` and relay promptly.
     function recordPaymentSigned(bytes32 ref, address provider, uint256 amount, bytes calldata signature) external {
         if (provider == address(0)) revert ZeroAddress();
-        if (payments[ref].payer != address(0)) revert AlreadyRecorded();
 
         bytes32 structHash = keccak256(abi.encode(PAYMENT_AUTH_TYPEHASH, ref, provider, amount));
         bytes32 digest = keccak256(abi.encodePacked("\x19\x01", _DOMAIN_SEPARATOR, structHash));
@@ -107,7 +117,9 @@ contract Reputation {
         if (payer == address(0)) revert BadSignature();
         if (payer == provider) revert SelfDeal();
 
-        payments[ref] = Payment({payer: payer, provider: provider, amount: amount, rated: false});
+        bytes32 key = paymentKey(payer, ref);
+        if (payments[key].payer != address(0)) revert AlreadyRecorded();
+        payments[key] = Payment({payer: payer, provider: provider, amount: amount, rated: false});
         volume[provider] += amount;
         emit PaymentRecorded(ref, payer, provider, amount);
     }
@@ -135,9 +147,10 @@ contract Reputation {
     ///         actually counted (no silent no-ops, no indexer over-count).
     function rate(bytes32 ref, uint8 score) external {
         if (score < 1 || score > 5) revert BadScore();
-        Payment storage p = payments[ref];
-        if (p.payer == address(0)) revert UnknownInteraction();
-        if (msg.sender != p.payer) revert NotPayer();
+        // The payment is keyed by (caller, ref), so this both finds the caller's own payment
+        // and structurally enforces "only the payer can rate" — a non-payer's key won't exist.
+        Payment storage p = payments[paymentKey(msg.sender, ref)];
+        if (p.payer == address(0)) revert NotPayer();
         if (p.rated) revert AlreadyRated();
         if (pairCount[p.payer][p.provider] >= PAIR_CAP) revert PairCapReached();
         p.rated = true;

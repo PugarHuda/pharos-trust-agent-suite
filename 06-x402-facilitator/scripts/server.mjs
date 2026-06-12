@@ -43,6 +43,15 @@ function readBody(req) {
 }
 const send = (res, code, obj) => { res.writeHead(code, { 'content-type': 'application/json' }); res.end(JSON.stringify(obj)); };
 
+// Serialize on-chain settlements so concurrent /settle requests can't collide on
+// the facilitator EOA's nonce (each waits for the previous to broadcast).
+let settleQueue = Promise.resolve();
+function enqueueSettle(fn) {
+  const run = settleQueue.then(fn, fn);
+  settleQueue = run.catch(() => {}); // keep the chain alive even if one settle throws
+  return run;
+}
+
 const server = createServer(async (req, res) => {
   try {
     if (req.method === 'GET' && req.url === '/supported') {
@@ -68,7 +77,7 @@ const server = createServer(async (req, res) => {
       const pk = process.env.FACILITATOR_PRIVATE_KEY;
       if (!pk) return send(res, 500, { success: false, reason: 'facilitator has no FACILITATOR_PRIVATE_KEY configured' });
       const signer = new Wallet(pk.startsWith('0x') ? pk : '0x' + pk, provider);
-      return send(res, 200, await settle(payment, domain, signer));
+      return send(res, 200, await enqueueSettle(() => settle(payment, domain, signer)));
     }
     send(res, 404, { error: 'not found' });
   } catch (err) {

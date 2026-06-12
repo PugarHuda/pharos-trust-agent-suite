@@ -92,12 +92,23 @@ test('non-payer CANNOT rate (the differentiator)', async () => {
   );
 });
 
-test('rating an unknown (unpaid) interaction reverts', async () => {
+test('rating an unknown (unpaid) interaction reverts (no payment under caller+ref key)', async () => {
   const { chain, reputation, REP } = await setup();
   await assert.rejects(
     chain.send(REP, reputation, CONSUMER, 'rate', [id('never-paid'), 5]),
-    /UnknownInteraction/,
+    /NotPayer/,
   );
+});
+
+test('ref griefing is impossible: a squatter recording the same ref does not block the real payer', async () => {
+  const { chain, reputation, REP } = await setup();
+  // OUTSIDER front-runs REF1 (records their own payment for the same ref)...
+  await chain.send(REP, reputation, RECORDER, 'recordPayment', [REF1, OUTSIDER, PROVIDER_B, 1n]);
+  // ...the legitimate CONSUMER can still record + rate REF1 (different (payer,ref) key).
+  await chain.send(REP, reputation, RECORDER, 'recordPayment', [REF1, CONSUMER, PROVIDER_A, 1000n]);
+  await chain.send(REP, reputation, CONSUMER, 'rate', [REF1, 5]);
+  const score = await chain.call(REP, reputation, 'scoreOf', [PROVIDER_A]);
+  assert.equal(score[0], 5n);
 });
 
 test('double-rating the same interaction reverts', async () => {
@@ -192,7 +203,7 @@ test('recordPaymentSigned: a relayer can record a payer-signed payment, then the
   const sig = await signAuth(repHex, REF1, PROVIDER_A, 1000n);
   // The RELAYER (RECORDER) submits — not the payer. The contract derives the payer from the sig.
   await chain.send(REP, reputation, RECORDER, 'recordPaymentSigned', [REF1, PROVIDER_A, 1000n, sig]);
-  const p = await chain.call(REP, reputation, 'payments', [REF1]);
+  const p = (await chain.call(REP, reputation, 'getPayment', [PAYER_WALLET.address, REF1]))[0];
   assert.equal(p.payer.toLowerCase(), PAYER_WALLET.address.toLowerCase());
   // and only that payer (the signer) can rate it
   await chain.fund(PAYER_WALLET.address);
@@ -218,7 +229,7 @@ test('recordPaymentSigned: tampering the amount changes the recovered payer (can
   // Relayer submits a DIFFERENT amount with the same sig: ecrecover yields some other address,
   // so the payer recorded is NOT the real signer — the real payer's identity can't be hijacked.
   await chain.send(REP, reputation, RECORDER, 'recordPaymentSigned', [REF1, PROVIDER_A, 9_999_999n, sig]);
-  const p = await chain.call(REP, reputation, 'payments', [REF1]);
+  const p = (await chain.call(REP, reputation, 'getPayment', [PAYER_WALLET.address, REF1]))[0];
   assert.notEqual(p.payer.toLowerCase(), PAYER_WALLET.address.toLowerCase());
 });
 
@@ -241,7 +252,7 @@ test('recordPaymentSigned: a signature for a DIFFERENT chainId does not credit t
   const types = { PaymentAuth: [{ name: 'ref', type: 'bytes32' }, { name: 'provider', type: 'address' }, { name: 'amount', type: 'uint256' }] };
   const sig = await PAYER_WALLET.signTypedData(wrongDomain, types, { ref: REF1, provider: PROVIDER_A, amount: 1000n });
   await chain.send(REP, reputation, RECORDER, 'recordPaymentSigned', [REF1, PROVIDER_A, 1000n, sig]);
-  const p = await chain.call(REP, reputation, 'payments', [REF1]);
+  const p = (await chain.call(REP, reputation, 'getPayment', [PAYER_WALLET.address, REF1]))[0];
   assert.notEqual(p.payer.toLowerCase(), PAYER_WALLET.address.toLowerCase()); // real payer NOT credited
 });
 
