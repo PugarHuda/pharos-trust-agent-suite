@@ -10,12 +10,15 @@ Owner / deployer: `0x39D2bae5EAedA9283535dDC98F1991c81eD5Cd7E`
 
 | Item | Address / tx | Link |
 |------|--------------|------|
-| **AgentTreasury** | `0xDea6Da93265871d828B20cace2BADd5F5e70209d` | [addr](https://atlantic.pharosscan.xyz/address/0xDea6Da93265871d828B20cace2BADd5F5e70209d) |
-| Deploy tx | `0x1c0e8b72096da36a12ac6755521b7439d07c4564e698106dc93e78ea5d02c4ba` | [tx](https://atlantic.pharosscan.xyz/tx/0x1c0e8b72096da36a12ac6755521b7439d07c4564e698106dc93e78ea5d02c4ba) |
-| set-policy (USDC, 10/day) | `0xac9eec31710fc22694f1ce2276326a27a14af2d2b6b26dd54ca97006801fa783` | [tx](https://atlantic.pharosscan.xyz/tx/0xac9eec31710fc22694f1ce2276326a27a14af2d2b6b26dd54ca97006801fa783) |
-| allow-contract (WPHRS) | `0xf1b3acd0cb7f33330d537f2d66c4d4c38de327fdd661aaa63ecbaa92b4d27095` | [tx](https://atlantic.pharosscan.xyz/tx/0xf1b3acd0cb7f33330d537f2d66c4d4c38de327fdd661aaa63ecbaa92b4d27095) |
-| grant-session (5 USDC, 7d) | `0x4cb4eefde9aa11a085d8957f03d78b80cf8f67ab14db1c967ffd96dbc10dcd0c` | [tx](https://atlantic.pharosscan.xyz/tx/0x4cb4eefde9aa11a085d8957f03d78b80cf8f67ab14db1c967ffd96dbc10dcd0c) |
+| **AgentTreasury** (hardened build) | `0x0cdF46EE713Cfd910938E1B56BaEC6eACD18EF1c` | [addr](https://atlantic.pharosscan.xyz/address/0x0cdF46EE713Cfd910938E1B56BaEC6eACD18EF1c) |
+| Deploy tx | `0x350eda4984036f5693c05002db2b7035c03425bcc0fe5aff3501d7701966d07b` | [tx](https://atlantic.pharosscan.xyz/tx/0x350eda4984036f5693c05002db2b7035c03425bcc0fe5aff3501d7701966d07b) |
+| set-policy (USDC, 10/day) | `0x260f6352495457a887cb47e4c2eb612d74148ed4f1b931ea2071b010b5e46292` | [tx](https://atlantic.pharosscan.xyz/tx/0x260f6352495457a887cb47e4c2eb612d74148ed4f1b931ea2071b010b5e46292) |
+| allow-contract (WPHRS) | `0xe3e4c67bc0244c88fa71d850cc18e0118a9c1c3ca8f6a3b9db3b6063fce46748` | [tx](https://atlantic.pharosscan.xyz/tx/0xe3e4c67bc0244c88fa71d850cc18e0118a9c1c3ca8f6a3b9db3b6063fce46748) |
+| grant-session (5 USDC, 7d) | `0x0f46fa5c82e04352bf6d016a4f727efffffe659481db65f66e174454fa2a8004` | [tx](https://atlantic.pharosscan.xyz/tx/0x0f46fa5c82e04352bf6d016a4f727efffffe659481db65f66e174454fa2a8004) |
 | Blocked spend (the money shot) | Pre-flight caught `ContractNotAllowed` and refused to broadcast a spend to a non-allowlisted address — the guardrail works *before* a tx is even sent. | — |
+
+> A first treasury was deployed at `0xDea6Da93265871d828B20cace2BADd5F5e70209d`; it was redeployed
+> after the QA round-2 cross-token fix so the live bytecode matches the audited source above.
 
 ## a2a-mesh
 

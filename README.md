@@ -23,7 +23,7 @@ A multi-agent adversarial QA pass hardened every skill against real findings —
 
 | Contract | Address |
 |----------|---------|
-| AgentTreasury | [`0xDea6Da93265871d828B20cace2BADd5F5e70209d`](https://atlantic.pharosscan.xyz/address/0xDea6Da93265871d828B20cace2BADd5F5e70209d) |
+| AgentTreasury | [`0x0cdF46EE713Cfd910938E1B56BaEC6eACD18EF1c`](https://atlantic.pharosscan.xyz/address/0x0cdF46EE713Cfd910938E1B56BaEC6eACD18EF1c) |
 | ServiceRegistry | [`0xE92254E3722D190ffC77C0aCa6856610708b9246`](https://atlantic.pharosscan.xyz/address/0xE92254E3722D190ffC77C0aCa6856610708b9246) |
 | Reputation | [`0xE9DC8a36e8f14c85E687eEe26978692dA98cbeab`](https://atlantic.pharosscan.xyz/address/0xE9DC8a36e8f14c85E687eEe26978692dA98cbeab) |
 
