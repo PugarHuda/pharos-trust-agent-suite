@@ -24,13 +24,14 @@ A multi-agent adversarial QA pass hardened every skill against real findings —
 
 | Contract | Address |
 |----------|---------|
-| AgentTreasury | [`0x0cdF46EE713Cfd910938E1B56BaEC6eACD18EF1c`](https://atlantic.pharosscan.xyz/address/0x0cdF46EE713Cfd910938E1B56BaEC6eACD18EF1c) |
+| AgentTreasury | [`0x0954E50cBC85836C9E3FC6868d24b6118d974E9d`](https://atlantic.pharosscan.xyz/address/0x0954E50cBC85836C9E3FC6868d24b6118d974E9d) |
 | ServiceRegistry | [`0x851C251411Fe4F4bab586F775c7450f86A348EAD`](https://atlantic.pharosscan.xyz/address/0x851C251411Fe4F4bab586F775c7450f86A348EAD) |
 | Reputation | [`0x05465b9887D7952fAC76DF42D193aae55EbA5891`](https://atlantic.pharosscan.xyz/address/0x05465b9887D7952fAC76DF42D193aae55EbA5891) |
 
-Proven on-chain: treasury policy config + a **blocked** out-of-policy spend; a full A2A
-discover → pay → rate flow where a **non-payer's rating was rejected**; and a live Chainlink
-oracle read driving a strategy decision.
+Proven on-chain: a treasury **successful policy-allowed spend** *and* a **blocked** out-of-policy
+spend (with on-chain cap/budget accounting); a full A2A discover → pay → rate flow where the payment
+was recorded from a **payer EIP-712 signature** and a **non-payer's rating was rejected**; and a live
+Chainlink oracle read driving a strategy decision. Full tx hashes in `DEPLOYMENTS.md`.
 
 Each skill is a standalone Node package: `npm install && npm test`. No skill hardcodes a key or a
 network — keys come from env vars, networks from `assets/networks.json`. See `DEPLOY.md` for putting

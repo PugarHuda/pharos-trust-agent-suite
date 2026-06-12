@@ -10,26 +10,15 @@ Owner / deployer: `0x39D2bae5EAedA9283535dDC98F1991c81eD5Cd7E`
 
 | Item | Address / tx | Link |
 |------|--------------|------|
-| **AgentTreasury** (hardened build) | `0x0cdF46EE713Cfd910938E1B56BaEC6eACD18EF1c` | [addr](https://atlantic.pharosscan.xyz/address/0x0cdF46EE713Cfd910938E1B56BaEC6eACD18EF1c) |
-| Deploy tx | `0x350eda4984036f5693c05002db2b7035c03425bcc0fe5aff3501d7701966d07b` | [tx](https://atlantic.pharosscan.xyz/tx/0x350eda4984036f5693c05002db2b7035c03425bcc0fe5aff3501d7701966d07b) |
-| set-policy (USDC, 10/day) | `0x260f6352495457a887cb47e4c2eb612d74148ed4f1b931ea2071b010b5e46292` | [tx](https://atlantic.pharosscan.xyz/tx/0x260f6352495457a887cb47e4c2eb612d74148ed4f1b931ea2071b010b5e46292) |
-| allow-contract (WPHRS) | `0xe3e4c67bc0244c88fa71d850cc18e0118a9c1c3ca8f6a3b9db3b6063fce46748` | [tx](https://atlantic.pharosscan.xyz/tx/0xe3e4c67bc0244c88fa71d850cc18e0118a9c1c3ca8f6a3b9db3b6063fce46748) |
-| grant-session (5 USDC, 7d) | `0x0f46fa5c82e04352bf6d016a4f727efffffe659481db65f66e174454fa2a8004` | [tx](https://atlantic.pharosscan.xyz/tx/0x0f46fa5c82e04352bf6d016a4f727efffffe659481db65f66e174454fa2a8004) |
-| Blocked spend (the money shot) | Pre-flight caught `ContractNotAllowed` and refused to broadcast a spend to a non-allowlisted address — the guardrail works *before* a tx is even sent. | — |
+| **AgentTreasury** (round-3 hardened build) | `0x0954E50cBC85836C9E3FC6868d24b6118d974E9d` | [addr](https://atlantic.pharosscan.xyz/address/0x0954E50cBC85836C9E3FC6868d24b6118d974E9d) |
+| Deploy tx | `0x16adbefd6c4d7e656d428963760d6d003f3de5d38a77939117d0990d724254e9` | [tx](https://atlantic.pharosscan.xyz/tx/0x16adbefd6c4d7e656d428963760d6d003f3de5d38a77939117d0990d724254e9) |
+| Demo token (MockERC20) + mint 100 → treasury | `0xda0cEB552af13f5a096D8aA4E5A9FceB9cf6D8D0` / `0x72bd5d95…` | [token](https://atlantic.pharosscan.xyz/address/0xda0cEB552af13f5a096D8aA4E5A9FceB9cf6D8D0) · [mint](https://atlantic.pharosscan.xyz/tx/0x72bd5d95cb4c8739eea28b7bcdc926def0b9e44f5878de4998df8f2022d4bc30) |
+| set-policy + allow + grant-session | `0x7351f728…`, `0xbdf823ca…`, `0xcdb5e43a…` | [policy](https://atlantic.pharosscan.xyz/tx/0x7351f728601ac35e489f6d6dcf7268d25007cefef09b11e5cd5b904c9b3448f6) · [allow](https://atlantic.pharosscan.xyz/tx/0xbdf823cad10829a14ee68b418c7f7a8cfa4c32add4b1d29da96f93f89d5c398b) · [session](https://atlantic.pharosscan.xyz/tx/0xcdb5e43a081ea0a96c1cc00c3cc2775ec726b869386cd03743ce536522349947) |
+| **✅ Successful policy-allowed spend** (1 token → allow-listed service) | `0x1fcd2c629d0a805bed93d99edfc150d3afcf375f44157b7ee331329c49d50634` | [tx](https://atlantic.pharosscan.xyz/tx/0x1fcd2c629d0a805bed93d99edfc150d3afcf375f44157b7ee331329c49d50634) |
+| **❌ Blocked spend** (same token, non-allowlisted dest) | pre-flight caught `ContractNotAllowed` and refused to broadcast — the guardrail fires *before* a tx is sent | — |
 
-### Full success + blocked path (with a deployed demo ERC-20, since canonical testnet USDC has no faucet)
-
-| Item | Address / tx | Link |
-|------|--------------|------|
-| Demo token (MockERC20) | `0xF97C6Bd1fA133341175cfE362D67160D43e0342A` | [addr](https://atlantic.pharosscan.xyz/address/0xF97C6Bd1fA133341175cfE362D67160D43e0342A) |
-| Mint 100 → treasury | `0x006c08e7ff8e72644c1d0dc1d6be1ff7b5c0bc927a297164997e384658932797` | [tx](https://atlantic.pharosscan.xyz/tx/0x006c08e7ff8e72644c1d0dc1d6be1ff7b5c0bc927a297164997e384658932797) |
-| set-policy + allow + session | `0x85c71607…`, `0x4c31ec2e…`, `0xd72ed33a…` | [policy](https://atlantic.pharosscan.xyz/tx/0x85c716079ac4a325259c055d655524373a716ec29550ea544265e15d73f413b3) · [allow](https://atlantic.pharosscan.xyz/tx/0x4c31ec2e5948dcf490e0d9b7f6b677ec2cf1f4d9034b6ff5264c8c77c27a6047) · [session](https://atlantic.pharosscan.xyz/tx/0xd72ed33a6580ddda3dd9e0384a403fa1c81e29d4c97198eabcbcd95572ecaae9) |
-| **✅ Successful policy-allowed spend** (1 token → allow-listed service) | `0x0ac87e9600dc869c7b05324d70065db11ac85bdc6821b7c177d20b940d2876ca` | [tx](https://atlantic.pharosscan.xyz/tx/0x0ac87e9600dc869c7b05324d70065db11ac85bdc6821b7c177d20b940d2876ca) |
-| On-chain accounting after the spend | service balance `1.0`, treasury `99.0`, daily cap `10 → 9`, session budget `5 → 4` | — |
-| ❌ Blocked spend (same token, non-allowlisted dest) | reverts `ContractNotAllowed` at pre-flight | — |
-
-> A first treasury was deployed at `0xDea6Da93265871d828B20cace2BADd5F5e70209d`; it was redeployed
-> after the QA round-2 cross-token fix so the live bytecode matches the audited source above.
+> Redeployed across QA rounds so the live bytecode matches the audited source: first treasury
+> `0xDea6Da93…` → round-2 cross-token fix `0x0cdF46EE…` → round-3 `MAX_POLICY_TOKENS` cap (current).
 
 ## a2a-mesh
 
