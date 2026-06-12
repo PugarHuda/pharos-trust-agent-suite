@@ -1,7 +1,17 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { id } from 'ethers';
+import { id, Wallet } from 'ethers';
+import { bytesToHex } from '@ethereumjs/util';
 import { Chain, ARTIFACTS } from './evm.mjs';
+
+// A deterministic payer wallet for EIP-712 signing tests. It never sends a tx
+// (a relayer does), so it needs no on-chain balance — only its signature matters.
+const PAYER_WALLET = new Wallet('0x' + '11'.repeat(32));
+async function signAuth(repHex, ref, provider, amount) {
+  const domain = { name: 'AnvitaMeshReputation', version: '1', chainId: 1, verifyingContract: repHex };
+  const types = { PaymentAuth: [{ name: 'ref', type: 'bytes32' }, { name: 'provider', type: 'address' }, { name: 'amount', type: 'uint256' }] };
+  return PAYER_WALLET.signTypedData(domain, types, { ref, provider, amount });
+}
 
 const PROVIDER_A = '0x' + 'a1'.repeat(20);
 const PROVIDER_B = '0x' + 'b2'.repeat(20);
@@ -171,6 +181,54 @@ test('recordPayment rejects zero-address payer/provider', async () => {
   await assert.rejects(
     chain.send(REP, reputation, RECORDER, 'recordPayment', [REF1, ZERO, PROVIDER_A, 1000n]),
     /ZeroAddress/,
+  );
+});
+
+// ---- EIP-712 signed (trustless) payment recording ----
+
+test('recordPaymentSigned: a relayer can record a payer-signed payment, then the payer rates', async () => {
+  const { chain, reputation, REP } = await setup();
+  const repHex = bytesToHex(reputation.bytes);
+  const sig = await signAuth(repHex, REF1, PROVIDER_A, 1000n);
+  // The RELAYER (RECORDER) submits — not the payer. The contract derives the payer from the sig.
+  await chain.send(REP, reputation, RECORDER, 'recordPaymentSigned', [REF1, PROVIDER_A, 1000n, sig]);
+  const p = await chain.call(REP, reputation, 'payments', [REF1]);
+  assert.equal(p.payer.toLowerCase(), PAYER_WALLET.address.toLowerCase());
+  // and only that payer (the signer) can rate it
+  await chain.fund(PAYER_WALLET.address);
+  await chain.send(REP, reputation, PAYER_WALLET.address, 'rate', [REF1, 5]);
+  const score = await chain.call(REP, reputation, 'scoreOf', [PROVIDER_A]);
+  assert.equal(score[0], 5n);
+});
+
+test('recordPaymentSigned: a relayer CANNOT fabricate a payment without the payer signature', async () => {
+  const { chain, reputation, REP } = await setup();
+  // 65 bytes of zeros is not a valid signature -> BadSignature (recorder cannot mint reputation).
+  const bogus = '0x' + '00'.repeat(65);
+  await assert.rejects(
+    chain.send(REP, reputation, RECORDER, 'recordPaymentSigned', [REF1, PROVIDER_A, 1000n, bogus]),
+    /BadSignature/,
+  );
+});
+
+test('recordPaymentSigned: tampering the amount changes the recovered payer (cannot impersonate)', async () => {
+  const { chain, reputation, REP } = await setup();
+  const repHex = bytesToHex(reputation.bytes);
+  const sig = await signAuth(repHex, REF1, PROVIDER_A, 1000n); // signed for 1000
+  // Relayer submits a DIFFERENT amount with the same sig: ecrecover yields some other address,
+  // so the payer recorded is NOT the real signer — the real payer's identity can't be hijacked.
+  await chain.send(REP, reputation, RECORDER, 'recordPaymentSigned', [REF1, PROVIDER_A, 9_999_999n, sig]);
+  const p = await chain.call(REP, reputation, 'payments', [REF1]);
+  assert.notEqual(p.payer.toLowerCase(), PAYER_WALLET.address.toLowerCase());
+});
+
+test('recordPaymentSigned: self-deal (signer == provider) is rejected', async () => {
+  const { chain, reputation, REP } = await setup();
+  const repHex = bytesToHex(reputation.bytes);
+  const sig = await signAuth(repHex, REF1, PAYER_WALLET.address, 1000n); // provider == signer
+  await assert.rejects(
+    chain.send(REP, reputation, RECORDER, 'recordPaymentSigned', [REF1, PAYER_WALLET.address, 1000n, sig]),
+    /SelfDeal/,
   );
 });
 

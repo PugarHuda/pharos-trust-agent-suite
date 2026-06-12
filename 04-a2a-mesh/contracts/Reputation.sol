@@ -4,8 +4,12 @@ pragma solidity ^0.8.24;
 /// @title Reputation
 /// @notice Payment-gated reputation for the a2a-mesh skill. A rating is only accepted from the address
 ///         that actually paid for the interaction, making reputation expensive to fake.
-/// @dev    `recordPayment` is called by the trusted recorder (the mesh settlement flow) when an x402
-///         payment settles; `rate` can then be called once by that payer. Pharos testnet (688689).
+/// @dev    Two ways to record a settled payment:
+///         - `recordPaymentSigned` (trustless, preferred): the PAYER signs an EIP-712 authorization
+///           off-chain; anyone may relay it. The contract recovers the signer and uses it as the payer,
+///           so a relayer/recorder CANNOT fabricate payments between addresses it doesn't control.
+///         - `recordPayment` (onlyRecorder): a convenience path for a trusted settlement relayer.
+///         `rate` can then be called once by that payer. Pharos testnet (688689).
 contract Reputation {
     struct Payment {
         address payer;
@@ -29,6 +33,11 @@ contract Reputation {
     mapping(address => mapping(address => uint256)) public pairCount;
     uint256 public constant PAIR_CAP = 10;
 
+    // --- EIP-712 (payer-signed payment authorization) -----------------------
+    bytes32 private immutable _DOMAIN_SEPARATOR;
+    bytes32 private constant PAYMENT_AUTH_TYPEHASH =
+        keccak256("PaymentAuth(bytes32 ref,address provider,uint256 amount)");
+
     event PaymentRecorded(bytes32 indexed ref, address indexed payer, address indexed provider, uint256 amount);
     event Rated(bytes32 indexed ref, address indexed provider, uint8 score);
 
@@ -41,9 +50,23 @@ contract Reputation {
     error PairCapReached();
     error ZeroAddress();
     error BadScore();
+    error BadSignature();
 
     constructor(address _recorder) {
         recorder = _recorder;
+        _DOMAIN_SEPARATOR = keccak256(
+            abi.encode(
+                keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
+                keccak256(bytes("AnvitaMeshReputation")),
+                keccak256(bytes("1")),
+                block.chainid,
+                address(this)
+            )
+        );
+    }
+
+    function DOMAIN_SEPARATOR() external view returns (bytes32) {
+        return _DOMAIN_SEPARATOR;
     }
 
     modifier onlyRecorder() {
@@ -63,6 +86,42 @@ contract Reputation {
         payments[ref] = Payment({payer: payer, provider: provider, amount: amount, rated: false});
         volume[provider] += amount;
         emit PaymentRecorded(ref, payer, provider, amount);
+    }
+
+    /// @notice Record a settled payment authorized by the PAYER's EIP-712 signature. Callable by
+    ///         anyone (a relayer/facilitator), because the signature — not the caller — is the
+    ///         authorization. This is the trustless path: a relayer cannot fabricate a payment for a
+    ///         payer whose key it does not hold.
+    function recordPaymentSigned(bytes32 ref, address provider, uint256 amount, bytes calldata signature) external {
+        if (provider == address(0)) revert ZeroAddress();
+        if (payments[ref].payer != address(0)) revert AlreadyRecorded();
+
+        bytes32 structHash = keccak256(abi.encode(PAYMENT_AUTH_TYPEHASH, ref, provider, amount));
+        bytes32 digest = keccak256(abi.encodePacked("\x19\x01", _DOMAIN_SEPARATOR, structHash));
+        address payer = _recover(digest, signature);
+        if (payer == address(0)) revert BadSignature();
+        if (payer == provider) revert SelfDeal();
+
+        payments[ref] = Payment({payer: payer, provider: provider, amount: amount, rated: false});
+        volume[provider] += amount;
+        emit PaymentRecorded(ref, payer, provider, amount);
+    }
+
+    /// @dev Recover the signer of a 65-byte ECDSA signature, rejecting malleable high-s values.
+    function _recover(bytes32 digest, bytes calldata sig) internal pure returns (address) {
+        if (sig.length != 65) return address(0);
+        bytes32 r;
+        bytes32 s;
+        uint8 v;
+        assembly {
+            r := calldataload(sig.offset)
+            s := calldataload(add(sig.offset, 32))
+            v := byte(0, calldataload(add(sig.offset, 64)))
+        }
+        // EIP-2: reject the upper half of the curve order (signature malleability).
+        if (uint256(s) > 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0) return address(0);
+        if (v != 27 && v != 28) return address(0);
+        return ecrecover(digest, v, r, s);
     }
 
     /// @notice Rate a paid interaction. Only the payer can call, once per interaction.

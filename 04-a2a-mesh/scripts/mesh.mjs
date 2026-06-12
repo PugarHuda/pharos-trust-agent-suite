@@ -132,6 +132,26 @@ async function main() {
       break;
     }
 
+    case 'record-signed': {
+      // Trustless path: the PAYER signs an EIP-712 authorization; a relayer submits it.
+      // The recorder/relayer cannot fabricate a payment for a payer whose key it lacks.
+      const repAddr = args.reputation || die('--reputation required');
+      const ref = args.ref || die('--ref 0x.. required');
+      const providerAddr = args.provider || die('--provider 0x.. required');
+      if (!isAddress(providerAddr)) die(`--provider is not a valid address: ${providerAddr}`);
+      const amount = BigInt(args.amount ?? die('--amount required'));
+      const payerSigner = getSigner('PAYER_PRIVATE_KEY', provider);
+      const domain = { name: 'AnvitaMeshReputation', version: '1', chainId: net.chainId, verifyingContract: repAddr };
+      const types = { PaymentAuth: [{ name: 'ref', type: 'bytes32' }, { name: 'provider', type: 'address' }, { name: 'amount', type: 'uint256' }] };
+      const sig = await payerSigner.signTypedData(domain, types, { ref, provider: providerAddr, amount });
+      const payerAddr = await payerSigner.getAddress();
+      console.log(`Payer ${payerAddr} signed payment authorization for ref ${ref} -> provider ${providerAddr}, amount ${amount}`);
+      // Relayer (recorder key, or any funded key) submits the signed authorization.
+      const relayer = new Contract(repAddr, REP.abi, getSigner('RECORDER_PRIVATE_KEY', provider));
+      await sendTx(relayer, 'recordPaymentSigned', [ref, providerAddr, amount, sig], net, 'recordPaymentSigned');
+      break;
+    }
+
     case 'rate': {
       const c = new Contract(args.reputation || die('--reputation required'), REP.abi, getSigner('PAYER_PRIVATE_KEY', provider));
       const ref = args.ref || die('--ref 0x.. required');
@@ -164,7 +184,7 @@ async function main() {
       break;
 
     default:
-      console.error('commands: address deploy register discover record-payment rate score ref tag');
+      console.error('commands: address deploy register discover record-payment record-signed rate score ref tag');
       process.exit(2);
   }
 }

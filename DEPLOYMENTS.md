@@ -35,12 +35,15 @@ Owner / deployer: `0x39D2bae5EAedA9283535dDC98F1991c81eD5Cd7E`
 
 | Item | Address / tx | Link |
 |------|--------------|------|
-| **ServiceRegistry** | `0xE92254E3722D190ffC77C0aCa6856610708b9246` | [addr](https://atlantic.pharosscan.xyz/address/0xE92254E3722D190ffC77C0aCa6856610708b9246) |
-| **Reputation** | `0xE9DC8a36e8f14c85E687eEe26978692dA98cbeab` | [addr](https://atlantic.pharosscan.xyz/address/0xE9DC8a36e8f14c85E687eEe26978692dA98cbeab) |
-| register (price-feed service) | `0x611c381e9e346cfa4e100b6f18e6747abaa04400a67ffd7f85eaece2c39d2c65` | [tx](https://atlantic.pharosscan.xyz/tx/0x611c381e9e346cfa4e100b6f18e6747abaa04400a67ffd7f85eaece2c39d2c65) |
-| recordPayment (payer→provider) | `0x1591ad7efa6a3f2ee29afe2dee30708758ca4b05d28164d24695b0e9e9b14053` | [tx](https://atlantic.pharosscan.xyz/tx/0x1591ad7efa6a3f2ee29afe2dee30708758ca4b05d28164d24695b0e9e9b14053) |
-| rate (payer-only, score 5) | `0xdf83a341501db428b2b2114b916d61cebc1a21d16873d112f526cf34d0ac4f06` | [tx](https://atlantic.pharosscan.xyz/tx/0xdf83a341501db428b2b2114b916d61cebc1a21d16873d112f526cf34d0ac4f06) |
-| Anti-sybil proof | A **non-payer's** `rate` was rejected (`NotPayer`) before broadcast; only the verified payer's rating moved the score. `discover` then ranks the service by its on-chain reputation (5/100). | — |
+| **ServiceRegistry** | `0x851C251411Fe4F4bab586F775c7450f86A348EAD` | [addr](https://atlantic.pharosscan.xyz/address/0x851C251411Fe4F4bab586F775c7450f86A348EAD) |
+| **Reputation** (EIP-712 trustless recording) | `0x05465b9887D7952fAC76DF42D193aae55EbA5891` | [addr](https://atlantic.pharosscan.xyz/address/0x05465b9887D7952fAC76DF42D193aae55EbA5891) |
+| register (price-feed service, by provider) | `0x162b97149592b61d4b9d4af931e007e0d11449417432c1a2240b1cad418da77c` | [tx](https://atlantic.pharosscan.xyz/tx/0x162b97149592b61d4b9d4af931e007e0d11449417432c1a2240b1cad418da77c) |
+| **recordPaymentSigned** (payer-signed, relayer-submitted) | `0xb9d46f54871e076a547fc3f9705d3b95464f760b21e8abcbdf78762f6c666770` | [tx](https://atlantic.pharosscan.xyz/tx/0xb9d46f54871e076a547fc3f9705d3b95464f760b21e8abcbdf78762f6c666770) |
+| rate (payer-only, score 5) | `0xf5aa99350c9dfa60cb0dcc272e5dc65a2341100db7c4b38b14b296a3f7619e76` | [tx](https://atlantic.pharosscan.xyz/tx/0xf5aa99350c9dfa60cb0dcc272e5dc65a2341100db7c4b38b14b296a3f7619e76) |
+| Anti-sybil proof | The payment was recorded from the **payer's EIP-712 signature** (a relayer cannot fabricate it); a non-payer's `rate` reverts `NotPayer`; only the verified payer's rating moved the score. `discover` ranks the service by its on-chain reputation (5/100). | — |
+
+> First mesh deploy (`ServiceRegistry 0xE92254…`, `Reputation 0xE9DC8a…`) used the trusted-recorder
+> `recordPayment`; redeployed after adding the trustless EIP-712 `recordPaymentSigned` path.
 
 ## stylus-compute
 

@@ -61,8 +61,12 @@ node scripts/mesh.mjs register --registry 0xREG --tag price-feed --endpoint http
 # 3. Discover services for a capability, best reputation first
 node scripts/mesh.mjs discover --registry 0xREG --reputation 0xREP --tag price-feed
 
-# 4. After an x402 payment settles, the recorder binds it; the payer rates it
-node scripts/mesh.mjs record-payment --reputation 0xREP --ref 0xSETTLEMENT_TX --payer 0xC --provider 0xA --amount 1000
+# 4. After an x402 payment settles, bind it then the payer rates it.
+#    Preferred (trustless): the PAYER signs an EIP-712 authorization; ANY relayer submits it,
+#    so a relayer cannot fabricate a payment for a payer whose key it does not hold.
+node scripts/mesh.mjs record-signed  --reputation 0xREP --ref 0xSETTLEMENT_TX --provider 0xA --amount 1000
+#    (or the trusted-relayer convenience path:)
+# node scripts/mesh.mjs record-payment --reputation 0xREP --ref 0xSETTLEMENT_TX --payer 0xC --provider 0xA --amount 1000
 node scripts/mesh.mjs rate           --reputation 0xREP --ref 0xSETTLEMENT_TX --score 5
 node scripts/mesh.mjs score          --reputation 0xREP --provider 0xA
 

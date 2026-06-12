@@ -24,8 +24,8 @@ A multi-agent adversarial QA pass hardened every skill against real findings —
 | Contract | Address |
 |----------|---------|
 | AgentTreasury | [`0x0cdF46EE713Cfd910938E1B56BaEC6eACD18EF1c`](https://atlantic.pharosscan.xyz/address/0x0cdF46EE713Cfd910938E1B56BaEC6eACD18EF1c) |
-| ServiceRegistry | [`0xE92254E3722D190ffC77C0aCa6856610708b9246`](https://atlantic.pharosscan.xyz/address/0xE92254E3722D190ffC77C0aCa6856610708b9246) |
-| Reputation | [`0xE9DC8a36e8f14c85E687eEe26978692dA98cbeab`](https://atlantic.pharosscan.xyz/address/0xE9DC8a36e8f14c85E687eEe26978692dA98cbeab) |
+| ServiceRegistry | [`0x851C251411Fe4F4bab586F775c7450f86A348EAD`](https://atlantic.pharosscan.xyz/address/0x851C251411Fe4F4bab586F775c7450f86A348EAD) |
+| Reputation | [`0x05465b9887D7952fAC76DF42D193aae55EbA5891`](https://atlantic.pharosscan.xyz/address/0x05465b9887D7952fAC76DF42D193aae55EbA5891) |
 
 Proven on-chain: treasury policy config + a **blocked** out-of-policy spend; a full A2A
 discover → pay → rate flow where a **non-payer's rating was rejected**; and a live Chainlink

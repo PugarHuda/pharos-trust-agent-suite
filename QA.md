@@ -70,6 +70,16 @@ A second adversarial pass focused on the code *added* in round 1.
 > 4 of the 5 round-2 reviewers were interrupted by a session limit; their skills (shield/strategy/mesh/stylus)
 > were re-probed directly instead. The treasury critical finding came from the one reviewer that completed.
 
+### Follow-up: mesh recorder centralization removed
+
+The earlier "single trusted recorder can fabricate payments" limitation is now closed: `Reputation`
+gained a trustless **`recordPaymentSigned`** path where the PAYER signs an EIP-712 `PaymentAuth(ref,
+provider, amount)` and any relayer submits it. The contract recovers the signer (rejecting malleable
+high-`s` / bad `v`) and uses it as the payer, so a relayer cannot mint reputation for payers whose keys
+it does not hold. Proven on-chain (`recordPaymentSigned` tx in DEPLOYMENTS.md) and with 4 new tests
+(valid record + payer rates; bogus signature rejected; amount-tamper changes the recovered payer;
+signer==provider self-deal rejected).
+
 ## Notes
 
 - All findings above were verified and fixed against the in-memory EVM / live Atlantic RPC, then locked
