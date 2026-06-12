@@ -19,6 +19,18 @@ official Pharos Skill format (`SKILL.md` + `references/` + `assets/`). The suite
 
 A multi-agent adversarial QA pass hardened every skill against real findings — see [`QA.md`](QA.md).
 
+### Live on Atlantic testnet (full details + tx hashes in [`DEPLOYMENTS.md`](DEPLOYMENTS.md))
+
+| Contract | Address |
+|----------|---------|
+| AgentTreasury | [`0xDea6Da93265871d828B20cace2BADd5F5e70209d`](https://atlantic.pharosscan.xyz/address/0xDea6Da93265871d828B20cace2BADd5F5e70209d) |
+| ServiceRegistry | [`0xE92254E3722D190ffC77C0aCa6856610708b9246`](https://atlantic.pharosscan.xyz/address/0xE92254E3722D190ffC77C0aCa6856610708b9246) |
+| Reputation | [`0xE9DC8a36e8f14c85E687eEe26978692dA98cbeab`](https://atlantic.pharosscan.xyz/address/0xE9DC8a36e8f14c85E687eEe26978692dA98cbeab) |
+
+Proven on-chain: treasury policy config + a **blocked** out-of-policy spend; a full A2A
+discover → pay → rate flow where a **non-payer's rating was rejected**; and a live Chainlink
+oracle read driving a strategy decision.
+
 Each skill is a standalone Node package: `npm install && npm test`. No skill hardcodes a key or a
 network — keys come from env vars, networks from `assets/networks.json`. See `DEPLOY.md` for putting
 contracts on-chain and `DEMO.md` for the demo-video script.
