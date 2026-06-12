@@ -17,6 +17,17 @@ Owner / deployer: `0x39D2bae5EAedA9283535dDC98F1991c81eD5Cd7E`
 | grant-session (5 USDC, 7d) | `0x0f46fa5c82e04352bf6d016a4f727efffffe659481db65f66e174454fa2a8004` | [tx](https://atlantic.pharosscan.xyz/tx/0x0f46fa5c82e04352bf6d016a4f727efffffe659481db65f66e174454fa2a8004) |
 | Blocked spend (the money shot) | Pre-flight caught `ContractNotAllowed` and refused to broadcast a spend to a non-allowlisted address — the guardrail works *before* a tx is even sent. | — |
 
+### Full success + blocked path (with a deployed demo ERC-20, since canonical testnet USDC has no faucet)
+
+| Item | Address / tx | Link |
+|------|--------------|------|
+| Demo token (MockERC20) | `0xF97C6Bd1fA133341175cfE362D67160D43e0342A` | [addr](https://atlantic.pharosscan.xyz/address/0xF97C6Bd1fA133341175cfE362D67160D43e0342A) |
+| Mint 100 → treasury | `0x006c08e7ff8e72644c1d0dc1d6be1ff7b5c0bc927a297164997e384658932797` | [tx](https://atlantic.pharosscan.xyz/tx/0x006c08e7ff8e72644c1d0dc1d6be1ff7b5c0bc927a297164997e384658932797) |
+| set-policy + allow + session | `0x85c71607…`, `0x4c31ec2e…`, `0xd72ed33a…` | [policy](https://atlantic.pharosscan.xyz/tx/0x85c716079ac4a325259c055d655524373a716ec29550ea544265e15d73f413b3) · [allow](https://atlantic.pharosscan.xyz/tx/0x4c31ec2e5948dcf490e0d9b7f6b677ec2cf1f4d9034b6ff5264c8c77c27a6047) · [session](https://atlantic.pharosscan.xyz/tx/0xd72ed33a6580ddda3dd9e0384a403fa1c81e29d4c97198eabcbcd95572ecaae9) |
+| **✅ Successful policy-allowed spend** (1 token → allow-listed service) | `0x0ac87e9600dc869c7b05324d70065db11ac85bdc6821b7c177d20b940d2876ca` | [tx](https://atlantic.pharosscan.xyz/tx/0x0ac87e9600dc869c7b05324d70065db11ac85bdc6821b7c177d20b940d2876ca) |
+| On-chain accounting after the spend | service balance `1.0`, treasury `99.0`, daily cap `10 → 9`, session budget `5 → 4` | — |
+| ❌ Blocked spend (same token, non-allowlisted dest) | reverts `ContractNotAllowed` at pre-flight | — |
+
 > A first treasury was deployed at `0xDea6Da93265871d828B20cace2BADd5F5e70209d`; it was redeployed
 > after the QA round-2 cross-token fix so the live bytecode matches the audited source above.
 
