@@ -54,6 +54,22 @@ count rose from **69 → 110**. This document is the audit trail.
 | Doc | SKILL.md showed the example vector scoring `0.49…`; the true value is `0.647887`. | Corrected. |
 | Test | The bit-identical claim lacked negative-z and fuzz coverage. | Added negative-z parity cases and a **1000-vector parity fuzz** (score() vs an independent integer reimplementation), plus a gate-boundary test. |
 
+## Round 2 (post-hardening re-review)
+
+A second adversarial pass focused on the code *added* in round 1.
+
+| Skill | Finding | Resolution |
+|-------|---------|-----------|
+| **treasury** | **Critical** — `executeCall`'s balance-delta only measured the session's *bound* token. With two tokens allow-listed, a USDC-bound session could `executeCall(USDC, USDT, 0, USDT.transfer(attacker, all))`: `spendAmount=0` passed the budget, the delta was read on USDC (unchanged), and **all USDT drained unmeasured**. | `executeCall` now (1) rejects a call that targets a *different* policy token (`CrossTokenCall`), and (2) snapshots **every** policy token and reverts if any non-bound token's balance drops (or the bound token drops beyond `spendAmount`). New test proves the drain is blocked. Also added the missing zero-address guard on `ownerWithdraw`. |
+| **shield** | False positive — the file-level taint rule fired on a generic `process.env.API_KEY` + an *allow-listed* fetch. | Narrowed the taint's secret-read pattern to **wallet** secrets (private key / mnemonic / seed), not generic API keys. Verified: `API_KEY` + allowlisted host → pass; `PRIVATE_KEY`/`MNEMONIC` exfil → still caught. |
+| shield | Verified no **ReDoS** in the broadened skillscan regexes (50 000-char adversarial input scans in ~4 ms — bounded quantifiers, no catastrophic backtracking) and no FP on `0x{64}` constants or `.privateKeyId`. | No change needed. |
+| **strategy** | Verified the new NL parsers: `biweekly`/`every 1.5 hours`/`every 0 days` are rejected cleanly; `drops 10% with 5% slippage and 2% fee` → dropPct 10 / slippage 500 (no clause confusion). ("twice daily" maps to daily — acceptable.) | No change needed. |
+| **stylus** | Verified `toFixed` rejects `1e6`, `1.`, `.`, `+5`, `0x10`, `1.2.3` and accepts `.5`/whitespace — integer-only, no float leak. | No change needed. |
+| **mesh** | `getByTagPaged` offset+limit overflow reverts under Solidity 0.8 checked arithmetic (no silent wrap/under-return). | No change needed. |
+
+> 4 of the 5 round-2 reviewers were interrupted by a session limit; their skills (shield/strategy/mesh/stylus)
+> were re-probed directly instead. The treasury critical finding came from the one reviewer that completed.
+
 ## Notes
 
 - All findings above were verified and fixed against the in-memory EVM / live Atlantic RPC, then locked

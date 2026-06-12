@@ -39,6 +39,11 @@ contract AgentTreasury {
     // session key (agent address) => session
     mapping(address => Session) public sessions;
 
+    // Enumerable set of tokens that have ever had a policy, so executeCall can sweep
+    // every treasury asset's balance delta — not just the session's bound token.
+    address[] public policyTokens;
+    mapping(address => bool) private _isPolicyToken;
+
     // --- Events --------------------------------------------------------------
 
     event PolicySet(address indexed token, uint256 dailyCap);
@@ -63,6 +68,7 @@ contract AgentTreasury {
     error SessionBudgetExceeded();
     error SessionTokenMismatch();
     error SpendExceedsAccounted();
+    error CrossTokenCall();
     error CallFailed();
     error ZeroAddress();
     error BadExpiry();
@@ -90,6 +96,10 @@ contract AgentTreasury {
     function setPolicy(address token, uint256 cap) external onlyOwner {
         if (token == address(0)) revert ZeroAddress();
         dailyCap[token] = cap;
+        if (cap > 0 && !_isPolicyToken[token]) {
+            _isPolicyToken[token] = true;
+            policyTokens.push(token);
+        }
         emit PolicySet(token, cap);
     }
 
@@ -157,10 +167,12 @@ contract AgentTreasury {
 
     /// @notice Execute an arbitrary call to an allow-listed contract, with a token-denominated spend
     ///         accounted against policy (e.g. an approve+swap or an x402 settlement).
-    /// @dev    The actual movement of `token` out of the treasury is measured by a balance delta and
-    ///         must not exceed `spendAmount`, so the budget is a real bound — not advisory — even
-    ///         though `data` is arbitrary. (Approvals move 0 tokens and so are always within budget;
-    ///         the destination allowlist is what bounds an approved spender's future pull.)
+    /// @dev    Two guards make the budget a REAL cross-asset bound, not just for the bound token:
+    ///         (1) the call may not target a DIFFERENT policy token (so it can't `transfer` another
+    ///         treasury asset directly); (2) after the call, EVERY policy token's balance delta is
+    ///         checked — the bound `token` may drop by at most `spendAmount`, and no other policy
+    ///         token may drop at all. Approvals move 0 balance and pass; only allow-list routers you
+    ///         trust, since an approval still lets an allow-listed spender pull later.
     function executeCall(
         address token,
         address target,
@@ -171,16 +183,28 @@ contract AgentTreasury {
         uint256 cap = dailyCap[token];
         if (cap == 0) revert TokenNotAllowed();
         if (!allowedContract[target]) revert ContractNotAllowed();
+        // (1) can't act directly on a different policy token (cross-token drain via its transfer()).
+        if (_isPolicyToken[target] && target != token) revert CrossTokenCall();
 
         _accrueDaily(token, spendAmount, cap);
         s.budgetRemaining -= uint96(spendAmount);
 
-        uint256 balBefore = _balanceOf(token);
+        // (2) snapshot every policy token, run the call, then bound each delta.
+        uint256 n = policyTokens.length;
+        uint256[] memory balBefore = new uint256[](n);
+        for (uint256 i; i < n; ++i) balBefore[i] = _balanceOf(policyTokens[i]);
+
         (bool ok, bytes memory ret) = target.call(data);
         if (!ok) revert CallFailed();
-        uint256 balAfter = _balanceOf(token);
-        // Enforce that the call moved no more `token` out than was accounted against policy.
-        if (balBefore > balAfter && (balBefore - balAfter) > spendAmount) revert SpendExceedsAccounted();
+
+        for (uint256 i; i < n; ++i) {
+            uint256 balAfter = _balanceOf(policyTokens[i]);
+            if (balBefore[i] > balAfter) {
+                uint256 decrease = balBefore[i] - balAfter;
+                uint256 allowed = policyTokens[i] == token ? spendAmount : 0;
+                if (decrease > allowed) revert SpendExceedsAccounted();
+            }
+        }
 
         emit Spent(msg.sender, token, target, spendAmount);
         return ret;
@@ -229,6 +253,7 @@ contract AgentTreasury {
 
     /// @notice Owner can withdraw any ERC-20 from the treasury at will.
     function ownerWithdraw(address token, address to, uint256 amount) external onlyOwner {
+        if (to == address(0)) revert ZeroAddress();
         (bool ok, bytes memory ret) =
             token.call(abi.encodeWithSelector(0xa9059cbb, to, amount));
         if (!ok || (ret.length != 0 && !abi.decode(ret, (bool)))) revert CallFailed();

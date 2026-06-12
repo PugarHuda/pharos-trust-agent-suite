@@ -69,7 +69,9 @@ const RULES = [
 
 // File-level taint: a file that BOTH reads a secret and makes an outbound call
 // (even on different lines) is suspicious even if the line-proximity rule missed it.
-const SECRET_READ = /process\.env\.[A-Z_]*(?:KEY|MNEMONIC|SECRET|SEED)|os\.environ\[?['"][A-Z_]*(?:KEY|MNEMONIC|SECRET)|\.privateKey\b|readFileSync\([^\n)]*\.(?:key|pem|secret)/i;
+// Wallet-secret reads only (private key / mnemonic / seed) — NOT generic API_KEY/SECRET,
+// which would false-positive on legit skills that use an API key with an allowlisted host.
+const SECRET_READ = /process\.env\.[A-Z_]*(?:PRIVATE_?KEY|MNEMONIC|SEED_?PHRASE|SEED)|os\.environ\[?['"][A-Z_]*(?:PRIVATE_?KEY|MNEMONIC|SEED)|\.privateKey\b|readFileSync\([^\n)]*\.(?:key|pem)/i;
 const OUTBOUND_CALL = new RegExp(TRANSPORT, 'i');
 
 function* walkFiles(root) {

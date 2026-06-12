@@ -216,6 +216,26 @@ test('executeCall reverts SpendExceedsAccounted when the call moves more than sp
   );
 });
 
+test('executeCall CANNOT drain a different policy token (cross-token guard)', async () => {
+  // Session bound to token A; a second policy token B is also allow-listed as a target.
+  // A jailbroken agent must not be able to move B out via executeCall(A, B, 0, B.transfer(..)).
+  const { chain, treasury, T, M, tokenHex } = await setup();
+  const tokenB = await chain.deploy(ARTIFACTS.MockERC20, OWNER);
+  const tokenBHex = bytesToHex(tokenB.bytes);
+  await chain.send(M, tokenB, OWNER, 'mint', [bytesToHex(treasury.bytes), 20_000_000n]); // treasury holds B
+  await chain.send(T, treasury, OWNER, 'setPolicy', [tokenBHex, CAP]);                    // B is a policy token
+  await chain.send(T, treasury, OWNER, 'setAllowedContract', [tokenBHex, true]);          // B allow-listed as target
+  const drainB = new Interface(M.abi).encodeFunctionData('transfer', [ATTACKER, 5_000_000n]);
+  // session is bound to A (tokenHex); target B != A -> blocked outright
+  await assert.rejects(
+    chain.send(T, treasury, AGENT, 'executeCall', [tokenHex, tokenBHex, 0n, drainB]),
+    /CrossTokenCall/,
+  );
+  // B balance untouched
+  const bBal = await chain.call(M, tokenB, 'balanceOf', [ATTACKER]);
+  assert.equal(bBal[0], 0n);
+});
+
 test('executeCall allows an approval (moves 0 tokens, within any budget)', async () => {
   // Approvals move no balance, so delta 0 <= spendAmount always — the strategy skill relies on this.
   const { chain, token, treasury, T, M, tokenHex } = await setup();
