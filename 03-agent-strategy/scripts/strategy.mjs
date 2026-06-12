@@ -121,7 +121,7 @@ async function main() {
         const out = amounts[amounts.length - 1];
         console.log(`quote: ${amountIn} ${args.tokenIn} -> ${out} ${args.tokenOut} (router ${router})`);
         console.log(`pass this to plan as --quote-out ${out}`);
-        if (args.json) out && console.log(JSON.stringify({ amountIn: amountIn.toString(), quoteOut: out.toString(), path: [tokenIn, tokenOut] }));
+        if (args.json) console.log(JSON.stringify({ amountIn: amountIn.toString(), quoteOut: out.toString(), path: [tokenIn, tokenOut] }));
       } catch (err) {
         die(`getAmountsOut failed: ${err.shortMessage || err.message} (is ${router} a v2-style router with this pair?)`);
       }
