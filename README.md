@@ -1,13 +1,13 @@
 # Pharos Trust-First Agent Suite — Skill Hackathon (Phase 1)
 
-Five composable Skills for the **Pharos Skill-to-Agent Dual Cascade Hackathon**, built in the
+Six composable Skills for the **Pharos Skill-to-Agent Dual Cascade Hackathon**, built in the
 official Pharos Skill format (`SKILL.md` + `references/` + `assets/`). The suite is designed as a
 **trust layer for the Pharos agent economy**: the things every other agent needs but few will build.
 
 > Hackathon: Skill-to-Agent Dual Cascade (Phase 1) · Prize pool 50,000 PROS (Phase 1: 20,000 PROS / 40 winners)
 > Network: Pharos Atlantic Testnet (chainId **688689**) · Submission deadline **2026-06-15**
 
-## Status: all five skills implemented · 110 passing tests
+## Status: six skills implemented · 126 passing tests
 
 | # | Skill | One-liner | Status | Tests |
 |---|-------|-----------|--------|-------|
@@ -15,7 +15,8 @@ official Pharos Skill format (`SKILL.md` + `references/` + `assets/`). The suite
 | 2 | **agent-shield** | Pre-flight security: simulate, balance-diff, registry/poisoning verify, approval & skill scanning | Zero-dependency CLI; live-tested vs Atlantic RPC | 30 |
 | 3 | **agent-strategy** | Autonomous DeFi: oracle read → rule DSL → policy-bounded swap, one NL instruction | Live Chainlink read on Atlantic; full evaluator | 25 |
 | 4 | **a2a-mesh** | Agent-to-agent discovery + x402 payment + payment-gated on-chain reputation | Two contracts compile; anti-sybil core tested | 15 |
-| 5 | **stylus-compute** | Rust/WASM risk classifier gating a treasury spend, with a bit-identical verifiable JS reference | Source + JS reference + CLI done (WASM deploy pending a build host) | 15 |
+| 5 | **stylus-compute** | Rust/WASM risk classifier gating a treasury spend, with a bit-identical verifiable JS reference | Source + JS reference + CLI done; WASM build via Docker/gnu | 15 |
+| 6 | **x402-facilitator** | Self-hostable x402 facilitator (verify + gasless settle of EIP-3009 payments) — fills the missing-facilitator gap | verify/settle/server/CLI + tests; verify core proven | 11 |
 
 A multi-agent adversarial QA pass hardened every skill against real findings — see [`QA.md`](QA.md).
 
@@ -101,6 +102,7 @@ cd ../01-agent-treasury && npm install && npm run build && npm test
 cd ../03-agent-strategy && npm install && npm test
 cd ../04-a2a-mesh && npm install && npm run build && npm test
 cd ../05-stylus-compute && npm install && npm test
+cd ../06-x402-facilitator && npm install && npm test
 ```
 
 ## Canonical Pharos data used throughout

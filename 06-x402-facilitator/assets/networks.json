@@ -1,0 +1,26 @@
+{
+  "_comment": "x402-facilitator network registry. The x402 demo USDC differs from the canonical testnet USDC (per Pharos docs) and is what the facilitator settles against.",
+  "atlantic-testnet": {
+    "name": "Pharos Atlantic Testnet",
+    "chainId": 688689,
+    "rpcUrl": "https://atlantic.dplabs-internal.com",
+    "explorer": "https://atlantic.pharosscan.xyz",
+    "nativeToken": "PHRS",
+    "default": true,
+    "tokens": {
+      "USDC_x402": { "address": "0xE0BE08c77f415F577A1B3A9aD7a1Df1479564ec8", "decimals": 6, "note": "x402 demo USDC (docs: not an official address)" },
+      "USDC": { "address": "0xcfC8330f4BCAB529c625D12781b1C19466A9Fc8B", "decimals": 6 }
+    }
+  },
+  "pacific-mainnet": {
+    "name": "Pharos Pacific Mainnet",
+    "chainId": 1672,
+    "rpcUrl": "https://rpc.pharos.xyz",
+    "explorer": "https://www.pharosscan.xyz",
+    "nativeToken": "PROS",
+    "default": false,
+    "tokens": {
+      "USDC": { "address": "0xc879c018db60520f4355c26ed1a6d572cdac1815", "decimals": 6 }
+    }
+  }
+}

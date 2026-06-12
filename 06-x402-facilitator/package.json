@@ -1,0 +1,20 @@
+{
+  "name": "x402-facilitator",
+  "version": "1.0.0",
+  "description": "Self-hostable x402 payment facilitator for Pharos: verify + settle EIP-3009 payment authorizations so agents can pay each other gaslessly.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "x402": "./scripts/x402.mjs"
+  },
+  "scripts": {
+    "test": "node --test tests/x402.test.mjs",
+    "serve": "node scripts/server.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "ethers": "^6.13.0"
+  }
+}
