@@ -81,4 +81,56 @@ for the Pharos agent economy."
 - Pre-fund keys and pre-deploy contracts **before** recording so you only show the interesting calls.
 - Keep a Pharosscan tab open; click each tx hash live — the on-chain proof is the point.
 - For blocked cases, make the revert reason visible (the CLIs print it). That frame wins.
-- Mention the numbers: 5 skills, 69 tests, live oracle read, on-chain policy enforcement.
+- Mention the numbers: **6 skills, 133 tests, CI green, live on Atlantic**.
+
+---
+
+## Storyboard mapped to the LIVE artifacts (copy-paste, ~3 min)
+
+All addresses/tx below are real and already on-chain (see `DEPLOYMENTS.md`). For the video you can
+**click the existing tx hashes on Pharosscan** and run the read-only / blocked commands live (those
+need no gas), so nothing can fail on camera. `.env` is already set for the funded test wallet.
+
+**0:00–0:20 — Hook.** "Can an agent hold and spend money safely? Here's a trust layer for the Pharos
+agent economy: 6 composable skills, 133 tests, live on testnet." Show README badges + the
+`DEPLOYMENTS.md` address table.
+
+**0:20–1:00 — agent-treasury (the guardrail).** Dir `01-agent-treasury`.
+```
+node scripts/treasury.mjs status --treasury 0x0954E50cBC85836C9E3FC6868d24b6118d974E9d --token 0xda0cEB552af13f5a096D8aA4E5A9FceB9cf6D8D0
+node scripts/treasury.mjs spend  --treasury 0x0954E50cBC85836C9E3FC6868d24b6118d974E9d --token 0xda0cEB552af13f5a096D8aA4E5A9FceB9cf6D8D0 --to 0x000000000000000000000000000000000000dEaD --amount 1
+```
+The blocked spend prints `simulation: REVERT -> ContractNotAllowed` and refuses to broadcast. Then open
+the **successful** spend already on-chain: pharosscan.xyz/tx/`0x1fcd2c629d0a805bed93d99edfc150d3afcf375f44157b7ee331329c49d50634`.
+Line: "the limit lives in the contract, not the prompt — a jailbroken agent still can't exceed it."
+
+**1:00–1:35 — agent-shield (detection).** Dir `02-agent-shield`.
+```
+node scripts/shield.mjs verify-address --address 0xcfC8330f4BCAB529c625D12781b1C19466A9Fc8B
+node scripts/shield.mjs check-approval --token 0xcfC8330f4BCAB529c625D12781b1C19466A9Fc8B --spender 0x9999999999999999999999999999999999999999 --amount max
+```
+→ FAIL: unlimited approval to unverified spender. "Zero dependencies, 100% read-only — clean by
+construction for the CertiK scanner."
+
+**1:35–2:05 — a2a-mesh (trustless reputation).** Dir `04-a2a-mesh`.
+```
+node scripts/mesh.mjs discover --registry 0xa4d6d9932B19f9B03D0439264F1188F39F8522f0 --reputation 0x8010e567b6f68dcfD19312644F1c3E6249b43ef7 --tag price-feed
+```
+Shows the provider ranked by on-chain reputation 5/100. Open the live
+`recordPaymentSigned` tx pharosscan.xyz/tx/`0x972295c47b832da56cebf7c4212510299074caac6703b0819c241a84a3abc565`
+and the `rate` tx `0xcef892b3ae1604ffaa17369ed03d1ae4c7608c35ceec522329a74ab9fa530de9`. Line: "the
+payer signs; a relayer can't fake reputation, and a non-payer's rating reverts."
+
+**2:05–2:30 — agent-strategy (live oracle).** Dir `03-agent-strategy`.
+```
+node scripts/strategy.mjs price --feed BTC/USD
+node scripts/strategy.mjs eval  --rule "sell WBTC when price > 60000" --feed BTC/USD
+```
+Live Chainlink price drives a SWAP/NOOP decision (routed through treasury + shield).
+
+**2:30–2:55 — x402-facilitator + stylus-compute (the rails + verifiable compute).** Dir `06-x402-facilitator`:
+`node scripts/x402.mjs pay ...` then `verify` → VALID (gasless agent payment). Dir `05-stylus-compute`:
+`node scripts/compute.mjs gate --features 1,1,1,1` → BLOCK (the risk model that gates a treasury spend).
+
+**2:55–3:00 — Close.** "Six skills, wired together, 133 tests, real tx on Pharosscan — the trust layer
+the agent economy needs. Cascades straight into the Agent Arena."

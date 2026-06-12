@@ -25,8 +25,8 @@ A multi-agent adversarial QA pass hardened every skill against real findings —
 | Contract | Address |
 |----------|---------|
 | AgentTreasury | [`0x0954E50cBC85836C9E3FC6868d24b6118d974E9d`](https://atlantic.pharosscan.xyz/address/0x0954E50cBC85836C9E3FC6868d24b6118d974E9d) |
-| ServiceRegistry | [`0x851C251411Fe4F4bab586F775c7450f86A348EAD`](https://atlantic.pharosscan.xyz/address/0x851C251411Fe4F4bab586F775c7450f86A348EAD) |
-| Reputation | [`0x05465b9887D7952fAC76DF42D193aae55EbA5891`](https://atlantic.pharosscan.xyz/address/0x05465b9887D7952fAC76DF42D193aae55EbA5891) |
+| ServiceRegistry | [`0xa4d6d9932B19f9B03D0439264F1188F39F8522f0`](https://atlantic.pharosscan.xyz/address/0xa4d6d9932B19f9B03D0439264F1188F39F8522f0) |
+| Reputation | [`0x8010e567b6f68dcfD19312644F1c3E6249b43ef7`](https://atlantic.pharosscan.xyz/address/0x8010e567b6f68dcfD19312644F1c3E6249b43ef7) |
 
 Proven on-chain: a treasury **successful policy-allowed spend** *and* a **blocked** out-of-policy
 spend (with on-chain cap/budget accounting); a full A2A discover → pay → rate flow where the payment
