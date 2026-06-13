@@ -32,6 +32,7 @@ Owner / deployer: `0x39D2bae5EAedA9283535dDC98F1991c81eD5Cd7E`
 | Anti-sybil proof | Payment recorded from the **payer's EIP-712 signature** (a relayer cannot fabricate it, and payments are keyed by (payer,ref) so a ref can't be griefed); a non-payer's `rate` reverts `NotPayer`; only the verified payer's rating moved the score. `discover` ranks the service by on-chain reputation (5/100). | — |
 
 | **Reputation8004Adapter** (ERC-8004 read surface → live Reputation) | `0x6B99B00BD52Bc134D5658745E64DF1938592e468` | [addr](https://atlantic.pharosscan.xyz/address/0x6B99B00BD52Bc134D5658745E64DF1938592e468) |
+| **IdentityRegistry8004** (ERC-8004 Identity; agentId 1 registered) | `0xa048D4F17282488B60D96E6FB01FbdA106F38B8A` | [addr](https://atlantic.pharosscan.xyz/address/0xa048D4F17282488B60D96E6FB01FbdA106F38B8A) · [register](https://atlantic.pharosscan.xyz/tx/0x9241017e01b15b7531029a52f8c55ead229dfde78dac4de030b2967d8d404a14) |
 | Bazaar seeded services | extra `price-feed` (acme, 800), `compute` (5000), `data-api` (200) registered so `bazaar discover` shows a populated, reputation-ranked marketplace | [register](https://atlantic.pharosscan.xyz/tx/0x50c9f01c12a9ba9e2ede28f41ecda2e61fda6cfd240bf60b8208767a51a51e2b) |
 
 > Mesh was redeployed across QA rounds to keep live bytecode == audited source: trusted-recorder →

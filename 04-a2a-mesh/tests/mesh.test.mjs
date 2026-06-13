@@ -274,6 +274,30 @@ test('recordPaymentSigned: a malleable (high-s) signature is rejected', async ()
   );
 });
 
+// ---- ERC-8004 Identity Registry ----
+
+test('IdentityRegistry8004: register mints an agentId, sets URI + agentWallet', async () => {
+  const { chain } = await setup();
+  const ID = ARTIFACTS.IdentityRegistry8004;
+  const reg = await chain.deploy(ID, PROVIDER_A);
+  await chain.send(ID, reg, CONSUMER, 'register', ['ipfs://agent-card-1']);
+  assert.equal((await chain.call(ID, reg, 'ownerOf', [1n]))[0].toLowerCase(), CONSUMER);
+  assert.equal((await chain.call(ID, reg, 'tokenURI', [1n]))[0], 'ipfs://agent-card-1');
+  // agentWallet defaults to the owner until set
+  assert.equal((await chain.call(ID, reg, 'getAgentWallet', [1n]))[0].toLowerCase(), CONSUMER);
+  await chain.send(ID, reg, CONSUMER, 'setAgentWallet', [1n, PROVIDER_B]);
+  assert.equal((await chain.call(ID, reg, 'getAgentWallet', [1n]))[0].toLowerCase(), PROVIDER_B);
+});
+
+test('IdentityRegistry8004: only the agent owner can update it', async () => {
+  const { chain } = await setup();
+  const ID = ARTIFACTS.IdentityRegistry8004;
+  const reg = await chain.deploy(ID, PROVIDER_A);
+  await chain.send(ID, reg, CONSUMER, 'register', ['ipfs://card']);
+  await assert.rejects(chain.send(ID, reg, OUTSIDER, 'setAgentURI', [1n, 'ipfs://evil']), /NotAgentOwner/);
+  await assert.rejects(chain.send(ID, reg, OUTSIDER, 'setAgentWallet', [1n, OUTSIDER]), /NotAgentOwner/);
+});
+
 // ---- ERC-8004 adapter ----
 
 test('Reputation8004Adapter exposes our score via the ERC-8004 getSummary interface', async () => {

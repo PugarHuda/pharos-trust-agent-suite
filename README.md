@@ -9,14 +9,14 @@ official Pharos Skill format (`SKILL.md` + `references/` + `assets/`). The suite
 > Hackathon: Skill-to-Agent Dual Cascade (Phase 1) · Prize pool 50,000 PROS (Phase 1: 20,000 PROS / 40 winners)
 > Network: Pharos Atlantic Testnet (chainId **688689**) · Submission deadline **2026-06-15**
 
-## Status: eight skills implemented · 152 passing tests
+## Status: eight skills implemented · 154 passing tests
 
 | # | Skill | One-liner | Status | Tests |
 |---|-------|-----------|--------|-------|
 | 1 | **agent-treasury** | Smart-account wallet with on-chain spending policy, session keys, kill-switch | Contract compiles; CLI on ethers; policy proven on in-memory EVM | 28 |
 | 2 | **agent-shield** | Pre-flight security: simulate, balance-diff, registry/poisoning verify, approval & skill scanning | Zero-dependency CLI; live-tested vs Atlantic RPC | 30 |
 | 3 | **agent-strategy** | Autonomous DeFi: oracle read → rule DSL → policy-bounded swap, one NL instruction | Live Chainlink read on Atlantic; full evaluator | 25 |
-| 4 | **a2a-mesh** | Agent-to-agent discovery + x402 payment + payment-gated on-chain reputation (EIP-712 trustless, ERC-8004-aligned) | Two contracts compile; anti-sybil core tested | 24 |
+| 4 | **a2a-mesh** | Agent-to-agent discovery + x402 payment + payment-gated on-chain reputation (EIP-712 trustless, ERC-8004-aligned) | Contracts compile (mesh + ERC-8004 Identity/adapter); anti-sybil core tested | 26 |
 | 5 | **stylus-compute** | Rust/WASM risk classifier gating a treasury spend, with a bit-identical verifiable JS reference | Source + JS reference + CLI done; WASM build via Docker/gnu | 15 |
 | 6 | **x402-facilitator** | Self-hostable x402 facilitator (verify + gasless settle of EIP-3009 payments) — fills the missing-facilitator gap | verify/settle/server/CLI + a paid risk-score resource; tested | 19 |
 | 7 | **agent-utils** | High-frequency read-only utilities (price, gas advisor, token info, balance, address-safety) — cheapest to adopt, most-called | Zero-key CLI; live-verified on Atlantic | 7 |
@@ -32,6 +32,8 @@ A multi-agent adversarial QA pass hardened every skill against real findings —
 | ServiceRegistry | [`0xa4d6d9932B19f9B03D0439264F1188F39F8522f0`](https://atlantic.pharosscan.xyz/address/0xa4d6d9932B19f9B03D0439264F1188F39F8522f0) |
 | Reputation | [`0x8010e567b6f68dcfD19312644F1c3E6249b43ef7`](https://atlantic.pharosscan.xyz/address/0x8010e567b6f68dcfD19312644F1c3E6249b43ef7) |
 | Reputation8004Adapter (ERC-8004 read surface) | [`0x6B99B00BD52Bc134D5658745E64DF1938592e468`](https://atlantic.pharosscan.xyz/address/0x6B99B00BD52Bc134D5658745E64DF1938592e468) |
+| IdentityRegistry8004 (ERC-8004 Identity) | [`0xa048D4F17282488B60D96E6FB01FbdA106F38B8A`](https://atlantic.pharosscan.xyz/address/0xa048D4F17282488B60D96E6FB01FbdA106F38B8A) |
+| MockUSDC3009 (EIP-3009 settlement token) | [`0xBd80E06F0325C4758e06d8a9522588363C4c75a4`](https://atlantic.pharosscan.xyz/address/0xBd80E06F0325C4758e06d8a9522588363C4c75a4) |
 
 Proven on-chain: a treasury **successful policy-allowed spend** *and* a **blocked** out-of-policy
 spend (with on-chain cap/budget accounting); a full A2A discover → pay → rate flow where the payment
