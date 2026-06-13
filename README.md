@@ -24,6 +24,28 @@ official Pharos Skill format (`SKILL.md` + `references/` + `assets/`). The suite
 > uploads the mp4. Run it yourself: `node demo.mjs` (keyless, nothing broadcast; add `--write` for the
 > two live treasury-spend transactions).
 
+## 👩‍⚖️ For judges — try it
+
+**Watch (0 setup).** Open [`web/demo.html`](web/demo.html) and press ▶ — a narrated, pointer-driven tour
+of all 13 skills with live on-chain values (or `npx serve web` then visit `/demo.html`). A ready-made
+video is the **pharos-combined** artifact from *Actions → demo-combined*.
+
+**Verify it's real (0 setup).** Every contract + transaction is a clickable Pharosscan link in
+[`DEPLOYMENTS.md`](DEPLOYMENTS.md). Tests run on every push — see the green CI badge above (logs are public).
+
+**Run all 13 skills live (2 commands).** Needs only Node 18+ (read-only, no keys, nothing broadcast):
+```bash
+node setup.mjs      # installs each skill's deps
+node demo.mjs       # runs all 13 skills' read-only CLI live against Atlantic
+```
+Add `node demo.mjs --write` to also broadcast the two treasury-spend txs (needs a funded key in
+`01-agent-treasury/.env`).
+
+**Test any skill offline.** e.g. `cd 02-agent-shield && npm install && npm test` (in-memory EVM, no network).
+
+**Regenerate the video.** *Actions → demo-combined → Run workflow* (or `gh workflow run demo-combined.yml`)
+builds the narrated walkthrough + a real-terminal run of all 13 skills into one mp4.
+
 ## Status: thirteen skills implemented · 236 passing tests
 
 | # | Skill | One-liner | Status | Tests |
@@ -147,6 +169,8 @@ composable skills, 236 tests, eleven live contracts, and the only complete ERC-8
 ```
 .
 ├── README.md                  ← this file
+├── setup.mjs                   ← installs all 13 skills' deps (judge one-liner)
+├── demo.mjs                    ← runs all 13 skills' read-only CLI live on Atlantic
 ├── STRATEGY.md                ← judging-criteria deep dive + submission checklist
 ├── shared/
 │   └── networks.json          ← canonical Pharos network + token + contract registry
