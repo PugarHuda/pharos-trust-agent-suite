@@ -1,0 +1,12 @@
+{
+  "contract": "0x4Ca9b16E6a107717A7c68F615ca4D5EFE4F2Ee4a",
+  "mandate": {
+    "user": "0x39D2bae5EAedA9283535dDC98F1991c81eD5Cd7E",
+    "agent": "0x39D2bae5EAedA9283535dDC98F1991c81eD5Cd7E",
+    "recipient": "0x000000000000000000000000000000000000C0DE",
+    "maxAmount": "1000000000000000",
+    "expiry": "1900000000",
+    "nonce": "7"
+  },
+  "signature": "0x1bfab84114aa818772dd8e9bfdcfd5f980f0e63840c857476519ee75777a29fa18900664e5501d313ddaa3de3d25932309426c5c44b516004b0181ee7c3423ae1c"
+}

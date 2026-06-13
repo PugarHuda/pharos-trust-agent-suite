@@ -65,6 +65,15 @@ step('6g. agent-bond — sybil resistance: a bonded agent has skin in the game (
 step('6h. pharos-bazaar — export an x402-Bazaar catalog (reputation attached)', '08-pharos-bazaar',
   `node scripts/bazaar.mjs export --registry ${REG} --reputation ${REP} --tag price-feed`);
 
+step('6i. a2a-mesh — read a provider reputation straight from the mesh contract', '04-a2a-mesh',
+  `node scripts/mesh.mjs score --reputation ${REP} --provider ${GOOD_PROVIDER}`);
+
+step('6j. x402-facilitator — supported payment schemes/networks (read-only)', '06-x402-facilitator',
+  'node scripts/x402.mjs supported');
+
+step('6k. intent-mandate — read a user-signed AP2-style spending envelope (on-chain)', '12-intent-mandate',
+  'node scripts/mandate.mjs remaining --file assets/sample-mandate.json');
+
 // Opt-in live WRITE segment (broadcasts real txs; needs 01-agent-treasury/.env).
 // Default demo is read-only/safe; pass --write to include this on camera.
 if (process.argv.includes('--write')) {

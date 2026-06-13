@@ -247,6 +247,27 @@ const SCENES = [
     out:[L('{ "x402Version": 1, "network": "eip155:688689",'), L('  "items": [ { … "metadata": { "reputation": 10 … } } ] }','pivot')],
     badge:{cls:'info', text:'interoperable with x402'} },
 
+  { tag:'SKILL 4', title:'a2a-mesh', skill:'agent discovery + payment-gated reputation',
+    why:'Reputation is read straight from the mesh contract — and it only accrues from real, paid interactions (EIP-712 payer signature), so it cannot be faked.',
+    caption:'Under the bazaar is the <span class="k">a2a-mesh</span>: agent discovery plus payment-gated reputation, read straight from the contract. Ten out of a hundred, from two real paid interactions — impossible to fake.',
+    cmd:'mesh score --provider 0x6d42…b630',
+    out:[L('reputation: 10/100  (ratings: 2, volume: 0.002 USDC)','pivot')],
+    badge:{cls:'ok', text:'payment-gated reputation'} },
+
+  { tag:'SKILL 6', title:'x402-facilitator', skill:'self-hostable gasless settlement',
+    why:'A self-hostable x402 facilitator (verify + gasless EIP-3009 settle) — the missing piece Pharos documents but ships no public facilitator for.',
+    caption:'The payment rail is a self-hostable <span class="k">x402 facilitator</span> — gasless EIP-3009 settlement. Here are the schemes and networks it supports on Pharos.',
+    cmd:'x402 supported',
+    out:[L('{ "kinds": [ { "scheme": "exact-evm",'), L('             "network": "eip155:688689", "x402Version": 1 } ] }','pivot')],
+    badge:{cls:'info', text:'gasless payments'} },
+
+  { tag:'SKILL 12', title:'intent-mandate', skill:'AP2-style cryptographic leash',
+    why:"A user signs an EIP-712 envelope (agent, cap, recipient, expiry). The agent can spend their funds ONLY inside it — Google AP2's Intent Mandate, on-chain.",
+    caption:'And a cryptographic leash, modeled on <span class="k">Google AP2</span>: the user signs an envelope — this agent, up to this amount, before this expiry. The contract confirms the remaining authorized amount; the agent cannot exceed it.',
+    cmd:'mandate remaining --file sample-mandate.json',
+    out:[L('remaining on mandate: 0.001 PHRS  (user-signed envelope, on-chain)','pivot')],
+    badge:{cls:'ok', text:'agent bound by signed intent'} },
+
   { tag:'LIVE WRITE', title:'agent-treasury', skill:'a real spend — and a blocked one',
     why:'A policy-allowed spend executes and confirms; an out-of-policy spend reverts before broadcast. A jailbroken prompt cannot get past it.',
     caption:'Watch real transactions. A <span class="k">policy-allowed spend executes</span> and confirms on Pharosscan. Then a spend to a non-allow-listed address is <span class="k">reverted before broadcast</span>.',

@@ -16,8 +16,13 @@ official Pharos Skill format (`SKILL.md` + `references/` + `assets/`). The suite
 > ▶️ **Interactive walkthrough:** [`web/demo.html`](web/demo.html) — a self-playing, **narrated**,
 > pointer-driven tour of all 13 skills (~3½ min), synced captions, a **live** Chainlink price read, real
 > on-chain values. Open it and press play — or **auto-record it to a video file** with the Playwright
-> recorder in [`video/`](video/) (`npm run record`), which also runs in CI
-> (Actions → **demo-video**) and uploads an `.mp4` artifact anyone can download.
+> recorder in [`video/`](video/) (`npm run record:vo` for a synced, Piper-narrated mp4), which also runs
+> in CI (Actions → **demo-video**).
+>
+> 🖥️ **Real-terminal video:** Actions → **demo-terminal** records a genuine terminal *actually running*
+> `node demo.mjs` — which executes the read-only CLI of **all 13 skills live** against Atlantic — and
+> uploads the mp4. Run it yourself: `node demo.mjs` (keyless, nothing broadcast; add `--write` for the
+> two live treasury-spend transactions).
 
 ## Status: thirteen skills implemented · 236 passing tests
 

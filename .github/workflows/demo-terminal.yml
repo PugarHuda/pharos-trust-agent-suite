@@ -1,0 +1,37 @@
+name: demo-terminal
+
+# Records a REAL terminal running `node demo.mjs` — which actually executes the read-only CLI of all
+# 13 skills live against Pharos Atlantic — and uploads the rendered mp4. Run on demand:
+# Actions → demo-terminal → Run workflow. Proves every skill runs, in a genuine terminal.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: install all skill deps (demo.mjs shells into each)
+        run: |
+          set -e
+          for d in 01-agent-treasury 02-agent-shield 03-agent-strategy 04-a2a-mesh \
+                   05-stylus-compute 06-x402-facilitator 07-agent-utils 08-pharos-bazaar \
+                   09-agent-escrow 10-agent-validation 11-reputation-gate 12-intent-mandate 13-agent-bond; do
+            echo "::group::npm install $d"; (cd "$d" && npm install --no-audit --no-fund); echo "::endgroup::"
+          done
+      - name: smoke-run demo.mjs (read-only)
+        run: node demo.mjs > /dev/null
+      - name: record terminal with VHS
+        uses: charmbracelet/vhs-action@v2
+        with:
+          path: video/demo.tape
+      - name: upload terminal video
+        uses: actions/upload-artifact@v4
+        with:
+          name: pharos-terminal
+          path: video/out/pharos-terminal.mp4
+          if-no-files-found: error
