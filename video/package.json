@@ -1,0 +1,14 @@
+{
+  "name": "pharos-demo-recorder",
+  "version": "1.0.0",
+  "description": "Records web/demo.html to a video file with Playwright (deterministic, headless, CI-friendly).",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "record": "node record.mjs"
+  },
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "playwright": "^1.48.0"
+  }
+}

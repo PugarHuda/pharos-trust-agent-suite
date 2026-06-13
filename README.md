@@ -14,8 +14,10 @@ official Pharos Skill format (`SKILL.md` + `references/` + `assets/`). The suite
 > Stylus risk gate. `npx serve web` or deploy in one command (see [`web/README.md`](web/README.md)).
 >
 > ▶️ **Interactive walkthrough:** [`web/demo.html`](web/demo.html) — a self-playing, **narrated**,
-> pointer-driven tour of all 13 skills (~3½ min), synced captions, real on-chain values. Open it and
-> press play — or screen-record it for a demo-video file.
+> pointer-driven tour of all 13 skills (~3½ min), synced captions, a **live** Chainlink price read, real
+> on-chain values. Open it and press play — or **auto-record it to a video file** with the Playwright
+> recorder in [`video/`](video/) (`npm run record`), which also runs in CI
+> (Actions → **demo-video**) and uploads an `.mp4` artifact anyone can download.
 
 ## Status: thirteen skills implemented · 236 passing tests
 

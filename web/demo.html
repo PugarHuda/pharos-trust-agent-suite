@@ -145,6 +145,26 @@ const RPC = "https://atlantic.dplabs-internal.com";
 const EXP = "https://atlantic.pharosscan.xyz";
 const tx = (h) => `${EXP}/tx/${h}`;
 
+// Live Chainlink BTC/USD on Atlantic (18-dec Push-Engine feed; supports latestAnswer/latestTimestamp).
+const BTC_FEED = "0x82d0e03ea6d94120B92EA4Ea236DcFA273D42994";
+let _rpcId = 1000;
+async function ethCall(data) {
+  const r = await fetch(RPC, { method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ jsonrpc:'2.0', id:_rpcId++, method:'eth_call', params:[{ to:BTC_FEED, data }, 'latest'] }) });
+  const j = await r.json(); if (j.error) throw new Error(j.error.message); return j.result;
+}
+async function fetchOracle() {
+  try {
+    const ans = await ethCall('0x50d25bcd'); // latestAnswer()
+    const tsR = await ethCall('0x8205bf6a'); // latestTimestamp()
+    const price = Number(BigInt(ans)) / 1e18;
+    if (!isFinite(price) || price <= 0) return null;
+    const ageMin = Math.max(0, Math.round((Date.now()/1000 - parseInt(tsR,16)) / 60));
+    const usd = price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return `BTC/USD: $${usd}  (live Chainlink read ✓, updated ${ageMin}m ago)`;
+  } catch { return null; }
+}
+
 // ---- the script: each scene mirrors `node demo.mjs` / NARRATION.md, with REAL on-chain values ----
 const L = (text, cls) => ({ text, cls });
 const SCENES = [
@@ -154,10 +174,10 @@ const SCENES = [
     cmd:'node demo.mjs --write', out:[L('Pharos Trust-First Agent Suite — live demo (13 skills, 236 tests, CI green)','pivot')],
     badge:{cls:'info', text:'live on Atlantic · chainId 688689'} },
 
-  { tag:'SKILL 7', title:'agent-utils', skill:'cheap, high-frequency primitives',
+  { tag:'SKILL 7', title:'agent-utils', skill:'cheap, high-frequency primitives', live:'oracle',
     why:'A live Chainlink price read on Pharos — no API key, no gas. The most-called primitive every agent needs.',
-    caption:'First, the primitives every agent calls. A <span class="k">live Bitcoin price</span> from the Chainlink oracle on Pharos, with a freshness check. No API key, no gas — just a read.',
-    cmd:'utils price --feed BTC/USD', out:[L('BTC/USD: live Chainlink read ✓  (fresh — staleness checked)','pivot')],
+    caption:'First, the primitives every agent calls. A <span class="k">live Bitcoin price</span> fetched right now from the Chainlink oracle on Pharos, with a freshness check. No API key, no gas — just a read.',
+    cmd:'utils price --feed BTC/USD', out:[L('BTC/USD: live Chainlink read ✓  (fetching…)','pivot')],
     badge:{cls:'ok', text:'live oracle read'} },
 
   { tag:'SKILL 2', title:'agent-shield', skill:'pre-flight security · zero-dependency',
@@ -331,9 +351,14 @@ async function playScene(i) {
   } else { cmdLine.style.display = 'none'; }
   await sleep(280); if (runId!==mySeq) return;
 
-  // output lines
+  // output lines — the oracle scene fetches the live price right now (fallback to the static line)
+  let outLines = sc.out;
+  if (sc.live === 'oracle') {
+    const live = await fetchOracle(); if (runId!==mySeq) return;
+    if (live) outLines = [L(live, 'pivot')];
+  }
   let pivotEl = null, firstLink = null;
-  for (const ln of sc.out) {
+  for (const ln of outLines) {
     const d = document.createElement('div'); d.className = 'out';
     if (ln.link) {
       d.innerHTML = (ln.text||'') + `<a class="txlink" href="${tx(ln.link)}" target="_blank" rel="noopener">${ln.link.slice(0,14)}…</a>`;
@@ -352,7 +377,10 @@ async function playScene(i) {
   // dwell, then auto-advance
   const dwell = Math.max(3600, sc.caption.replace(/<[^>]+>/g,'').length * 52);
   await sleep(dwell); if (runId!==mySeq) return;
-  if (playing) { if (i + 1 < SCENES.length) playScene(i + 1); else { playing = false; updatePlayBtn(); } }
+  if (playing) {
+    if (i + 1 < SCENES.length) playScene(i + 1);
+    else { playing = false; updatePlayBtn(); window.WALKTHROUGH_DONE = true; } // hook for Playwright recorder
+  }
 }
 
 function goto(i) { if (i < 0 || i >= SCENES.length) return; speechSynthesis.cancel(); playScene(i); }
@@ -388,12 +416,19 @@ async function ping() {
 ping(); setInterval(ping, 12000);
 
 // start
-$('startBtn').onclick = () => {
+function begin() {
   $('overlay').style.display = 'none';
-  // unlock TTS with a tiny utterance on the user gesture
   try { speechSynthesis.speak(new SpeechSynthesisUtterance(' ')); } catch {}
   playing = true; updatePlayBtn(); playScene(0);
-};
+}
+$('startBtn').onclick = begin;
+
+// Headless / auto path for the Playwright recorder: ?autoplay=1 starts without a click
+// (and ?mute=1 disables voice-over, which headless browsers can't render anyway).
+const params = new URLSearchParams(location.search);
+if (params.get('mute') === '1') { narrate = false; $('voice').classList.remove('on'); $('voice').textContent = '🔇 Voice off'; }
+const sp = parseFloat(params.get('speed')); if (sp === 1 || sp === 1.5 || sp === 2) { speed = sp; $('speed').textContent = sp + '×'; }
+if (params.get('autoplay') === '1') { setTimeout(begin, 400); }
 paintProgress();
 </script>
 </body>

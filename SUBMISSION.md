@@ -22,6 +22,11 @@ the tab in one take (~3½ min). It auto-plays all 13 skills with synced captions
 browser voice-over, and real on-chain values + Pharosscan links — no manual typing, nothing can fail on
 camera. Press **F** for fullscreen first. Upload to YouTube/Loom (unlisted is fine) and copy the link.
 
+**Fully automated — Playwright / GitHub Actions.** For a reproducible video file with zero local setup:
+GitHub → **Actions → demo-video → Run workflow**; download the **pharos-demo** artifact (`pharos-demo.mp4`).
+Or locally: `cd video && npm install && npx playwright install chromium && npm run record`. (Playwright
+video is silent — captions carry the narration; see `video/README.md`.)
+
 **Alternative — live terminal.** Follow `DEMO.md` / `NARRATION.md`:
 1. Screen-record a terminal + a Pharosscan tab.
 2. Run the real CLIs against the deployed contracts (addresses in `DEPLOYMENTS.md`):

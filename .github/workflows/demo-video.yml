@@ -1,0 +1,40 @@
+name: demo-video
+
+# Records web/demo.html to a video file with Playwright and uploads it as an artifact.
+# Run on demand: Actions → demo-video → Run workflow. Anyone can reproduce the video from the repo.
+
+on:
+  workflow_dispatch:
+    inputs:
+      speed:
+        description: "Playback speed (1, 1.5, or 2)"
+        default: "1"
+        required: false
+
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: install recorder deps
+        working-directory: video
+        run: npm install --no-audit --no-fund
+      - name: install chromium
+        working-directory: video
+        run: npx playwright install --with-deps chromium
+      - name: record walkthrough
+        working-directory: video
+        env:
+          SPEED: ${{ github.event.inputs.speed }}
+        run: npm run record
+      - name: upload video
+        uses: actions/upload-artifact@v4
+        with:
+          name: pharos-demo
+          path: |
+            video/out/pharos-demo.mp4
+            video/out/pharos-demo.webm
+          if-no-files-found: error
