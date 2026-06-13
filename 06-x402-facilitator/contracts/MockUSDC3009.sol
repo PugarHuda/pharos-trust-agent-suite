@@ -60,6 +60,11 @@ contract MockUSDC3009 {
         require(block.timestamp < validBefore, "expired");
         require(!_used[from][nonce], "authorization used");
 
+        require(from != address(0), "zero from");
+        // EIP-2: reject malleable high-s and bad v, matching canonical USDC / FiatTokenV2.
+        require(uint256(s) <= 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0, "bad s");
+        require(v == 27 || v == 28, "bad v");
+
         bytes32 structHash = keccak256(abi.encode(TRANSFER_WITH_AUTHORIZATION_TYPEHASH, from, to, value, validAfter, validBefore, nonce));
         bytes32 digest = keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, structHash));
         require(ecrecover(digest, v, r, s) == from, "bad signature");

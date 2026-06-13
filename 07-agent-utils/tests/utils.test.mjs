@@ -41,6 +41,14 @@ test('classifyAddress ignores zero-padded prefixes (no false poisoning of Permit
   assert.notEqual(classifyAddress('0x0000000000000000000000000000000000001234', reg).status, 'poisoning-suspect');
 });
 
+test('classifyAddress catches a long-suffix look-alike that differs early (false-negative fix)', () => {
+  const reg = { [USDC]: 'USDC' }; // 0xcfC8330f4BCAB529c625D12781b1C19466A9Fc8B
+  // share the last 34 hex chars, differ only in the first 6 -> user-visible last-4 match
+  const body = USDC.toLowerCase().slice(2);
+  const lookalike = '0x' + 'deadbe' + body.slice(6);
+  assert.equal(classifyAddress(lookalike, reg).status, 'poisoning-suspect');
+});
+
 test('isAddress', () => {
   assert.ok(isAddress(USDC));
   assert.ok(!isAddress('0x123'));

@@ -8,7 +8,7 @@
     "x402": "./scripts/x402.mjs"
   },
   "scripts": {
-    "test": "node --test tests/x402.test.mjs tests/risk.test.mjs",
+    "test": "node --test tests/x402.test.mjs tests/risk.test.mjs tests/usdc3009.test.mjs",
     "serve": "node scripts/server.mjs"
   },
   "engines": {
@@ -18,6 +18,9 @@
     "ethers": "^6.13.0"
   },
   "devDependencies": {
-    "solc": "^0.8.26"
+    "solc": "^0.8.26",
+    "@ethereumjs/evm": "^3.1.0",
+    "@ethereumjs/common": "^4.4.0",
+    "@ethereumjs/util": "^9.1.0"
   }
 }

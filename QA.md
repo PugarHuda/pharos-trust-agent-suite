@@ -99,6 +99,22 @@ A third pass focused on code added after round 2. Test count 110 → **132**.
 > hardened in rounds 1–2); the new x402 skill and the new mesh/treasury code were reviewed in depth, and
 > shield/strategy/stylus were re-probed directly for regressions.
 
+## Round 4 (new code: ERC-8004 contracts, EIP-3009 token, agent-utils, bazaar, risk-API)
+
+Reviewed everything added after the suite grew to 8 skills. Test count 154 → **162**.
+
+| Area | Finding | Resolution |
+|------|---------|-----------|
+| **MockUSDC3009** (EIP-3009) | EIP-712 domain/typehash, digest, and **replay prevention confirmed correct** (a real USDC-style signature verifies; the nonce is consumed before the balance moves). Only gap: no malleability guard (not exploitable — nonce blocks double-spend) and **no unit tests**. | Added the EIP-2 high-`s`/`v` guard + `from != 0`; added a 5-case EVM unit harness (valid settle, replay revert, expiry boundary, wrong-chain reject, high-`s` reject). |
+| **IdentityRegistry8004 / Reputation8004Adapter** | Reviewer: **no bugs** — access control tight (no agentId hijack), agentId↔provider mapping lossless, adapter read-only/safe. | No change; minor doc nits only. |
+| **x402 risk-service** | **Medium** — verify is stateless and never settles, so one signed payment could fetch unlimited scores until expiry (free-rider). Also `riskScore` truncated >6-dp features while the "bit-identical" stylus reference throws. | Added a per-`(payer,nonce)` replay guard (one paid response per authorization; server keeps the set) and made `riskScore` reject >6-dp features. +2 tests. |
+| **agent-utils** poisoning | **Medium (false negative)** — the non-zero-prefix guard (added to kill zero-pad false positives) let a long-**suffix** look-alike that differs only early slip through as `unknown`. | Added a long-end trigger (`suffix>=30` or `prefix>=30` with a long combined match). +1 test. |
+| **pharos-bazaar** rank | `rankServices` could be poisoned by a non-finite reputation (not reachable live, but it's exported pure logic). | Coerce non-finite reputation to `-1` in the comparator. |
+
+> The two reviewers ran in restricted permission mode (static analysis); every fix was re-validated by
+> running the suites. MockUSDC3009's signature/replay correctness is also confirmed empirically by the
+> live x402 settle on Atlantic.
+
 ## Notes
 
 - All findings above were verified and fixed against the in-memory EVM / live Atlantic RPC, then locked

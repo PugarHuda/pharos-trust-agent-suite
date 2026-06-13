@@ -22,6 +22,7 @@ const provider = new JsonRpcProvider(args.rpcUrl || net.rpcUrl, net.chainId, { s
 const PORT = Number(args.port || 4030);
 const TOKEN = process.env.TOKEN || net.tokens?.USDC_x402?.address || net.tokens?.USDC?.address;
 const PAY_TO = process.env.PAY_TO;
+const seen = new Set(); // consumed (payer,nonce) pairs — one paid response per authorization
 
 const server = createServer(async (req, res) => {
   const url = new URL(req.url, `http://localhost:${PORT}`);
@@ -30,7 +31,7 @@ const server = createServer(async (req, res) => {
   const features = (url.searchParams.get('features') || '').split(',').map((s) => s.trim());
   const requirements = riskRequirements({ chainId: net.chainId, asset: TOKEN, payTo: PAY_TO, price: args.price || '1000' });
   const domain = await resolveTokenDomain(TOKEN, net.chainId, { provider, registryEntry: Object.values(net.tokens || {}).find((t) => t.address.toLowerCase() === TOKEN.toLowerCase()) });
-  const out = handleRiskRequest({ headers: { 'x-payment': req.headers['x-payment'] }, features }, { requirements, domain });
+  const out = handleRiskRequest({ headers: { 'x-payment': req.headers['x-payment'] }, features }, { requirements, domain, seen });
   res.writeHead(out.status, { 'content-type': 'application/json', ...(out.headers || {}) });
   res.end(JSON.stringify(out.body));
 });

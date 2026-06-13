@@ -50,6 +50,24 @@ test('underpayment -> 402 invalid', async () => {
   assert.match(res.body.error, /below required/);
 });
 
+test('replay guard: the same payment cannot fetch a second score', async () => {
+  const seen = new Set();
+  const hdr = { 'x-payment': xpaymentHeader(await payment()) };
+  const first = handleRiskRequest({ headers: hdr, features: ['0.2', '1', '0.1', '0'] }, { requirements, domain, now: NOW, seen });
+  assert.equal(first.status, 200);
+  const second = handleRiskRequest({ headers: hdr, features: ['0.2', '1', '0.1', '0'] }, { requirements, domain, now: NOW, seen });
+  assert.equal(second.status, 402);
+  assert.match(second.body.error, /replay/);
+});
+
+test('feature with >6 decimals is rejected (matches stylus toFixed)', async () => {
+  const res = handleRiskRequest(
+    { headers: { 'x-payment': xpaymentHeader(await payment()) }, features: ['0.1234567', '1', '0.1', '0'] },
+    { requirements, domain, now: NOW },
+  );
+  assert.equal(res.status, 400);
+});
+
 test('malformed X-PAYMENT -> 400', () => {
   const res = handleRiskRequest({ headers: { 'x-payment': '!!notbase64json' }, features: ['0', '0', '0', '0'] }, { requirements, domain, now: NOW });
   assert.equal(res.status, 400);

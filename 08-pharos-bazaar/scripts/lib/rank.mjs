@@ -4,8 +4,9 @@
 
 // Rank services: higher reputation first, then lower price, then lower id (stable).
 export function rankServices(services) {
+  const fin = (r) => (Number.isFinite(r) ? r : -1); // guard against null/NaN poisoning the comparator
   return [...services].sort((a, b) => {
-    const ra = a.reputation ?? -1, rb = b.reputation ?? -1;
+    const ra = fin(a.reputation), rb = fin(b.reputation);
     if (rb !== ra) return rb - ra;
     const pa = BigInt(a.price ?? 0), pb = BigInt(b.price ?? 0);
     if (pa !== pb) return pa < pb ? -1 : 1;

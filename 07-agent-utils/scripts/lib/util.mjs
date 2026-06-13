@@ -54,7 +54,13 @@ export function classifyAddress(address, registry, { minMatch = 6, minNonZeroPre
   for (const k of known) {
     const { prefix, suffix } = matchEnds(body, k.a.slice(2));
     const nonZero = body.slice(0, prefix).replace(/0/g, '').length;
-    if (prefix >= minMatch && suffix >= minMatch && nonZero >= minNonZeroPrefix) {
+    // (a) classic: both visible ends match with real (non-zero) prefix chars; OR
+    // (b) a very long prefix or suffix match alone (an attacker who reproduced most of
+    //     the address but differs early/late) — catches look-alikes the prefix+nonZero
+    //     rule would miss when divergence is at one end.
+    const classic = prefix >= minMatch && suffix >= minMatch && nonZero >= minNonZeroPrefix;
+    const longEnd = (suffix >= 30 || prefix >= 30) && (prefix + suffix) >= 32;
+    if (classic || longEnd) {
       return { status: 'poisoning-suspect', lookalike: { address: '0x' + k.a.slice(2), label: k.label, prefix, suffix } };
     }
   }

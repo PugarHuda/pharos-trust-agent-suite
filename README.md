@@ -9,7 +9,7 @@ official Pharos Skill format (`SKILL.md` + `references/` + `assets/`). The suite
 > Hackathon: Skill-to-Agent Dual Cascade (Phase 1) · Prize pool 50,000 PROS (Phase 1: 20,000 PROS / 40 winners)
 > Network: Pharos Atlantic Testnet (chainId **688689**) · Submission deadline **2026-06-15**
 
-## Status: eight skills implemented · 154 passing tests
+## Status: eight skills implemented · 162 passing tests
 
 | # | Skill | One-liner | Status | Tests |
 |---|-------|-----------|--------|-------|
@@ -18,8 +18,8 @@ official Pharos Skill format (`SKILL.md` + `references/` + `assets/`). The suite
 | 3 | **agent-strategy** | Autonomous DeFi: oracle read → rule DSL → policy-bounded swap, one NL instruction | Live Chainlink read on Atlantic; full evaluator | 25 |
 | 4 | **a2a-mesh** | Agent-to-agent discovery + x402 payment + payment-gated on-chain reputation (EIP-712 trustless, ERC-8004-aligned) | Contracts compile (mesh + ERC-8004 Identity/adapter); anti-sybil core tested | 26 |
 | 5 | **stylus-compute** | Rust/WASM risk classifier gating a treasury spend, with a bit-identical verifiable JS reference | Source + JS reference + CLI done; WASM build via Docker/gnu | 15 |
-| 6 | **x402-facilitator** | Self-hostable x402 facilitator (verify + gasless settle of EIP-3009 payments) — fills the missing-facilitator gap | verify/settle/server/CLI + a paid risk-score resource; tested | 19 |
-| 7 | **agent-utils** | High-frequency read-only utilities (price, gas advisor, token info, balance, address-safety) — cheapest to adopt, most-called | Zero-key CLI; live-verified on Atlantic | 7 |
+| 6 | **x402-facilitator** | Self-hostable x402 facilitator (verify + gasless settle of EIP-3009 payments) — fills the missing-facilitator gap | verify/settle/server/CLI + a paid risk-score resource; tested | 26 |
+| 7 | **agent-utils** | High-frequency read-only utilities (price, gas advisor, token info, balance, address-safety) — cheapest to adopt, most-called | Zero-key CLI; live-verified on Atlantic | 8 |
 | 8 | **pharos-bazaar** | The discover→pay→rate marketplace hub composing mesh + x402 (Pharos's x402-Bazaar, reputation-ranked) | Live discovery vs deployed mesh; ranking tested | 4 |
 
 A multi-agent adversarial QA pass hardened every skill against real findings — see [`QA.md`](QA.md).

@@ -25,6 +25,7 @@ export function riskScore(features) {
   const fx = features.map((h) => {
     const m = String(h).trim().match(/^(-?)(\d*)(?:\.(\d+))?$/);
     if (!m || (m[2] === '' && (m[3] ?? '') === '')) throw new Error(`bad feature: ${h}`);
+    if ((m[3] ?? '').length > 6) throw new Error(`feature ${h} has more than 6 decimal places`);
     const frac = (m[3] ?? '').padEnd(6, '0').slice(0, 6);
     const v = BigInt((m[2] || '0') + frac);
     return m[1] === '-' ? -v : v;
@@ -53,7 +54,7 @@ export function riskRequirements({ chainId, asset, payTo, price = '1000' }) {
 //   ctx: { requirements, domain, now? }
 // returns { status, headers?, body }
 export function handleRiskRequest(req, ctx) {
-  const { requirements, domain, now } = ctx;
+  const { requirements, domain, now, seen } = ctx;
   const xpayment = req.headers?.['x-payment'];
   if (!xpayment) {
     // 402: tell the client how to pay (base64 PaymentRequired, per x402).
@@ -70,8 +71,16 @@ export function handleRiskRequest(req, ctx) {
   const v = verifyPayment(payment, requirements, domain, { now });
   if (!v.isValid) return { status: 402, body: { error: `invalid payment: ${v.reason}` } };
 
-  // Paid + valid -> deliver the resource. (A production facilitator would also settle on-chain;
-  // here verify gates access and settlement is done by the /settle endpoint.)
+  // Replay guard: a stateless verify would let one signed payment be reused indefinitely until
+  // its validBefore. Consume the authorization's nonce per (payer,nonce) so each payment buys one
+  // response. (Production should also settle on-chain, which consumes the nonce there too.)
+  if (seen) {
+    const key = `${v.payer.toLowerCase()}:${payment.payload?.authorization?.nonce}`;
+    if (seen.has(key)) return { status: 402, body: { error: 'payment already used (replay)' } };
+    seen.add(key);
+  }
+
+  // Paid + valid -> deliver the resource.
   let scored;
   try { scored = riskScore(req.features); }
   catch (e) { return { status: 400, body: { error: e.message } }; }
