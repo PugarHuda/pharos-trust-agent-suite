@@ -2,7 +2,7 @@
 
 [![tests](https://github.com/PugarHuda/pharos-trust-agent-suite/actions/workflows/test.yml/badge.svg)](https://github.com/PugarHuda/pharos-trust-agent-suite/actions/workflows/test.yml)
 
-Eight composable Skills for the **Pharos Skill-to-Agent Dual Cascade Hackathon**, built in the
+Nine composable Skills for the **Pharos Skill-to-Agent Dual Cascade Hackathon**, built in the
 official Pharos Skill format (`SKILL.md` + `references/` + `assets/`). The suite is designed as a
 **trust layer for the Pharos agent economy**: the things every other agent needs but few will build.
 
@@ -13,7 +13,7 @@ official Pharos Skill format (`SKILL.md` + `references/` + `assets/`). The suite
 > contracts *in the browser*: run the Bazaar live, click the on-chain commerce loop, and play with the
 > Stylus risk gate. `npx serve web` or deploy in one command (see [`web/README.md`](web/README.md)).
 
-## Status: eight skills implemented · 162 passing tests
+## Status: nine skills implemented · 185 passing tests
 
 | # | Skill | One-liner | Status | Tests |
 |---|-------|-----------|--------|-------|
@@ -25,6 +25,7 @@ official Pharos Skill format (`SKILL.md` + `references/` + `assets/`). The suite
 | 6 | **x402-facilitator** | Self-hostable x402 facilitator (verify + gasless settle of EIP-3009 payments) — fills the missing-facilitator gap | verify/settle/server/CLI + a paid risk-score resource; tested | 26 |
 | 7 | **agent-utils** | High-frequency read-only utilities (price, gas advisor, token info, balance, address-safety) — cheapest to adopt, most-called | Zero-key CLI; live-verified on Atlantic | 8 |
 | 8 | **pharos-bazaar** | The discover→pay→rate marketplace hub composing mesh + x402 (Pharos's x402-Bazaar, reputation-ranked) | Live discovery vs deployed mesh; ranking tested | 4 |
+| 9 | **agent-escrow** | The "hire" primitive: lock funds for a job, release on approval / refund on timeout / arbiter split on dispute; jobId doubles as the mesh reputation ref | Contract live on Atlantic; full lifecycle proven on-chain | 23 |
 
 A multi-agent adversarial QA pass hardened every skill against real findings — see [`QA.md`](QA.md).
 
@@ -38,6 +39,7 @@ A multi-agent adversarial QA pass hardened every skill against real findings —
 | Reputation8004Adapter (ERC-8004 read surface) | [`0x6B99B00BD52Bc134D5658745E64DF1938592e468`](https://atlantic.pharosscan.xyz/address/0x6B99B00BD52Bc134D5658745E64DF1938592e468) |
 | IdentityRegistry8004 (ERC-8004 Identity) | [`0xa048D4F17282488B60D96E6FB01FbdA106F38B8A`](https://atlantic.pharosscan.xyz/address/0xa048D4F17282488B60D96E6FB01FbdA106F38B8A) |
 | MockUSDC3009 (EIP-3009 settlement token) | [`0xBd80E06F0325C4758e06d8a9522588363C4c75a4`](https://atlantic.pharosscan.xyz/address/0xBd80E06F0325C4758e06d8a9522588363C4c75a4) |
+| AgentEscrow (hire/escrow; full lifecycle on-chain) | [`0x5919e995b29Bf81B322171769C9e63c5964258A7`](https://atlantic.pharosscan.xyz/address/0x5919e995b29Bf81B322171769C9e63c5964258A7) |
 
 Proven on-chain (tx hashes in `DEPLOYMENTS.md`): a treasury **successful policy-allowed spend** *and* a
 **blocked** out-of-policy spend (with on-chain cap/budget accounting); the **full agent-commerce loop** —
@@ -47,8 +49,9 @@ and reputation readable via the standard `getSummary`; and a live Chainlink orac
 
 ### What's real vs. fixture vs. pending (full transparency)
 
-- **Real & live on Atlantic:** all 6 contracts above, the full x402→reputation loop, every read path.
-  162 tests pass locally **and in CI** on a clean runner.
+- **Real & live on Atlantic:** all 7 contracts above, the full x402→reputation loop, the full escrow
+  lifecycle, every read path.
+  185 tests pass locally **and in CI** on a clean runner.
 - **Test/demo fixtures (clearly labeled):** `MockERC20`, `MockUSDC3009` (an EIP-3009 token), `DrainRouter`
   exist only to exercise/demonstrate the real contracts — Atlantic has **no faucet** for a real EIP-3009
   USDC, so the live settle uses a deployed mock. Canonical Pharos token addresses are in every
@@ -67,12 +70,16 @@ contracts on-chain and `DEMO.md` for the demo-video script.
 agent-strategy ──pre-flight──► agent-shield ──gate──► agent-treasury ──executeCall──► DEX / x402 / peer
                                                   ▲                         │
 stylus-compute ──risk score gates a spend─────────┘        a2a-mesh ───routes payment through treasury
+
+pharos-bazaar: discover ──► agent-escrow: hire (lock) ──► deliver ──► release ──► a2a-mesh: rate
+                                  (jobId === mesh reputation ref — a settled escrow mints reputation)
 ```
 
 `agent-treasury spend` literally shells out to `agent-shield verify-address` + simulates before
 broadcasting; `agent-strategy plan` emits `treasury.executeCall` calldata; `stylus-compute` gates a
-spend on an on-chain risk score; `a2a-mesh` routes x402 settlement through the treasury policy. The
-composition is wired in code, not just described.
+spend on an on-chain risk score; `a2a-mesh` routes x402 settlement through the treasury policy;
+`agent-escrow` uses its `jobId` as the `a2a-mesh` reputation `ref`, so a settled hire mints
+payment-gated reputation. The composition is wired in code, not just described.
 
 ## Why this wins (strategy)
 
@@ -105,12 +112,12 @@ This suite is different on six defensible axes:
 | **Reputation** | self-reported or absent | **payment-gated, anti-sybil** — only the `(payer,ref)` who paid (EIP-712) can rate; non-payer reverts `NotPayer` |
 | **The full discover→pay→settle→rate loop** | claimed or partial | **proven live, tx-by-tx** on Atlantic |
 | **Scope** | one deep skill *or* many shallow ones | **8 composable skills, all tested** (breadth × depth) |
-| **Tests / CI** | often none | **162 passing · green CI** on a clean runner |
+| **Tests / CI** | often none | **185 passing · green CI** on a clean runner |
 | **Standards** | rarely | **ERC-8004 + x402 native**; score readable via `getSummary()` on-chain |
 
 The one-liner for the submission: **the only entry that proves the entire agent-commerce loop on-chain,
-with un-fakeable reputation, behind a trust layer that *enforces* rather than *advises* — eight
-composable skills, 162 tests, six live contracts.**
+with un-fakeable reputation, behind a trust layer that *enforces* rather than *advises* — nine
+composable skills, 185 tests, seven live contracts.**
 
 ## Repository layout
 
@@ -137,6 +144,7 @@ composable skills, 162 tests, six live contracts.**
 ├── 06-x402-facilitator/       ← self-hostable x402 facilitator (verify + gasless settle) + tests
 ├── 07-agent-utils/            ← read-only utilities (price/gas/token/balance/address-safety) + tests
 ├── 08-pharos-bazaar/          ← discover→pay→rate marketplace hub (composes mesh + x402) + tests
+├── 09-agent-escrow/           ← hire/escrow primitive (release/refund/arbiter) + live contract + tests
 ├── DEPLOY.md                  ← faucet → deploy → record addresses
 ├── DEMO.md                    ← demo-video script
 ├── SUBMISSION.md              ← DoraHacks + Anvita submission guide
@@ -161,6 +169,7 @@ cd ../05-stylus-compute && npm install && npm test
 cd ../06-x402-facilitator && npm install && npm test
 cd ../07-agent-utils && npm install && npm test
 cd ../08-pharos-bazaar && npm install && npm test
+cd ../09-agent-escrow && npm install && npm run build && npm test
 ```
 
 ## Canonical Pharos data used throughout

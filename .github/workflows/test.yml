@@ -1,6 +1,6 @@
 name: tests
 
-# Runs every skill's test suite on push/PR so the 132 passing tests are
+# Runs every skill's test suite on push/PR so all passing tests are
 # reproducible by anyone (judges included). All suites are offline — in-memory
 # EVM (@ethereumjs) + mocked RPC — so no network or keys are needed.
 
@@ -25,6 +25,7 @@ jobs:
           - 06-x402-facilitator
           - 07-agent-utils
           - 08-pharos-bazaar
+          - 09-agent-escrow
     name: ${{ matrix.skill }}
     steps:
       - uses: actions/checkout@v4

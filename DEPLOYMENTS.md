@@ -40,6 +40,24 @@ Owner / deployer: `0x39D2bae5EAedA9283535dDC98F1991c81eD5Cd7E`
 > (deployed 2026-06-13) exposes the live Reputation through the standard `getSummary` interface —
 > verified live: `getSummary(agentId(0x6d42…)) → count 1, value 5, decimals 0`.
 
+## agent-escrow
+
+| Item | Address / tx | Link |
+|------|--------------|------|
+| **AgentEscrow** (native-PHRS escrow; pull-payments, reentrancy-guarded, no admin) | `0x5919e995b29Bf81B322171769C9e63c5964258A7` | [addr](https://atlantic.pharosscan.xyz/address/0x5919e995b29Bf81B322171769C9e63c5964258A7) |
+| Deploy tx | `0xe3ae71e39ed33dc610081365bdc6016e0f014182a01d8ce77ebf3ad861cdad4d` | [tx](https://atlantic.pharosscan.xyz/tx/0xe3ae71e39ed33dc610081365bdc6016e0f014182a01d8ce77ebf3ad861cdad4d) |
+| **Release path** — createJob (0.002 locked) | `0x6df5039da132eae7b671b75a3e662a7d1e55516654c0517b5092911a2d0debca` | [tx](https://atlantic.pharosscan.xyz/tx/0x6df5039da132eae7b671b75a3e662a7d1e55516654c0517b5092911a2d0debca) |
+| ↳ release (provider credited) | `0x2a31bf3f82105c2c02b1ace1d96a848dac16001c95fddf2f9ecbea0ab381c10e` | [tx](https://atlantic.pharosscan.xyz/tx/0x2a31bf3f82105c2c02b1ace1d96a848dac16001c95fddf2f9ecbea0ab381c10e) |
+| **Dispute path** — createJob (0.001 locked, arbiter set) | `0x4b4a96a3d542b7e15229bb854a9d6bf4dfecca556381138fdeceafed79c60c01` | [tx](https://atlantic.pharosscan.xyz/tx/0x4b4a96a3d542b7e15229bb854a9d6bf4dfecca556381138fdeceafed79c60c01) |
+| ↳ dispute (by client) | `0x5badcc4adaab806a5c093d196c539d85c6728e4a991dffab86f9c0b4d83bf4dd` | [tx](https://atlantic.pharosscan.xyz/tx/0x5badcc4adaab806a5c093d196c539d85c6728e4a991dffab86f9c0b4d83bf4dd) |
+| ↳ resolve (arbiter, 100% → client) | `0xedfe433bda960c0ab07a8d709adea07ca1cd6728a45d5a7781abfcdc3d337966` | [tx](https://atlantic.pharosscan.xyz/tx/0xedfe433bda960c0ab07a8d709adea07ca1cd6728a45d5a7781abfcdc3d337966) |
+| ↳ **withdraw** (real PHRS pulled back to client) | `0x26ff7a7ab6a66553d7819c497ee847ef536f0da9a7bdae0963bdf1436f19f470` | [tx](https://atlantic.pharosscan.xyz/tx/0x26ff7a7ab6a66553d7819c497ee847ef536f0da9a7bdae0963bdf1436f19f470) |
+
+> Full lifecycle on-chain with one funded key (client = arbiter; provider = passive dummy): the
+> **release** path proves create + release (provider credited), and the **dispute** path proves
+> dispute → arbiter resolve → pull `withdraw()` (funds returned to a real wallet). The `jobId` doubles
+> as the a2a-mesh reputation `ref`. Refund-on-timeout is covered by the 23-test suite.
+
 ## stylus-compute
 
 | Item | Address / tx | Link |

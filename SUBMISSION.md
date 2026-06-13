@@ -1,14 +1,16 @@
 # Submission Guide — Skill-to-Agent Dual Cascade Hackathon (Phase 1)
 
-Everything needed to submit, plus a ready-to-paste writeup. **Deadline: 2026-06-15 22:59** (page
-header; body says submission by Jun 16, judging Jun 17–22).
+Everything needed to submit, plus a ready-to-paste writeup. **Deadline EXTENDED: 2026-06-17 17:00**
+(judging Jun 17–22). The only hard submission requirement is a GitHub link; a demo video is strongly
+recommended (it's where the UX/clarity score is won).
 
 ## Pre-flight checklist
 
 - [x] Public GitHub repo: https://github.com/PugarHuda/pharos-trust-agent-suite
-- [x] 8 skills in official `SKILL.md` format, 152 passing tests, **green CI** (`.github/workflows/test.yml`)
-- [x] On-chain proof on Atlantic incl. a **full gasless x402 → reputation loop** (addresses + tx in `DEPLOYMENTS.md`)
-- [ ] **Demo video (REQUIRED)** — record per `DEMO.md` (contracts are live; film the real tx on Pharosscan)
+- [x] 9 skills in official `SKILL.md` format, 185 passing tests, **green CI** (`.github/workflows/test.yml`)
+- [x] On-chain proof on Atlantic incl. a **full gasless x402 → reputation loop** + a **full escrow lifecycle** (addresses + tx in `DEPLOYMENTS.md`)
+- [x] Live read-only **web dashboard** (`web/`) — reads the deployed contracts in-browser; deploy with `vercel --prod`
+- [ ] **Demo video (strongly recommended)** — record per `DEMO.md` / `NARRATION.md` (contracts are live; film the real tx on Pharosscan), or screen-record the dashboard
 - [ ] Submit BUIDL on DoraHacks (link below)
 - [ ] Register on Anvita Flow (flow.anvita.xyz)
 
@@ -48,8 +50,15 @@ same repo link. Confirm any exact registry/template in the dev Telegram (t.me/+U
 
 ## Ready-to-paste DoraHacks description
 
-> **Pharos Trust-First Agent Suite** — six composable Skills that form the trust & infrastructure layer
+> **Pharos Trust-First Agent Suite** — nine composable Skills that form the trust & infrastructure layer
 > for the Pharos agent economy: the things every other agent needs but few build.
+>
+> **What makes it different from the field:** the most crowded category this round is agent "safety", and
+> almost every such entry *returns advice* — a score or ALLOW/WARN/BLOCK verdict the agent can ignore. A
+> jailbroken agent ignores advice. This suite *enforces* on-chain: the treasury **reverts** an
+> out-of-policy spend before it can broadcast, and reputation is **payment-gated** so it cannot be faked.
+> It's the only entry that proves the *entire* agent-commerce loop on-chain — and it's nine composable
+> skills, not one.
 >
 > 1. **agent-treasury** — a smart-account treasury that enforces a spending policy **on-chain** (daily
 >    cap, token/contract allowlist, single-token session keys, kill-switch). A jailbroken agent still
@@ -60,7 +69,7 @@ same repo link. Confirm any exact registry/template in the dev Telegram (t.me/+U
 > 3. **agent-strategy** — natural-language mandate → live Chainlink oracle read → policy-bounded swap
 >    calldata (routed through treasury + shield).
 > 4. **a2a-mesh** — agent discovery + payment-gated on-chain reputation. Recording is **trustless via an
->    EIP-712 payer signature**, so a relayer can't fabricate reputation. *Live on Atlantic.*
+>    EIP-712 payer signature**, so a relayer can't fabricate reputation. ERC-8004-aligned. *Live on Atlantic.*
 > 5. **stylus-compute** — a Rust/WASM risk classifier that gates a treasury spend, with a bit-identical
 >    JS reference so the on-chain result is independently verifiable.
 > 6. **x402-facilitator** — a self-hostable x402 facilitator (verify + **gasless** EIP-3009 settle),
@@ -69,8 +78,14 @@ same repo link. Confirm any exact registry/template in the dev Telegram (t.me/+U
 >    address-safety) — the cheapest-to-adopt, most-called primitives, aimed at the Invocation Race.
 > 8. **pharos-bazaar** — the discover→pay→rate marketplace hub composing mesh + x402 (Pharos's answer to
 >    Coinbase's x402 Bazaar), reputation-ranked.
+> 9. **agent-escrow** — the **"hire" primitive**: a client locks native funds for a job; settlement is by
+>    code (release on approval / refund on timeout / arbiter split on dispute), all pull-payments, no
+>    admin. The `jobId` doubles as the mesh reputation `ref`, so a settled hire mints un-fakeable
+>    reputation. *Live on Atlantic; full lifecycle (release + dispute→resolve→withdraw) proven on-chain.*
 >
 > The skills are wired together in code, and proven on Atlantic with a **full agent-commerce loop** —
-> discover → gasless x402 pay/settle → record → rate → on-chain reputation — plus a treasury successful
-> + blocked spend. Aligned with **ERC-8004** (Trustless Agents). 152 passing tests with green CI;
-> hardened across three adversarial QA rounds (see QA.md). Addresses + tx hashes in DEPLOYMENTS.md.
+> discover → hire (escrow) → gasless x402 pay/settle → record → rate → on-chain reputation — plus a
+> treasury successful + blocked spend and a full escrow lifecycle. Aligned with **ERC-8004** (Trustless
+> Agents) + **x402**. **185 passing tests with green CI**; hardened across four adversarial QA rounds
+> (see QA.md). A zero-backend **live web dashboard** (`web/`) reads the deployed contracts in-browser.
+> Seven contracts + all tx hashes in DEPLOYMENTS.md.

@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Pharos Trust-First Agent Suite — live</title>
-<meta name="description" content="A trust layer for the Pharos agent economy: 8 composable skills, 162 tests, the full discover→pay→settle→rate loop proven live on Atlantic with payment-gated, un-fakeable reputation." />
+<meta name="description" content="A trust layer for the Pharos agent economy: 9 composable skills, 185 tests, the full discover→hire→pay→settle→rate loop proven live on Atlantic with payment-gated, un-fakeable reputation." />
 <style>
   :root{
     --bg:#070b12; --panel:#0e1622; --panel2:#121f30; --line:#1d2c40;
@@ -130,9 +130,9 @@
     <a class="btn" id="ghbtn" href="https://github.com/PugarHuda/pharos-trust-agent-suite" target="_blank" rel="noopener">View source on GitHub</a>
   </div>
   <div class="chips">
-    <div class="chip"><b>8</b><span>composable skills</span></div>
-    <div class="chip"><b>162</b><span>tests · CI green</span></div>
-    <div class="chip"><b>6</b><span>contracts live on Atlantic</span></div>
+    <div class="chip"><b>9</b><span>composable skills</span></div>
+    <div class="chip"><b>185</b><span>tests · CI green</span></div>
+    <div class="chip"><b>7</b><span>contracts live on Atlantic</span></div>
     <div class="chip"><b id="repchip">10/100</b><span>real, payment-gated reputation</span></div>
     <div class="chip"><b id="blkchip">#…</b><span>live block height</span></div>
   </div>
@@ -147,7 +147,7 @@
   <div class="grid g3" style="margin-bottom:26px">
     <div class="card"><span class="tag">UNIQUE #1</span><h3>Enforcement, not advice</h3><p>Spending limits, allow-lists and a kill-switch are enforced by <code>AgentTreasury</code> on-chain. A compromised prompt physically cannot exceed the policy — proven by a live <span class="muted">blocked</span> spend tx.</p></div>
     <div class="card"><span class="tag">UNIQUE #2</span><h3>Un-fakeable reputation</h3><p>Reputation is <b>payment-gated</b>: only the address that actually paid (EIP-712 signed, keyed by <code>(payer,ref)</code>) can rate. A relayer can’t forge it; a non-payer’s rating reverts <code>NotPayer</code>. Anti-sybil by construction.</p></div>
-    <div class="card"><span class="tag">UNIQUE #3</span><h3>Breadth × depth × proof</h3><p>Others are broad-but-shallow or deep-but-narrow. We are the only entry high on all three axes at once: <b>8 skills, 162 tests, 6 live contracts</b>, and a complete on-chain commerce loop.</p></div>
+    <div class="card"><span class="tag">UNIQUE #3</span><h3>Breadth × depth × proof</h3><p>Others are broad-but-shallow or deep-but-narrow. We are the only entry high on all three axes at once: <b>9 skills, 185 tests, 7 live contracts</b>, and a complete on-chain commerce loop.</p></div>
     <div class="card"><span class="tag">UNIQUE #4</span><h3>Composition wired in code</h3><p><code>treasury</code> shells to <code>shield</code> pre-flight; <code>strategy</code> emits <code>treasury.executeCall</code> calldata; <code>stylus</code> risk-gates a spend; <code>mesh</code> routes x402 settlement through the policy. Not a diagram — actual call paths.</p></div>
     <div class="card"><span class="tag">UNIQUE #5</span><h3>Standards-native</h3><p>Implements <b>ERC-8004</b> (Trustless Agents: Identity + Reputation) and <b>x402</b> gasless payments. The same score is readable through the standard <code>getSummary()</code> on-chain.</p></div>
     <div class="card"><span class="tag">UNIQUE #6</span><h3>Verifiable heavy compute</h3><p>A fixed-point risk model written once in Rust/Stylus and a <b>bit-identical</b> JS reference — so the on-chain WASM result is independently verifiable. A Pharos-exclusive angle. (Try it below.)</p></div>
@@ -160,7 +160,7 @@
       <tr><td>Reputation</td><td class="them">self-reported or none</td><td class="us"><span class="yes">payment-gated, anti-sybil</span></td></tr>
       <tr><td>Full discover→pay→settle→rate loop</td><td class="them"><span class="partial">claimed / partial</span></td><td class="us"><span class="yes">proven live, tx-by-tx</span></td></tr>
       <tr><td>Scope</td><td class="them">1 skill (deep) or many (shallow)</td><td class="us"><span class="yes">8 composable, all tested</span></td></tr>
-      <tr><td>Tests / CI</td><td class="them">varies, often none</td><td class="us"><span class="yes">162 passing · CI green</span></td></tr>
+      <tr><td>Tests / CI</td><td class="them">varies, often none</td><td class="us"><span class="yes">185 passing · CI green</span></td></tr>
       <tr><td>ERC-8004 + x402</td><td class="them"><span class="no">rarely</span></td><td class="us"><span class="yes">both, native</span></td></tr>
     </table>
   </div>
@@ -222,7 +222,7 @@
 <!-- CONTRACTS -->
 <section id="contracts"><div class="wrap">
   <div class="stitle">Verifiable</div>
-  <h2>Six contracts, live on Atlantic testnet</h2>
+  <h2>Seven contracts, live on Atlantic testnet</h2>
   <p class="lead">All addresses below are real and clickable on Pharosscan. <button class="btn" id="verifyBtn" style="padding:6px 12px;font-size:13px">Verify reputation live ↻</button> <span class="muted" id="verifyOut"></span></p>
   <div class="card" style="padding:0;overflow:auto">
     <table id="ctab">
@@ -379,6 +379,7 @@ function updateGate(){
 // ---- contracts table ----
 const CONTRACTS=[
   ["AgentTreasury","on-chain spending policy + kill-switch",TREASURY],
+  ["AgentEscrow","hire/escrow: release · refund · arbiter split","0x5919e995b29Bf81B322171769C9e63c5964258A7"],
   ["ServiceRegistry","agent service marketplace",REG],
   ["Reputation","payment-gated, anti-sybil reputation",REP],
   ["Reputation8004Adapter","ERC-8004 read surface (getSummary)","0x6B99B00BD52Bc134D5658745E64DF1938592e468"],

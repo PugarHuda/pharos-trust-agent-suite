@@ -1,0 +1,26 @@
+{
+  "name": "agent-escrow",
+  "version": "1.0.0",
+  "description": "Agent-to-agent escrow on Pharos: lock funds for a job, release on approval, refund on timeout, or arbiter split on dispute. The 'hire' primitive that composes with a2a-mesh reputation.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "escrow": "./scripts/escrow.mjs"
+  },
+  "scripts": {
+    "build": "node scripts/compile.mjs",
+    "test": "node --test tests/escrow.test.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "ethers": "^6.13.0"
+  },
+  "devDependencies": {
+    "solc": "^0.8.26",
+    "@ethereumjs/evm": "^3.1.0",
+    "@ethereumjs/common": "^4.4.0",
+    "@ethereumjs/util": "^9.1.0"
+  }
+}

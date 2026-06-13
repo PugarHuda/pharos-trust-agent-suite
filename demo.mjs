@@ -24,7 +24,7 @@ function step(title, dir, cmd) {
   catch (e) { console.log((e.stdout || '').trim() || `(exited ${e.status})`); } // non-zero exit (e.g. shield fail / gate block) is expected
 }
 
-console.log('\x1b[1m Pharos Trust-First Agent Suite — live demo (8 skills, 162 tests, CI green)\x1b[0m');
+console.log('\x1b[1m Pharos Trust-First Agent Suite — live demo (9 skills, 185 tests, CI green)\x1b[0m');
 
 step('1. agent-utils — live BTC/USD price (oracle, read-only)', '07-agent-utils',
   'node scripts/utils.mjs price --feed BTC/USD');
@@ -43,6 +43,10 @@ step('5. stylus-compute — risk model gates an action (BLOCK)', '05-stylus-comp
 
 step('6. pharos-bazaar — discover services ranked by on-chain reputation', '08-pharos-bazaar',
   `node scripts/bazaar.mjs discover --registry ${REG} --reputation ${REP} --tag price-feed`);
+
+const ESCROW = '0x5919e995b29Bf81B322171769C9e63c5964258A7';
+step('6d. agent-escrow — a hire settled on-chain (read the released job)', '09-agent-escrow',
+  `node scripts/escrow.mjs status --escrow ${ESCROW} --job live-release-1`);
 
 // Opt-in live WRITE segment (broadcasts real txs; needs 01-agent-treasury/.env).
 // Default demo is read-only/safe; pass --write to include this on camera.
