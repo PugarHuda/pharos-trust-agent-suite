@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Pharos Trust-First Agent Suite — live</title>
+<meta name="description" content="A trust layer for the Pharos agent economy: 8 composable skills, 162 tests, the full discover→pay→settle→rate loop proven live on Atlantic with payment-gated, un-fakeable reputation." />
+<style>
+  :root{
+    --bg:#070b12; --panel:#0e1622; --panel2:#121f30; --line:#1d2c40;
+    --ink:#e8f0fb; --mut:#8aa0bd; --dim:#5c789c;
+    --cyan:#2ee6d6; --cyan2:#19b3c7; --green:#37e29a; --red:#ff6b6b; --amber:#ffc857; --violet:#9d8bff;
+    --mut2:#6f86a6;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:radial-gradient(1200px 600px at 70% -10%,#10243a 0%,var(--bg) 55%);
+    color:var(--ink);font:15px/1.55 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+  a{color:var(--cyan);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+  code,.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  /* nav */
+  nav{position:sticky;top:0;z-index:20;backdrop-filter:blur(10px);
+    background:rgba(7,11,18,.72);border-bottom:1px solid var(--line)}
+  nav .wrap{display:flex;align-items:center;gap:16px;height:56px}
+  nav .brand{font-weight:700;letter-spacing:.2px}
+  nav .brand b{color:var(--cyan)}
+  nav .links{margin-left:auto;display:flex;gap:18px;font-size:13.5px}
+  nav .links a{color:var(--mut)}
+  nav .links a:hover{color:var(--ink);text-decoration:none}
+  .live{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--mut);
+    border:1px solid var(--line);border-radius:999px;padding:4px 10px}
+  .dot{width:8px;height:8px;border-radius:50%;background:#444;box-shadow:0 0 0 0 rgba(55,226,154,.6)}
+  .dot.on{background:var(--green);animation:pulse 1.8s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(55,226,154,.5)}70%{box-shadow:0 0 0 8px rgba(55,226,154,0)}100%{box-shadow:0 0 0 0 rgba(55,226,154,0)}}
+  /* hero */
+  header.hero{padding:64px 0 36px}
+  .eyebrow{color:var(--cyan);font-weight:600;letter-spacing:.12em;text-transform:uppercase;font-size:12.5px}
+  h1{font-size:clamp(30px,5vw,50px);line-height:1.05;margin:14px 0 0;letter-spacing:-.5px}
+  h1 .grad{background:linear-gradient(90deg,var(--cyan),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{font-size:18px;color:var(--mut);max-width:760px;margin:18px 0 0}
+  .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}
+  .btn{display:inline-flex;align-items:center;gap:8px;border-radius:10px;padding:11px 18px;font-weight:600;
+    border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer}
+  .btn.primary{background:linear-gradient(90deg,var(--cyan),var(--cyan2));color:#04181a;border-color:transparent}
+  .btn:hover{transform:translateY(-1px)}
+  .chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:30px}
+  .chip{border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:10px 14px;font-size:13px}
+  .chip b{color:var(--ink);font-size:18px;display:block;line-height:1.1}
+  .chip span{color:var(--mut)}
+  /* sections */
+  section{padding:46px 0;border-top:1px solid var(--line)}
+  .stitle{font-size:13px;color:var(--cyan);font-weight:600;letter-spacing:.12em;text-transform:uppercase}
+  h2{font-size:clamp(23px,3.4vw,32px);margin:8px 0 6px;letter-spacing:-.3px}
+  .lead{color:var(--mut);max-width:780px;margin:0 0 22px}
+  .grid{display:grid;gap:16px}
+  .g2{grid-template-columns:repeat(2,1fr)} .g3{grid-template-columns:repeat(3,1fr)} .g4{grid-template-columns:repeat(4,1fr)}
+  @media(max-width:820px){.g2,.g3,.g4{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+  .card h3{margin:0 0 6px;font-size:16px}
+  .card p{margin:0;color:var(--mut);font-size:14px}
+  .tag{display:inline-block;font-size:11px;color:var(--cyan);border:1px solid var(--line);border-radius:6px;padding:2px 7px;margin-bottom:8px;letter-spacing:.04em}
+  /* unique table */
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--mut);font-weight:600;font-size:12.5px;text-transform:uppercase;letter-spacing:.06em}
+  td.us{color:var(--green)} td.them{color:var(--mut2)}
+  .yes{color:var(--green);font-weight:700} .no{color:var(--red)} .partial{color:var(--amber)}
+  /* bazaar */
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+  select,input[type=text]{background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:9px;padding:9px 12px;font:inherit}
+  .svc{display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--panel);margin-bottom:10px}
+  .svc .rank{font-weight:800;color:var(--cyan);font-size:18px;width:28px}
+  .svc .meta{flex:1;min-width:0}
+  .svc .meta .o{font-family:ui-monospace,monospace;font-size:13px;color:var(--ink);word-break:break-all}
+  .svc .meta .e{color:var(--mut);font-size:12.5px}
+  .rep{text-align:right;min-width:120px}
+  .repbar{height:7px;border-radius:6px;background:#15263a;overflow:hidden;margin-top:6px}
+  .repbar i{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--green))}
+  .badge{display:inline-block;font-size:11px;border-radius:6px;padding:2px 8px;font-weight:700}
+  .badge.win{background:rgba(55,226,154,.12);color:var(--green);border:1px solid rgba(55,226,154,.3)}
+  .note{font-size:13px;color:var(--mut);margin-top:8px}
+  .err{color:var(--red);font-size:13px}
+  /* loop stepper */
+  .loop{display:flex;gap:0;flex-wrap:wrap;align-items:stretch}
+  .step{flex:1;min-width:150px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;margin:6px;position:relative}
+  .step .n{font-size:11px;color:var(--cyan);font-weight:700}
+  .step h4{margin:6px 0 4px;font-size:14.5px}
+  .step p{margin:0;font-size:12.5px;color:var(--mut)}
+  .step a{font-size:12px;display:inline-block;margin-top:8px}
+  /* gate */
+  .slider{margin:14px 0}
+  .slider label{display:flex;justify-content:space-between;font-size:13px;color:var(--mut);margin-bottom:6px}
+  .slider label b{color:var(--ink)}
+  input[type=range]{width:100%;accent-color:var(--cyan)}
+  .gauge{margin-top:8px}
+  .gbar{height:14px;border-radius:8px;background:#15263a;overflow:hidden;position:relative}
+  .gbar i{display:block;height:100%;transition:width .25s}
+  .thr{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--amber)}
+  .verdict{font-size:30px;font-weight:800;margin-top:14px}
+  .verdict.allow{color:var(--green)} .verdict.block{color:var(--red)}
+  /* contracts */
+  .ct{font-family:ui-monospace,monospace;font-size:12.5px;word-break:break-all}
+  .pill{font-size:11px;padding:2px 8px;border-radius:6px;border:1px solid var(--line);color:var(--mut)}
+  footer{padding:40px 0 60px;color:var(--mut);font-size:13px;border-top:1px solid var(--line)}
+  .muted{color:var(--mut)}
+  .kbd{font-family:ui-monospace,monospace;background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:12px}
+</style>
+</head>
+<body>
+<nav><div class="wrap">
+  <div class="brand">Pharos <b>Trust Suite</b></div>
+  <div class="links">
+    <a href="#unique">Why us</a>
+    <a href="#bazaar">Live Bazaar</a>
+    <a href="#loop">The loop</a>
+    <a href="#gate">Risk gate</a>
+    <a href="#contracts">Contracts</a>
+  </div>
+  <span class="live" style="margin-left:6px"><span id="dot" class="dot"></span><span id="livetxt">connecting…</span></span>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="eyebrow">Skill-to-Agent Dual Cascade · Phase 1 · live on Atlantic</div>
+  <h1>The <span class="grad">trust layer</span> for the<br/>Pharos agent economy.</h1>
+  <p class="sub">Eight composable Skills that let an AI agent <b>hold money, pay other agents, and know who to trust</b> — with limits enforced <i>on-chain</i>, not in a prompt. The full <b>discover → pay → settle → rate</b> loop is proven live, and the reputation it produces <b>cannot be faked</b> because it costs a real payment.</p>
+  <div class="cta">
+    <a class="btn primary" href="#bazaar">▶ Run the live Bazaar</a>
+    <a class="btn" id="ghbtn" href="https://github.com/PugarHuda/pharos-trust-agent-suite" target="_blank" rel="noopener">View source on GitHub</a>
+  </div>
+  <div class="chips">
+    <div class="chip"><b>8</b><span>composable skills</span></div>
+    <div class="chip"><b>162</b><span>tests · CI green</span></div>
+    <div class="chip"><b>6</b><span>contracts live on Atlantic</span></div>
+    <div class="chip"><b id="repchip">10/100</b><span>real, payment-gated reputation</span></div>
+    <div class="chip"><b id="blkchip">#…</b><span>live block height</span></div>
+  </div>
+</div></header>
+
+<!-- WHY US -->
+<section id="unique"><div class="wrap">
+  <div class="stitle">The differentiator</div>
+  <h2>Everyone built a shield. We built the firewall.</h2>
+  <p class="lead">The most crowded category in this hackathon is agent “safety”. Almost all of those projects <b>return advice</b> — a score, an ALLOW/WARN/BLOCK verdict the agent is free to ignore. A jailbroken agent ignores advice. Our boundary lives <b>inside the contract</b>: the treasury <i>reverts</i> an out-of-policy spend before it can broadcast. That is the difference between a linter and a firewall — and it is only one of eight skills.</p>
+
+  <div class="grid g3" style="margin-bottom:26px">
+    <div class="card"><span class="tag">UNIQUE #1</span><h3>Enforcement, not advice</h3><p>Spending limits, allow-lists and a kill-switch are enforced by <code>AgentTreasury</code> on-chain. A compromised prompt physically cannot exceed the policy — proven by a live <span class="muted">blocked</span> spend tx.</p></div>
+    <div class="card"><span class="tag">UNIQUE #2</span><h3>Un-fakeable reputation</h3><p>Reputation is <b>payment-gated</b>: only the address that actually paid (EIP-712 signed, keyed by <code>(payer,ref)</code>) can rate. A relayer can’t forge it; a non-payer’s rating reverts <code>NotPayer</code>. Anti-sybil by construction.</p></div>
+    <div class="card"><span class="tag">UNIQUE #3</span><h3>Breadth × depth × proof</h3><p>Others are broad-but-shallow or deep-but-narrow. We are the only entry high on all three axes at once: <b>8 skills, 162 tests, 6 live contracts</b>, and a complete on-chain commerce loop.</p></div>
+    <div class="card"><span class="tag">UNIQUE #4</span><h3>Composition wired in code</h3><p><code>treasury</code> shells to <code>shield</code> pre-flight; <code>strategy</code> emits <code>treasury.executeCall</code> calldata; <code>stylus</code> risk-gates a spend; <code>mesh</code> routes x402 settlement through the policy. Not a diagram — actual call paths.</p></div>
+    <div class="card"><span class="tag">UNIQUE #5</span><h3>Standards-native</h3><p>Implements <b>ERC-8004</b> (Trustless Agents: Identity + Reputation) and <b>x402</b> gasless payments. The same score is readable through the standard <code>getSummary()</code> on-chain.</p></div>
+    <div class="card"><span class="tag">UNIQUE #6</span><h3>Verifiable heavy compute</h3><p>A fixed-point risk model written once in Rust/Stylus and a <b>bit-identical</b> JS reference — so the on-chain WASM result is independently verifiable. A Pharos-exclusive angle. (Try it below.)</p></div>
+  </div>
+
+  <div class="card" style="padding:0;overflow:auto">
+    <table>
+      <tr><th>Capability</th><th>Typical entry</th><th>Pharos Trust Suite</th></tr>
+      <tr><td>Safety mechanism</td><td class="them">advice / verdict (ignorable)</td><td class="us"><span class="yes">on-chain enforcement (reverts)</span></td></tr>
+      <tr><td>Reputation</td><td class="them">self-reported or none</td><td class="us"><span class="yes">payment-gated, anti-sybil</span></td></tr>
+      <tr><td>Full discover→pay→settle→rate loop</td><td class="them"><span class="partial">claimed / partial</span></td><td class="us"><span class="yes">proven live, tx-by-tx</span></td></tr>
+      <tr><td>Scope</td><td class="them">1 skill (deep) or many (shallow)</td><td class="us"><span class="yes">8 composable, all tested</span></td></tr>
+      <tr><td>Tests / CI</td><td class="them">varies, often none</td><td class="us"><span class="yes">162 passing · CI green</span></td></tr>
+      <tr><td>ERC-8004 + x402</td><td class="them"><span class="no">rarely</span></td><td class="us"><span class="yes">both, native</span></td></tr>
+    </table>
+  </div>
+  <p class="note">Honest scope: the Stylus <b>WASM artifact is not yet deployed</b> (an upstream toolchain issue, disclosed in the repo). 7 of 8 skills are fully live; the risk model’s algorithm is proven by the bit-identical JS reference you can run below.</p>
+</div></section>
+
+<!-- BAZAAR -->
+<section id="bazaar"><div class="wrap">
+  <div class="stitle">Live · reads Atlantic in your browser</div>
+  <h2>The Bazaar: discover services ranked by on-chain trust</h2>
+  <p class="lead">This isn’t a mock. Your browser calls the deployed <code>ServiceRegistry</code> + <code>Reputation</code> contracts on Atlantic via JSON-RPC and ranks the results — higher reputation first, then lower price. Watch the trusted provider win <i>even though it’s pricier</i>.</p>
+  <div class="toolbar">
+    <select id="tagsel">
+      <option value="price-feed">tag: price-feed</option>
+      <option value="compute">tag: compute</option>
+      <option value="data-api">tag: data-api</option>
+    </select>
+    <button class="btn primary" id="discoverBtn">Discover →</button>
+    <span class="muted" id="discMeta"></span>
+  </div>
+  <div id="svcList"></div>
+  <p class="note" id="bazaarNote"></p>
+</div></section>
+
+<!-- LOOP -->
+<section id="loop"><div class="wrap">
+  <div class="stitle">Already on-chain — click any step</div>
+  <h2>The full agent-commerce loop, proven tx-by-tx</h2>
+  <p class="lead">An agent found a service, paid for it <b>gaslessly</b>, the payment minted <b>un-fakeable</b> reputation, and the score is readable through the ERC-8004 standard interface. Every step below is a real transaction on Pharosscan.</p>
+  <div class="loop" id="loopSteps"></div>
+  <p class="note">Result: the payer signed once (no gas); a relayer moved 0.001 USDC via EIP-3009 <code>transferWithAuthorization</code>; the settlement hash became the rateable <code>ref</code>; the provider’s reputation rose to <b>10/100</b> — and only the payer could move it.</p>
+</div></section>
+
+<!-- GATE -->
+<section id="gate"><div class="wrap">
+  <div class="stitle">Interactive · runs the real model in your browser</div>
+  <h2>Stylus risk gate — try to get a spend approved</h2>
+  <p class="lead">This is the exact fixed-point logistic model from <code>05-stylus-compute</code> (weights <code>[1.5, 2.0, 1.2, 0.8]</code>, bias <code>-2.0</code>, threshold <code>0.5</code>) — the same integer math the Rust/WASM contract runs, computed live below. Push the risk up and the gate blocks the spend.</p>
+  <div class="grid g2">
+    <div class="card">
+      <div class="slider"><label>spend fraction of daily cap <b id="f0v">0.20</b></label><input type="range" id="f0" min="0" max="1" step="0.01" value="0.20"></div>
+      <div class="slider"><label>destination unknown <b id="f1v">1.00</b></label><input type="range" id="f1" min="0" max="1" step="1" value="1"></div>
+      <div class="slider"><label>recent failure velocity <b id="f2v">0.10</b></label><input type="range" id="f2" min="0" max="1" step="0.01" value="0.10"></div>
+      <div class="slider"><label>off-hours deviation <b id="f3v">0.00</b></label><input type="range" id="f3" min="0" max="1" step="0.01" value="0.00"></div>
+    </div>
+    <div class="card">
+      <p class="muted" style="margin:0 0 6px">risk score (0.0 – 1.0)</p>
+      <div class="gauge">
+        <div class="gbar"><i id="gfill"></i><span class="thr" id="gthr"></span></div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--mut);margin-top:6px"><span>0.0</span><span>threshold 0.5</span><span>1.0</span></div>
+      </div>
+      <div class="verdict" id="verdict">—</div>
+      <p class="mono" id="scoreTxt" style="color:var(--mut);font-size:13px"></p>
+      <p class="note">Because the JS here and the Rust contract use identical integer fixed-point math, <code>compute verify</code> can prove the on-chain result matches this exactly.</p>
+    </div>
+  </div>
+</div></section>
+
+<!-- CONTRACTS -->
+<section id="contracts"><div class="wrap">
+  <div class="stitle">Verifiable</div>
+  <h2>Six contracts, live on Atlantic testnet</h2>
+  <p class="lead">All addresses below are real and clickable on Pharosscan. <button class="btn" id="verifyBtn" style="padding:6px 12px;font-size:13px">Verify reputation live ↻</button> <span class="muted" id="verifyOut"></span></p>
+  <div class="card" style="padding:0;overflow:auto">
+    <table id="ctab">
+      <tr><th>Contract</th><th>Role</th><th>Address</th></tr>
+    </table>
+  </div>
+  <p class="note">Network: Pharos Atlantic Testnet · chainId <b>688689</b> · RPC <code>atlantic.dplabs-internal.com</code> · explorer <code>atlantic.pharosscan.xyz</code>. This page holds <b>no keys</b> and only ever performs read-only <code>eth_call</code> — the same safety posture as the skills themselves.</p>
+</div></section>
+
+<footer><div class="wrap">
+  <b>Pharos Trust-First Agent Suite</b> — discover → pay (gasless) → settle → rate → reputation. The trust layer for the Pharos agent economy, aligned with ERC-8004 + x402.<br/>
+  <span class="muted">Static, zero-backend, read-only. Source &amp; 162 tests: <a id="ghfoot" href="https://github.com/PugarHuda/pharos-trust-agent-suite" target="_blank" rel="noopener">github.com/PugarHuda/pharos-trust-agent-suite</a></span>
+</div></footer>
+
+<script>
+const RPC = "https://atlantic.dplabs-internal.com";
+const EXP = "https://atlantic.pharosscan.xyz";
+const REG = "0xa4d6d9932B19f9B03D0439264F1188F39F8522f0";
+const REP = "0x8010e567b6f68dcfD19312644F1c3E6249b43ef7";
+const TREASURY = "0x0954E50cBC85836C9E3FC6868d24b6118d974E9d";
+const TAGS = {
+  "price-feed":"0x53ddfa289352757c443096576a2d0e789394a867bf446b97e0f7ac72227f8367",
+  "compute":"0x251dcf5ceb5f707f8e6c67123f7ddb2068a5ae025c235b618229d8883ebb80aa",
+  "data-api":"0x9bb9a589de31d7a210d57bab197ba3d095ca6f48167f5148b40a390901b07f2d"
+};
+const SEL = { activeByTag:"0x4060ff2d", services:"0xc22c4f43", scoreOf:"0x133af456", ratingCount:"0x2404165e" };
+
+let rpcId = 1;
+async function rpc(method, params){
+  const r = await fetch(RPC,{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({jsonrpc:"2.0",id:rpcId++,method,params})});
+  const j = await r.json();
+  if(j.error) throw new Error(j.error.message||"rpc error");
+  return j.result;
+}
+const ethCall = (to,data)=>rpc("eth_call",[{to,data},"latest"]);
+const padAddr = a => a.toLowerCase().replace(/^0x/,"").padStart(64,"0");
+const padUint = n => BigInt(n).toString(16).padStart(64,"0");
+const word = (h,i)=>h.slice(i*64,(i+1)*64);
+function hexUtf8(hex){ const m=hex.match(/.{1,2}/g)||[]; return new TextDecoder().decode(new Uint8Array(m.map(b=>parseInt(b,16)))); }
+const short = a => a.slice(0,6)+"…"+a.slice(-4);
+
+// ---- liveness ----
+async function ping(){
+  try{
+    const cid = await rpc("eth_chainId",[]);
+    const blk = await rpc("eth_blockNumber",[]);
+    document.getElementById("dot").classList.add("on");
+    document.getElementById("livetxt").textContent = "Live · chainId "+parseInt(cid,16);
+    document.getElementById("blkchip").textContent = "#"+parseInt(blk,16).toLocaleString();
+  }catch(e){ document.getElementById("livetxt").textContent="RPC unreachable"; }
+}
+
+// ---- bazaar (real reads) ----
+async function getIds(tagHash){
+  const h = (await ethCall(REG, SEL.activeByTag + tagHash.replace(/^0x/,""))).replace(/^0x/,"");
+  const off = parseInt(word(h,0),16)*2;
+  const len = parseInt(h.slice(off,off+64),16);
+  const ids=[]; for(let i=0;i<len;i++) ids.push(BigInt("0x"+h.slice(off+64+i*64, off+64+(i+1)*64)));
+  return ids;
+}
+async function getService(id){
+  const h = (await ethCall(REG, SEL.services + padUint(id))).replace(/^0x/,"");
+  const owner = "0x"+word(h,0).slice(24);
+  const off = parseInt(word(h,2),16)*2;
+  const price = BigInt("0x"+word(h,3));
+  const slen = parseInt(h.slice(off,off+64),16);
+  const endpoint = hexUtf8(h.slice(off+64, off+64+slen*2));
+  return {id:Number(id), owner, endpoint, price};
+}
+async function readUint(to,sel,addr){ return Number(BigInt(await ethCall(to, sel + padAddr(addr)))); }
+
+function rankServices(s){
+  const fin=r=>Number.isFinite(r)?r:-1;
+  return [...s].sort((a,b)=>{ const ra=fin(a.reputation),rb=fin(b.reputation);
+    if(rb!==ra) return rb-ra; if(a.price!==b.price) return a.price<b.price?-1:1; return a.id-b.id; });
+}
+async function discover(){
+  const tag = document.getElementById("tagsel").value;
+  const list = document.getElementById("svcList");
+  const note = document.getElementById("bazaarNote");
+  const meta = document.getElementById("discMeta");
+  list.innerHTML = '<p class="muted">querying Atlantic…</p>'; note.textContent=""; meta.textContent="";
+  try{
+    const ids = await getIds(TAGS[tag]);
+    if(ids.length===0){ list.innerHTML='<p class="muted">no active services for this tag.</p>'; return; }
+    const rows=[];
+    for(const id of ids){
+      const s = await getService(id);
+      s.reputation = await readUint(REP, SEL.scoreOf, s.owner);
+      s.ratings = await readUint(REP, SEL.ratingCount, s.owner);
+      rows.push(s);
+    }
+    const ranked = rankServices(rows);
+    list.innerHTML="";
+    ranked.forEach((r,i)=>{
+      const conf = r.ratings>=20?"high":r.ratings>=5?"medium":"low";
+      const win = i===0 && ranked.length>1 && ranked[0].reputation>ranked[1].reputation && ranked[0].price>=ranked[1].price;
+      const el=document.createElement("div"); el.className="svc";
+      el.innerHTML = `<div class="rank">#${i+1}</div>
+        <div class="meta">
+          <div class="o"><a href="${EXP}/address/${r.owner}" target="_blank" rel="noopener">${r.owner}</a> ${win?'<span class="badge win">trust wins ▲</span>':''}</div>
+          <div class="e">${r.endpoint} · price ${r.price.toString()}</div>
+        </div>
+        <div class="rep"><b>${r.reputation}/100</b><div class="muted" style="font-size:11px">${r.ratings} rating(s) · ${conf}</div>
+          <div class="repbar"><i style="width:${Math.max(2,r.reputation)}%"></i></div></div>`;
+      list.appendChild(el);
+    });
+    meta.textContent = `${ranked.length} live service(s) · ranked by on-chain reputation`;
+    const top=ranked[0], cheap=[...ranked].sort((a,b)=>a.price<b.price?-1:1)[0];
+    if(top && cheap && top.id!==cheap.id && top.price>cheap.price)
+      note.innerHTML = `↑ <b>#${ranked.indexOf(top)+1}</b> is ranked above a cheaper provider (price ${cheap.price} &lt; ${top.price}) purely because its on-chain reputation is higher — trust beats price, and that trust was earned by a real payment.`;
+  }catch(e){ list.innerHTML='<p class="err">read failed: '+e.message+'</p>'; }
+}
+
+// ---- loop steps ----
+const LOOP=[
+  ["1","Discover","Agent finds a price-feed provider, ranked by on-chain reputation.", null,"read-only"],
+  ["2","Pay (gasless)","Payer signs once; a relayer pays gas. EIP-3009 transferWithAuthorization.","0x873f98cf344dcffb8268fba0673933091be9805d4944c693616c433306a5225b"],
+  ["3","Settle","0.001 USDC moves to the merchant; the settlement hash becomes the ref.","0x873f98cf344dcffb8268fba0673933091be9805d4944c693616c433306a5225b"],
+  ["4","Record","The paid interaction is recorded in the mesh (payer EIP-712 signature).","0xbc8940027763de6d9a2d645d3188713609e1736bdcd8f15d600b4a75fcf49c0b"],
+  ["5","Rate → reputation","Only the payer can rate. Provider reputation rises to 10/100.","0xc97221b6c1797be3b61986976b183d8522481f2ad1b86e92c73cd1c6689d5fb0"],
+];
+function renderLoop(){
+  const c=document.getElementById("loopSteps");
+  LOOP.forEach(([n,h,p,tx,tagtxt])=>{
+    const d=document.createElement("div"); d.className="step";
+    d.innerHTML=`<div class="n">STEP ${n}</div><h4>${h}</h4><p>${p}</p>`+
+      (tx?`<a href="${EXP}/tx/${tx}" target="_blank" rel="noopener">view tx ↗</a>`:`<span class="pill">${tagtxt}</span>`);
+    c.appendChild(d);
+  });
+}
+
+// ---- risk gate (bit-identical to score.mjs) ----
+const SCALE=1000000n, W=[1500000n,2000000n,1200000n,800000n], BIAS=-2000000n, THR=500000n;
+function fastSigmoid(z){ const az=z<0n?-z:z; const denom=SCALE+az; const frac=(z*SCALE)/denom; return SCALE/2n+frac/2n; }
+function scoreModel(fx){ let dot=0n; for(let i=0;i<4;i++) dot+=(W[i]*fx[i])/SCALE; return fastSigmoid(dot+BIAS); }
+function toFixed(v){ return BigInt(Math.round(v*1e6)); }
+function updateGate(){
+  const vals=[0,1,2,3].map(i=>parseFloat(document.getElementById("f"+i).value));
+  vals.forEach((v,i)=>document.getElementById("f"+i+"v").textContent=v.toFixed(2));
+  const s = scoreModel(vals.map(toFixed));
+  const sf = Number(s)/1e6;
+  const allow = s<=THR;
+  document.getElementById("gfill").style.width=(sf*100)+"%";
+  document.getElementById("gfill").style.background = allow? "linear-gradient(90deg,var(--cyan),var(--green))":"linear-gradient(90deg,var(--amber),var(--red))";
+  document.getElementById("gthr").style.left="50%";
+  const v=document.getElementById("verdict");
+  v.textContent = allow? "✓ ALLOW" : "✗ BLOCK";
+  v.className = "verdict "+(allow?"allow":"block");
+  document.getElementById("scoreTxt").textContent = `risk = ${sf.toFixed(4)} (raw ${s}) ${allow?"≤":">"} threshold 0.5 → spend ${allow?"permitted":"refused"}`;
+}
+
+// ---- contracts table ----
+const CONTRACTS=[
+  ["AgentTreasury","on-chain spending policy + kill-switch",TREASURY],
+  ["ServiceRegistry","agent service marketplace",REG],
+  ["Reputation","payment-gated, anti-sybil reputation",REP],
+  ["Reputation8004Adapter","ERC-8004 read surface (getSummary)","0x6B99B00BD52Bc134D5658745E64DF1938592e468"],
+  ["IdentityRegistry8004","ERC-8004 agent identity (ERC-721)","0xa048D4F17282488B60D96E6FB01FbdA106F38B8A"],
+  ["MockUSDC3009","EIP-3009 gasless settlement token","0xBd80E06F0325C4758e06d8a9522588363C4c75a4"],
+];
+function renderContracts(){
+  const t=document.getElementById("ctab");
+  CONTRACTS.forEach(([n,role,a])=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td><b>${n}</b></td><td class="muted">${role}</td><td class="ct"><a href="${EXP}/address/${a}" target="_blank" rel="noopener">${a}</a></td>`;
+    t.appendChild(tr);
+  });
+}
+async function verifyRep(){
+  const out=document.getElementById("verifyOut");
+  out.textContent="reading…";
+  try{
+    const prov="0x6d42BF50c05aC99a5Ef3b85783B8DE75e32cb630"; // the provider that earned reputation
+    const sc=await readUint(REP,SEL.scoreOf,prov);
+    const rc=await readUint(REP,SEL.ratingCount,prov);
+    out.innerHTML=`live: provider ${short(prov)} → <b>${sc}/100</b> from ${rc} rating(s) ✓`;
+    document.getElementById("repchip").textContent=sc+"/100";
+  }catch(e){ out.textContent="read failed: "+e.message; }
+}
+
+// init
+document.getElementById("discoverBtn").addEventListener("click",discover);
+[0,1,2,3].forEach(i=>document.getElementById("f"+i).addEventListener("input",updateGate));
+document.getElementById("verifyBtn").addEventListener("click",verifyRep);
+renderLoop(); renderContracts(); updateGate(); ping();
+discover(); // auto-run the live read on load
+</script>
+</body>
+</html>

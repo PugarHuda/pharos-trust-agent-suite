@@ -7,7 +7,11 @@ official Pharos Skill format (`SKILL.md` + `references/` + `assets/`). The suite
 **trust layer for the Pharos agent economy**: the things every other agent needs but few will build.
 
 > Hackathon: Skill-to-Agent Dual Cascade (Phase 1) · Prize pool 50,000 PROS (Phase 1: 20,000 PROS / 40 winners)
-> Network: Pharos Atlantic Testnet (chainId **688689**) · Submission deadline **2026-06-15**
+> Network: Pharos Atlantic Testnet (chainId **688689**) · Submission deadline **2026-06-17 17:00**
+
+> 🖥️ **Live dashboard:** [`web/`](web/) — a zero-backend page that reads the deployed Atlantic
+> contracts *in the browser*: run the Bazaar live, click the on-chain commerce loop, and play with the
+> Stylus risk gate. `npx serve web` or deploy in one command (see [`web/README.md`](web/README.md)).
 
 ## Status: eight skills implemented · 162 passing tests
 
@@ -88,6 +92,25 @@ skills depend on:
 
 If you submit only one: **agent-treasury** (it scores high on every criterion at once). If you submit
 two as a "Trust Suite": **agent-treasury + agent-shield** (detection + enforcement).
+
+### What sets this apart from the field
+
+The most crowded category this round is agent "safety". Almost every such entry **returns advice** — a
+score or an ALLOW/WARN/BLOCK verdict the agent is free to ignore. A jailbroken agent ignores advice.
+This suite is different on six defensible axes:
+
+| | Typical entry | This suite |
+|---|---|---|
+| **Safety mechanism** | advice / verdict (ignorable) | **on-chain enforcement** — `AgentTreasury` *reverts* an out-of-policy spend; proven by a live blocked tx |
+| **Reputation** | self-reported or absent | **payment-gated, anti-sybil** — only the `(payer,ref)` who paid (EIP-712) can rate; non-payer reverts `NotPayer` |
+| **The full discover→pay→settle→rate loop** | claimed or partial | **proven live, tx-by-tx** on Atlantic |
+| **Scope** | one deep skill *or* many shallow ones | **8 composable skills, all tested** (breadth × depth) |
+| **Tests / CI** | often none | **162 passing · green CI** on a clean runner |
+| **Standards** | rarely | **ERC-8004 + x402 native**; score readable via `getSummary()` on-chain |
+
+The one-liner for the submission: **the only entry that proves the entire agent-commerce loop on-chain,
+with un-fakeable reputation, behind a trust layer that *enforces* rather than *advises* — eight
+composable skills, 162 tests, six live contracts.**
 
 ## Repository layout
 
