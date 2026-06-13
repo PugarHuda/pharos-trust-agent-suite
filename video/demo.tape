@@ -14,6 +14,5 @@ Set Theme "Dracula"
 
 Type "node demo.mjs"
 Enter
-# wait until the final line prints (all 13 skills have run), with a generous cap
-Wait+Screen@300s /trust layer for the Pharos agent economy/
-Sleep 4s
+# demo.mjs runs all 13 skills live (~25-45s); record long enough to capture the whole run + the close
+Sleep 55s
