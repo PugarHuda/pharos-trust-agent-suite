@@ -75,6 +75,20 @@ Owner / deployer: `0x39D2bae5EAedA9283535dDC98F1991c81eD5Cd7E`
 > scored 95/100 by a registered validator. Only the designated validator could respond; only the
 > server agent could request (anti-griefing).
 
+## reputation-gate (ERC-8183 ReputationGateHook pattern)
+
+| Item | Address / tx | Link |
+|------|--------------|------|
+| **ReputationGate** (reads live Reputation + Validation) | `0xDec9B79F0f957F07F4896d2a2355507A7C8f5849` | [addr](https://atlantic.pharosscan.xyz/address/0xDec9B79F0f957F07F4896d2a2355507A7C8f5849) |
+| Deploy tx | `0x0724c01665d60681c29b4a1eab0042aa6d3e230419e5522db0f3c12e7577f156` | [tx](https://atlantic.pharosscan.xyz/tx/0x0724c01665d60681c29b4a1eab0042aa6d3e230419e5522db0f3c12e7577f156) |
+| **gatedPay** — 0.001 PHRS forwarded to a trusted provider (rep 10 ≥ bar 10) | `0x864bab3d931a98fe48b84ae45fe79484c4a22def368bb62dec8a49b5d831e6a0` | [tx](https://atlantic.pharosscan.xyz/tx/0x864bab3d931a98fe48b84ae45fe79484c4a22def368bb62dec8a49b5d831e6a0) |
+
+> Makes reputation **economic**: the gate forwards funds only above a reputation bar. Proven live — a
+> trusted provider (10/100) was paid; a 0-reputation address is blocked (`check` → BLOCK); and the
+> **composite** trust check returns TRUSTED for the provider whose escrowed work was validated **95/100**
+> (using the live `agent-escrow` jobId `0x31d03e57…` as the `dataHash`). The Pharos-native ERC-8183
+> ReputationGateHook, composing Reputation (`0x8010e567…`) + Validation (`0xc9142C34…`).
+
 ## stylus-compute
 
 | Item | Address / tx | Link |

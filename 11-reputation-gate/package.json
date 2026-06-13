@@ -1,0 +1,26 @@
+{
+  "name": "reputation-gate",
+  "version": "1.0.0",
+  "description": "Makes reputation economic: an on-chain gate (ERC-8183 ReputationGateHook pattern) that only allows a payment/action if the counterparty's ERC-8004 reputation + validation clear a threshold. The capstone of the trust suite.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "gate": "./scripts/gate.mjs"
+  },
+  "scripts": {
+    "build": "node scripts/compile.mjs",
+    "test": "node --test tests/gate.test.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "ethers": "^6.13.0"
+  },
+  "devDependencies": {
+    "solc": "^0.8.26",
+    "@ethereumjs/evm": "^3.1.0",
+    "@ethereumjs/common": "^4.4.0",
+    "@ethereumjs/util": "^9.1.0"
+  }
+}

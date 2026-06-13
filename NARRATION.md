@@ -56,8 +56,8 @@ Target ~2:45. Each block lines up with one section the driver prints. Pause ~1s 
 *(click the three tx links)*
 
 **[closing]**
-> "Discover, hire, pay, settle, rate, validate — ten skills, wired together, live on Pharos. The only
-> complete ERC-8004 trio plus x402. Aligned with
+> "Discover, hire, pay, settle, rate, validate, and gate — eleven skills, wired together, live on Pharos.
+> The only complete ERC-8004 + ERC-8183 + x402 stack, where reputation is economic. Aligned with
 > ERC-8004, the trust layer the agent economy is standardizing on. That's the suite."
 
 ---
@@ -67,4 +67,4 @@ Target ~2:45. Each block lines up with one section the driver prints. Pause ~1s 
 - If you'd rather not broadcast writes, drop `--write` — sections 6b/6c become the already-confirmed
   spend tx in `DEPLOYMENTS.md` (open it instead and narrate the same line).
 - Keep the Pharosscan tab pre-opened to the explorer home so tx links load instantly.
-- Numbers to say out loud: **10 skills, 198 tests, green CI, 8 live contracts, full ERC-8004 trio**.
+- Numbers to say out loud: **11 skills, 208 tests, green CI, 9 live contracts, ERC-8004 + ERC-8183 + x402**.

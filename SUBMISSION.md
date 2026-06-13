@@ -7,8 +7,8 @@ recommended (it's where the UX/clarity score is won).
 ## Pre-flight checklist
 
 - [x] Public GitHub repo: https://github.com/PugarHuda/pharos-trust-agent-suite
-- [x] 10 skills in official `SKILL.md` format, 198 passing tests, **green CI** (`.github/workflows/test.yml`)
-- [x] On-chain proof on Atlantic incl. a **full gasless x402 → reputation loop**, a **full escrow lifecycle**, and a **real ERC-8004 validation** (addresses + tx in `DEPLOYMENTS.md`)
+- [x] 11 skills in official `SKILL.md` format, 208 passing tests, **green CI** (`.github/workflows/test.yml`)
+- [x] On-chain proof on Atlantic incl. a **full gasless x402 → reputation loop**, a **full escrow lifecycle**, a **real ERC-8004 validation**, and a **reputation-gated payment** (addresses + tx in `DEPLOYMENTS.md`)
 - [x] Live read-only **web dashboard** (`web/`) — reads the deployed contracts in-browser; deploy with `vercel --prod`
 - [ ] **Demo video (strongly recommended)** — record per `DEMO.md` / `NARRATION.md` (contracts are live; film the real tx on Pharosscan), or screen-record the dashboard
 - [ ] Submit BUIDL on DoraHacks (link below)
@@ -50,8 +50,8 @@ same repo link. Confirm any exact registry/template in the dev Telegram (t.me/+U
 
 ## Ready-to-paste DoraHacks description
 
-> **Pharos Trust-First Agent Suite** — ten composable Skills that form the trust & infrastructure layer
-> for the Pharos agent economy: the things every other agent needs but few build.
+> **Pharos Trust-First Agent Suite** — eleven composable Skills that form the trust & infrastructure
+> layer for the Pharos agent economy: the things every other agent needs but few build.
 >
 > **What makes it different from the field:** the most crowded category this round is agent "safety", and
 > almost every such entry *returns advice* — a score or ALLOW/WARN/BLOCK verdict the agent can ignore. A
@@ -86,10 +86,16 @@ same repo link. Confirm any exact registry/template in the dev Telegram (t.me/+U
 >    0–100 score for another agent's work. This **completes the full ERC-8004 trio** (Identity +
 >    Reputation + Validation). *Live on Atlantic, wired to the Identity Registry; a validator scored the
 >    escrowed work 95/100 on-chain (the validated dataHash IS the live escrow jobId).*
+> 11. **reputation-gate** — makes reputation **economic, not just informational**: an on-chain gate (the
+>    **ERC-8183** ReputationGateHook pattern, live on Base from Virtuals + the Ethereum Foundation) that
+>    forwards funds **only** to a counterparty whose reputation — and optionally an independent validation
+>    of the specific work — clears a threshold. *Live on Atlantic; a gated payment succeeded to a trusted
+>    provider, a 0-reputation address is blocked, and composite trust (reputation + validation) is proven.*
 >
 > The skills are wired together in code, and proven on Atlantic with a **full agent-commerce loop** —
 > discover → hire (escrow) → gasless x402 pay/settle → record → rate → on-chain reputation → ERC-8004
-> validation — plus a treasury successful + blocked spend and a full escrow lifecycle. It is the **only
-> complete ERC-8004 + x402 stack** in the field. **198 passing tests with green CI**; hardened across
-> four adversarial QA rounds (see QA.md). A zero-backend **live web dashboard** (`web/`) reads the
-> deployed contracts in-browser. Eight contracts + all tx hashes in DEPLOYMENTS.md.
+> validation → reputation-gated funding — plus a treasury successful + blocked spend. It is the **only
+> complete ERC-8004 + ERC-8183 + x402 stack** in the field, and the only one where reputation actually
+> gates money on-chain. **208 passing tests with green CI**; hardened across four adversarial QA rounds
+> (see QA.md). A zero-backend **live web dashboard** (`web/`) reads the deployed contracts in-browser.
+> Nine contracts + all tx hashes in DEPLOYMENTS.md.

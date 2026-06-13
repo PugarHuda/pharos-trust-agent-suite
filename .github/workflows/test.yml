@@ -27,6 +27,7 @@ jobs:
           - 08-pharos-bazaar
           - 09-agent-escrow
           - 10-agent-validation
+          - 11-reputation-gate
     name: ${{ matrix.skill }}
     steps:
       - uses: actions/checkout@v4

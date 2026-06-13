@@ -1,0 +1,46 @@
+{
+  "contractName": "IValidationRead",
+  "compiler": "0.8.35+commit.47b9dedd.Emscripten.clang",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "dataHash",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getValidation",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "validatorAgentId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "serverAgentId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint8",
+          "name": "response",
+          "type": "uint8"
+        },
+        {
+          "internalType": "bool",
+          "name": "requested",
+          "type": "bool"
+        },
+        {
+          "internalType": "bool",
+          "name": "responded",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x"
+}
