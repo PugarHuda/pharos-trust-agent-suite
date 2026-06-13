@@ -1,0 +1,26 @@
+{
+  "name": "agent-bond",
+  "version": "1.0.0",
+  "description": "Sybil resistance via skin-in-the-game: agents lock a native bond (with an unbonding cooldown) so consumers can require a minimum stake before trusting them. The ERC-8004-recommended friction primitive.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "bond": "./scripts/bond.mjs"
+  },
+  "scripts": {
+    "build": "node scripts/compile.mjs",
+    "test": "node --test tests/bond.test.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "ethers": "^6.13.0"
+  },
+  "devDependencies": {
+    "solc": "^0.8.26",
+    "@ethereumjs/evm": "^3.1.0",
+    "@ethereumjs/common": "^4.4.0",
+    "@ethereumjs/util": "^9.1.0"
+  }
+}

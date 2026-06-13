@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Pharos Trust-First Agent Suite — live</title>
-<meta name="description" content="A trust layer for the Pharos agent economy: 11 composable skills, 208 tests, the only complete ERC-8004 + ERC-8183 + x402 stack, with reputation made economic via an on-chain gate — all proven live on Atlantic." />
+<meta name="description" content="A trust layer for the Pharos agent economy: 13 composable skills, 236 tests, the only complete ERC-8004 + ERC-8183 + AP2 + x402 stack — reputation made economic, agents leashed by signed intent, sybils priced out. All proven live on Atlantic." />
 <style>
   :root{
     --bg:#070b12; --panel:#0e1622; --panel2:#121f30; --line:#1d2c40;
@@ -130,9 +130,9 @@
     <a class="btn" id="ghbtn" href="https://github.com/PugarHuda/pharos-trust-agent-suite" target="_blank" rel="noopener">View source on GitHub</a>
   </div>
   <div class="chips">
-    <div class="chip"><b>11</b><span>composable skills</span></div>
-    <div class="chip"><b>208</b><span>tests · CI green</span></div>
-    <div class="chip"><b>9</b><span>contracts live on Atlantic</span></div>
+    <div class="chip"><b>13</b><span>composable skills</span></div>
+    <div class="chip"><b>236</b><span>tests · CI green</span></div>
+    <div class="chip"><b>11</b><span>contracts live on Atlantic</span></div>
     <div class="chip"><b id="repchip">10/100</b><span>real, payment-gated reputation</span></div>
     <div class="chip"><b id="blkchip">#…</b><span>live block height</span></div>
   </div>
@@ -147,7 +147,7 @@
   <div class="grid g3" style="margin-bottom:26px">
     <div class="card"><span class="tag">UNIQUE #1</span><h3>Enforcement, not advice</h3><p>Spending limits, allow-lists and a kill-switch are enforced by <code>AgentTreasury</code> on-chain. A compromised prompt physically cannot exceed the policy — proven by a live <span class="muted">blocked</span> spend tx.</p></div>
     <div class="card"><span class="tag">UNIQUE #2</span><h3>Un-fakeable reputation</h3><p>Reputation is <b>payment-gated</b>: only the address that actually paid (EIP-712 signed, keyed by <code>(payer,ref)</code>) can rate. A relayer can’t forge it; a non-payer’s rating reverts <code>NotPayer</code>. Anti-sybil by construction.</p></div>
-    <div class="card"><span class="tag">UNIQUE #3</span><h3>Breadth × depth × proof</h3><p>Others are broad-but-shallow or deep-but-narrow. We are the only entry high on all three axes at once: <b>11 skills, 208 tests, 9 live contracts</b>, and a complete on-chain commerce loop.</p></div>
+    <div class="card"><span class="tag">UNIQUE #3</span><h3>Breadth × depth × proof</h3><p>Others are broad-but-shallow or deep-but-narrow. We are the only entry high on all three axes at once: <b>13 skills, 236 tests, 11 live contracts</b>, and a complete on-chain commerce loop.</p></div>
     <div class="card"><span class="tag">UNIQUE #4</span><h3>Composition wired in code</h3><p><code>treasury</code> shells to <code>shield</code> pre-flight; <code>strategy</code> emits <code>treasury.executeCall</code> calldata; <code>stylus</code> risk-gates a spend; <code>mesh</code> routes x402 settlement through the policy. Not a diagram — actual call paths.</p></div>
     <div class="card"><span class="tag">UNIQUE #5</span><h3>Complete ERC-8004 + x402</h3><p>The <b>only entry implementing the full ERC-8004 trio</b> — Identity + Reputation + <b>Validation</b> — plus <b>x402</b> gasless payments. The reputation score is readable via the standard <code>getSummary()</code> on-chain.</p></div>
     <div class="card"><span class="tag">UNIQUE #6</span><h3>Reputation that's <i>economic</i></h3><p>A <b>ReputationGate</b> (the ERC-8183 hook live on Base from Virtuals + the Ethereum Foundation) forwards funds <b>only</b> to a counterparty whose reputation + validation clear a bar. Reputation becomes a permission that moves money — proven on-chain.</p></div>
@@ -160,7 +160,7 @@
       <tr><td>Reputation</td><td class="them">self-reported or none</td><td class="us"><span class="yes">payment-gated, anti-sybil</span></td></tr>
       <tr><td>Full discover→pay→settle→rate loop</td><td class="them"><span class="partial">claimed / partial</span></td><td class="us"><span class="yes">proven live, tx-by-tx</span></td></tr>
       <tr><td>Scope</td><td class="them">1 skill (deep) or many (shallow)</td><td class="us"><span class="yes">8 composable, all tested</span></td></tr>
-      <tr><td>Tests / CI</td><td class="them">varies, often none</td><td class="us"><span class="yes">208 passing · CI green</span></td></tr>
+      <tr><td>Tests / CI</td><td class="them">varies, often none</td><td class="us"><span class="yes">236 passing · CI green</span></td></tr>
       <tr><td>ERC-8004 + x402</td><td class="them"><span class="no">rarely</span></td><td class="us"><span class="yes">full trio + x402, native</span></td></tr>
     </table>
   </div>
@@ -222,7 +222,7 @@
 <!-- CONTRACTS -->
 <section id="contracts"><div class="wrap">
   <div class="stitle">Verifiable</div>
-  <h2>Nine contracts, live on Atlantic testnet</h2>
+  <h2>Eleven contracts, live on Atlantic testnet</h2>
   <p class="lead">All addresses below are real and clickable on Pharosscan. <button class="btn" id="verifyBtn" style="padding:6px 12px;font-size:13px">Verify reputation live ↻</button> <span class="muted" id="verifyOut"></span></p>
   <div class="card" style="padding:0;overflow:auto">
     <table id="ctab">
@@ -384,8 +384,10 @@ const CONTRACTS=[
   ["Reputation","payment-gated, anti-sybil reputation",REP],
   ["Reputation8004Adapter","ERC-8004 read surface (getSummary)","0x6B99B00BD52Bc134D5658745E64DF1938592e468"],
   ["IdentityRegistry8004","ERC-8004 agent identity (ERC-721)","0xa048D4F17282488B60D96E6FB01FbdA106F38B8A"],
-  ["ValidationRegistry8004","ERC-8004 validation: 0–100 verdicts","0xc9142C347b51Bd2f89f943BcEae5D302A14f5B88"],
-  ["ReputationGate","ERC-8183 hook: reputation-gated payments","0xDec9B79F0f957F07F4896d2a2355507A7C8f5849"],
+  ["ValidationRegistry8004","ERC-8004 validation: 0–100 verdicts","0xd3F1DEf0c294405Cbd02b8b84D1De861A8C058DC"],
+  ["ReputationGate","ERC-8183 hook: reputation-gated payments","0x425d3F086D8e98B7462cc987ED9B1aF9F396608d"],
+  ["IntentMandate","AP2-style signed spend envelope","0x4Ca9b16E6a107717A7c68F615ca4D5EFE4F2Ee4a"],
+  ["AgentBond","staked sybil resistance (bond + cooldown)","0xC59113F22BE46624D8ceFC4A030bCC098a8953Af"],
   ["MockUSDC3009","EIP-3009 gasless settlement token","0xBd80E06F0325C4758e06d8a9522588363C4c75a4"],
 ];
 function renderContracts(){

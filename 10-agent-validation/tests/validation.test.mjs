@@ -17,13 +17,13 @@ const DATA  = '0x' + 'aa'.repeat(32);
 const DATA2 = '0x' + 'bb'.repeat(32);
 
 // Build a fresh registry with a registered server (#1) and validator (#2).
-async function setup() {
+async function setup(maxPending = 100) {
   const chain = await Chain.create();
   for (const a of [SERVER, VALIDATOR, OUTSIDER, VWALLET]) await chain.fund(a);
   const identity = await chain.deploy(ID, SERVER);
   await chain.send(ID, identity, SERVER, 'register', [SERVER]);    // agentId 1 (server)
   await chain.send(ID, identity, SERVER, 'register', [VALIDATOR]); // agentId 2 (validator)
-  const vr = await chain.deploy(VR, SERVER, [identity.toString()]);
+  const vr = await chain.deploy(VR, SERVER, [identity.toString(), BigInt(maxPending)]);
   return { chain, identity, vr };
 }
 
@@ -118,6 +118,27 @@ test('the validator can respond from its operating wallet, not just the owner', 
   const v = await chain.call(VR, vr, 'getValidation', [DATA]);
   assert.equal(Number(v[2]), 70);
   assert.equal(v[4], true);
+});
+
+// ---------- storage-exhaustion cap (per-server pending limit) ----------
+
+test('a server cannot exceed its pending-request cap', async () => {
+  const { chain, vr } = await setup(2); // cap = 2 outstanding
+  await chain.send(VR, vr, SERVER, 'validationRequest', [2, 1, '0x' + '01'.repeat(32)]);
+  await chain.send(VR, vr, SERVER, 'validationRequest', [2, 1, '0x' + '02'.repeat(32)]);
+  await assert.rejects(
+    chain.send(VR, vr, SERVER, 'validationRequest', [2, 1, '0x' + '03'.repeat(32)]),
+    /TooManyPendingRequests/);
+});
+
+test('answering a request frees a pending slot', async () => {
+  const { chain, vr } = await setup(2);
+  const h1 = '0x' + '01'.repeat(32), h2 = '0x' + '02'.repeat(32), h3 = '0x' + '03'.repeat(32);
+  await chain.send(VR, vr, SERVER, 'validationRequest', [2, 1, h1]);
+  await chain.send(VR, vr, SERVER, 'validationRequest', [2, 1, h2]);
+  await chain.send(VR, vr, VALIDATOR, 'validationResponse', [h1, 80]); // frees a slot
+  await chain.send(VR, vr, SERVER, 'validationRequest', [2, 1, h3]);   // now fits
+  assert.equal(Number((await chain.call(VR, vr, 'pendingByServer', [1]))[0] ?? 0), 2);
 });
 
 // ---------- independence ----------

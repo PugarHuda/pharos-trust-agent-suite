@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { rankServices, pickBest, trustLabel } from '../scripts/lib/rank.mjs';
+import { rankServices, pickBest, trustLabel, toBazaarListing, toBazaarCatalog } from '../scripts/lib/rank.mjs';
 
 const services = [
   { id: 1, price: '1000', reputation: 60, ratings: 3 },
@@ -32,4 +32,25 @@ test('rankServices does not mutate the input', () => {
   const copy = [...services];
   rankServices(services);
   assert.deepEqual(services, copy);
+});
+
+test('toBazaarListing emits an x402-compatible discovery item with our reputation attached', () => {
+  const l = toBazaarListing(
+    { id: 3, owner: '0xabc', endpoint: 'https://svc/x402', price: '500', reputation: 90, ratings: 30 },
+    { caip2: 'eip155:688689', asset: '0xUSDC', tag: 'price-feed' });
+  assert.equal(l.x402Version, 1);
+  assert.equal(l.accepts[0].scheme, 'exact');
+  assert.equal(l.accepts[0].network, 'eip155:688689');
+  assert.equal(l.accepts[0].maxAmountRequired, '500');
+  assert.equal(l.accepts[0].payTo, '0xabc');
+  assert.equal(l.accepts[0].asset, '0xUSDC');
+  assert.equal(l.metadata.reputation, 90);     // the signal vanilla x402 Bazaar lacks
+  assert.match(l.metadata.trust, /high/);
+});
+
+test('toBazaarCatalog ranks items best-first and carries the network', () => {
+  const cat = toBazaarCatalog(services, { caip2: 'eip155:688689', tag: 'price-feed' });
+  assert.equal(cat.x402Version, 1);
+  assert.equal(cat.network, 'eip155:688689');
+  assert.deepEqual(cat.items.map((i) => i.metadata.registryId), [3, 2, 1, 4]); // ranked
 });

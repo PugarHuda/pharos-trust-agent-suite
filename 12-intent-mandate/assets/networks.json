@@ -7,8 +7,7 @@
     "nativeToken": "PHRS",
     "default": true,
     "deployed": {
-      "identityRegistry": "0xa048D4F17282488B60D96E6FB01FbdA106F38B8A",
-      "validationRegistry": "0xd3F1DEf0c294405Cbd02b8b84D1De861A8C058DC"
+      "intentMandate": "0x4Ca9b16E6a107717A7c68F615ca4D5EFE4F2Ee4a"
     }
   },
   "pacific-mainnet": {
@@ -18,8 +17,7 @@
     "explorer": "https://www.pharosscan.xyz",
     "nativeToken": "PROS",
     "deployed": {
-      "identityRegistry": null,
-      "validationRegistry": null
+      "intentMandate": null
     }
   }
 }

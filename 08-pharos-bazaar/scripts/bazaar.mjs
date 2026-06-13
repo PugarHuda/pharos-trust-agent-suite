@@ -17,7 +17,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { JsonRpcProvider, Contract } from 'ethers';
-import { rankServices, pickBest, trustLabel } from './lib/rank.mjs';
+import { rankServices, pickBest, trustLabel, toBazaarCatalog } from './lib/rank.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const networks = JSON.parse(readFileSync(join(ROOT, 'assets', 'networks.json'), 'utf8'));
@@ -89,6 +89,17 @@ async function main() {
       console.log(`Best for "${args.tag}": #${best.id} ${best.owner}`);
       console.log(`  ${trustLabel(best.reputation, best.ratings)} | price ${best.price} | ${best.endpoint}`);
       if (args.json) console.log(JSON.stringify(best));
+      break;
+    }
+
+    case 'export': {
+      // Emit an x402-Bazaar / Coinbase Agent.market-compatible discovery catalog for a tag, so an
+      // external x402 agent can find+pay these Pharos services — with on-chain reputation attached.
+      const rows = await discover(net, provider,
+        args.registry || die('--registry required'), args.reputation, args.tag || die('--tag required'));
+      const caip2 = `eip155:${net.chainId}`;
+      const catalog = toBazaarCatalog(rows, { caip2, asset: args.asset, tag: args.tag });
+      console.log(JSON.stringify(catalog, null, 2));
       break;
     }
 

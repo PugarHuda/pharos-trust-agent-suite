@@ -28,6 +28,8 @@ jobs:
           - 09-agent-escrow
           - 10-agent-validation
           - 11-reputation-gate
+          - 12-intent-mandate
+          - 13-agent-bond
     name: ${{ matrix.skill }}
     steps:
       - uses: actions/checkout@v4

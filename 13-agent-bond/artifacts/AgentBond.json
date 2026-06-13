@@ -1,0 +1,291 @@
+{
+  "contractName": "AgentBond",
+  "compiler": "0.8.35+commit.47b9dedd.Emscripten.clang",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "uint64",
+          "name": "cooldownSeconds",
+          "type": "uint64"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "have",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "need",
+          "type": "uint256"
+        }
+      ],
+      "name": "BelowMinimumBond",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "CooldownNotElapsed",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "InsufficientBond",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "NothingPending",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "Reentrancy",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "TransferFailed",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ZeroValue",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "agent",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "total",
+          "type": "uint256"
+        }
+      ],
+      "name": "Bonded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "agent",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "UnbondClaimed",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "agent",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint64",
+          "name": "readyAt",
+          "type": "uint64"
+        }
+      ],
+      "name": "UnbondRequested",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "agent",
+          "type": "address"
+        }
+      ],
+      "name": "bondOf",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "bondUp",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "bonded",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "claimUnbond",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "cooldown",
+      "outputs": [
+        {
+          "internalType": "uint64",
+          "name": "",
+          "type": "uint64"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "agent",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "minBond",
+          "type": "uint256"
+        }
+      ],
+      "name": "meetsBond",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "pendingUnbond",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "requestUnbond",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "agent",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "minBond",
+          "type": "uint256"
+        }
+      ],
+      "name": "requireBond",
+      "outputs": [],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "unbondReadyAt",
+      "outputs": [
+        {
+          "internalType": "uint64",
+          "name": "",
+          "type": "uint64"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x60a0604052348015600e575f5ffd5b50604051610745380380610745833981016040819052602b91603b565b6001600160401b03166080526066565b5f60208284031215604a575f5ffd5b81516001600160401b0381168114605f575f5ffd5b9392505050565b6080516106c06100855f395f81816101a101526104a701526106c05ff3fe60806040526004361061008f575f3560e01c806372d2b6c01161005757806372d2b6c01461015c578063787a08a614610190578063c3d51763146101c3578063d4ffe141146101e2578063f19e2a2114610211575f5ffd5b8063441048bc146100935780634ca39c2b146100d15780635281f7d01461011f57806353ef7cfa1461013557806354f63b141461013d575b5f5ffd5b34801561009e575f5ffd5b506100be6100ad3660046105d1565b60016020525f908152604090205481565b6040519081526020015b60405180910390f35b3480156100dc575f5ffd5b506101066100eb3660046105d1565b60026020525f908152604090205467ffffffffffffffff1681565b60405167ffffffffffffffff90911681526020016100c8565b34801561012a575f5ffd5b5061013361023c565b005b610133610382565b348015610148575f5ffd5b506101336101573660046105f1565b61040c565b348015610167575f5ffd5b506100be6101763660046105d1565b6001600160a01b03165f9081526020819052604090205490565b34801561019b575f5ffd5b506101067f000000000000000000000000000000000000000000000000000000000000000081565b3480156101ce575f5ffd5b506101336101dd366004610608565b610548565b3480156101ed575f5ffd5b506102016101fc366004610608565b610594565b60405190151581526020016100c8565b34801561021c575f5ffd5b506100be61022b3660046105d1565b5f6020819052908152604090205481565b60035460010361025f5760405163558a1e0360e11b815260040160405180910390fd5b60016003819055335f90815260209190915260408120549081900361029757604051630bae0d7560e11b815260040160405180910390fd5b335f9081526002602052604090205467ffffffffffffffff164210156102d057604051635115ba2f60e11b815260040160405180910390fd5b335f818152600160205260408082208290555190919083908381818185875af1925050503d805f811461031e576040519150601f19603f3d011682016040523d82523d5f602084013e610323565b606091505b5050905080610345576040516312171d8360e31b815260040160405180910390fd5b60405182815233907f11d3b6fa1418eff1e9dbd66f129ba60696a43890ea6bd3cb745921dbe15601479060200160405180910390a250505f600355565b345f036103a257604051637c946ed760e01b815260040160405180910390fd5b335f90815260208190526040812080543492906103c0908490610644565b9091555050335f8181526020818152604091829020548251348152918201527f524384adee0b2f52827eebf00ddd616aa286978612393216724d61cdb43dc835910160405180910390a2565b805f0361042c57604051637c946ed760e01b815260040160405180910390fd5b335f9081526020819052604090205481111561045b5760405163e92c469f60e01b815260040160405180910390fd5b335f9081526020819052604081208054839290610479908490610657565b9091555050335f908152600160205260408120805483929061049c908490610644565b909155506104cc90507f00000000000000000000000000000000000000000000000000000000000000004261066a565b335f8181526002602052604090819020805467ffffffffffffffff9490941667ffffffffffffffff19909416841790555190917fac526a10172f0bbd1328fce8b1172f31af97437a814307d519c9d755b39efa8c9161053d9185825267ffffffffffffffff16602082015260400190565b60405180910390a250565b6001600160a01b0382165f908152602081905260409020548181101561058f5760405163709e9dd760e01b8152600481018290526024810183905260440160405180910390fd5b505050565b6001600160a01b0382165f908152602081905260409020548111155b92915050565b80356001600160a01b03811681146105cc575f5ffd5b919050565b5f602082840312156105e1575f5ffd5b6105ea826105b6565b9392505050565b5f60208284031215610601575f5ffd5b5035919050565b5f5f60408385031215610619575f5ffd5b610622836105b6565b946020939093013593505050565b634e487b7160e01b5f52601160045260245ffd5b808201808211156105b0576105b0610630565b818103818111156105b0576105b0610630565b67ffffffffffffffff81811683821601908111156105b0576105b061063056fea264697066735822122043361f4c5ad233527196a0f272fe7fe22b3ca8bc1e72c3873089e6a7ec117b8664736f6c63430008230033"
+}

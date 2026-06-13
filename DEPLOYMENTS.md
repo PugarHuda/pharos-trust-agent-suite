@@ -62,15 +62,16 @@ Owner / deployer: `0x39D2bae5EAedA9283535dDC98F1991c81eD5Cd7E`
 
 | Item | Address / tx | Link |
 |------|--------------|------|
-| **ValidationRegistry8004** (wired to live Identity Registry) | `0xc9142C347b51Bd2f89f943BcEae5D302A14f5B88` | [addr](https://atlantic.pharosscan.xyz/address/0xc9142C347b51Bd2f89f943BcEae5D302A14f5B88) |
-| Deploy tx | `0xbfa67170fc64c4efda135c98a95e838fda0c9f1a4a3d6aeae197a86fae2f0196` | [tx](https://atlantic.pharosscan.xyz/tx/0xbfa67170fc64c4efda135c98a95e838fda0c9f1a4a3d6aeae197a86fae2f0196) |
+| **ValidationRegistry8004** (v2 — adds per-server pending-request cap; wired to live Identity Registry) | `0xd3F1DEf0c294405Cbd02b8b84D1De861A8C058DC` | [addr](https://atlantic.pharosscan.xyz/address/0xd3F1DEf0c294405Cbd02b8b84D1De861A8C058DC) |
+| Deploy tx (v2) | `0xb51ca98c8045c8bbc98ec2c0dfd8a3f88cfc5df15c79a788a889bbe394b3926c` | [tx](https://atlantic.pharosscan.xyz/tx/0xb51ca98c8045c8bbc98ec2c0dfd8a3f88cfc5df15c79a788a889bbe394b3926c) |
 | register server agent (#2) | `0x93e2812da066afa7091197ad72b0f5d5fa9809e31fb90dd55fba1011156a036e` | [tx](https://atlantic.pharosscan.xyz/tx/0x93e2812da066afa7091197ad72b0f5d5fa9809e31fb90dd55fba1011156a036e) |
 | register validator agent (#3) | `0x30a7cd0039a452b92a0630aba3999943468e90d90db45df4602b0626206bd9bf` | [tx](https://atlantic.pharosscan.xyz/tx/0x30a7cd0039a452b92a0630aba3999943468e90d90db45df4602b0626206bd9bf) |
-| **validationRequest** (server #2 → validator #3, dataHash = escrow jobId) | `0x6e258ec47734ad10611726d660f9c038fcd99d5fdc47e8b819038686b9b2f817` | [tx](https://atlantic.pharosscan.xyz/tx/0x6e258ec47734ad10611726d660f9c038fcd99d5fdc47e8b819038686b9b2f817) |
-| **validationResponse** (validator posts 95/100) | `0x2c4e6fec3872f2bca7900bbc8b82265b2f66b2ee4da36c253ff341a8b0cc1761` | [tx](https://atlantic.pharosscan.xyz/tx/0x2c4e6fec3872f2bca7900bbc8b82265b2f66b2ee4da36c253ff341a8b0cc1761) |
+| **validationRequest** (server #2 → validator #3, dataHash = escrow jobId) on v2 | `0xe8f3c5df1f18860f62f579b1a219a19050bd10c8c2ea47b875b4334d7618b8bf` | [tx](https://atlantic.pharosscan.xyz/tx/0xe8f3c5df1f18860f62f579b1a219a19050bd10c8c2ea47b875b4334d7618b8bf) |
+| **validationResponse** (validator posts 95/100) on v2 | `0xe740a91bc32139621f5baa1353586f5ec34aac6cd8c5ece5f311d731a1c24a43` | [tx](https://atlantic.pharosscan.xyz/tx/0xe740a91bc32139621f5baa1353586f5ec34aac6cd8c5ece5f311d731a1c24a43) |
 
-> Completes the **ERC-8004 trio** live: Identity (`0xa048D4F1…`) + Reputation (`0x8010e567…` /
-> adapter `0x6B99B00B…`) + **Validation** (`0xc9142C34…`). The validated `dataHash`
+> v2 redeploy adds a per-server pending-request cap (ERC-8004 storage-exhaustion mitigation); supersedes
+> v1 `0xc9142C34…`. Completes the **ERC-8004 trio** live: Identity (`0xa048D4F1…`) + Reputation
+> (`0x8010e567…` / adapter `0x6B99B00B…`) + **Validation** (`0xd3F1DEf0…`). The validated `dataHash`
 > `0x31d03e57…` is the live `agent-escrow` released jobId — i.e. the hired work was independently
 > scored 95/100 by a registered validator. Only the designated validator could respond; only the
 > server agent could request (anti-griefing).
@@ -79,15 +80,40 @@ Owner / deployer: `0x39D2bae5EAedA9283535dDC98F1991c81eD5Cd7E`
 
 | Item | Address / tx | Link |
 |------|--------------|------|
-| **ReputationGate** (reads live Reputation + Validation) | `0xDec9B79F0f957F07F4896d2a2355507A7C8f5849` | [addr](https://atlantic.pharosscan.xyz/address/0xDec9B79F0f957F07F4896d2a2355507A7C8f5849) |
-| Deploy tx | `0x0724c01665d60681c29b4a1eab0042aa6d3e230419e5522db0f3c12e7577f156` | [tx](https://atlantic.pharosscan.xyz/tx/0x0724c01665d60681c29b4a1eab0042aa6d3e230419e5522db0f3c12e7577f156) |
-| **gatedPay** — 0.001 PHRS forwarded to a trusted provider (rep 10 ≥ bar 10) | `0x864bab3d931a98fe48b84ae45fe79484c4a22def368bb62dec8a49b5d831e6a0` | [tx](https://atlantic.pharosscan.xyz/tx/0x864bab3d931a98fe48b84ae45fe79484c4a22def368bb62dec8a49b5d831e6a0) |
+| **ReputationGate** (v2 — wired to Validation v2) | `0x425d3F086D8e98B7462cc987ED9B1aF9F396608d` | [addr](https://atlantic.pharosscan.xyz/address/0x425d3F086D8e98B7462cc987ED9B1aF9F396608d) |
+| Deploy tx (v2) | `0x79fb17d5d515c4201f9a1ed4e1ea1a42d129de0b9dfd81c4041f88f070a89e84` | [tx](https://atlantic.pharosscan.xyz/tx/0x79fb17d5d515c4201f9a1ed4e1ea1a42d129de0b9dfd81c4041f88f070a89e84) |
+| **gatedPay** — 0.001 PHRS forwarded to a trusted provider (rep 10 ≥ bar 10) | `0x9a8221e0d0ac342ed38d899811d7d2129d65a3cdbfb16ccc42944184c460a07d` | [tx](https://atlantic.pharosscan.xyz/tx/0x9a8221e0d0ac342ed38d899811d7d2129d65a3cdbfb16ccc42944184c460a07d) |
 
 > Makes reputation **economic**: the gate forwards funds only above a reputation bar. Proven live — a
 > trusted provider (10/100) was paid; a 0-reputation address is blocked (`check` → BLOCK); and the
 > **composite** trust check returns TRUSTED for the provider whose escrowed work was validated **95/100**
 > (using the live `agent-escrow` jobId `0x31d03e57…` as the `dataHash`). The Pharos-native ERC-8183
-> ReputationGateHook, composing Reputation (`0x8010e567…`) + Validation (`0xc9142C34…`).
+> ReputationGateHook, composing Reputation (`0x8010e567…`) + Validation v2 (`0xd3F1DEf0…`).
+
+## intent-mandate (AP2-style signed Intent Mandate)
+
+| Item | Address / tx | Link |
+|------|--------------|------|
+| **IntentMandate** (EIP-712 user-signed spend envelope) | `0x4Ca9b16E6a107717A7c68F615ca4D5EFE4F2Ee4a` | [addr](https://atlantic.pharosscan.xyz/address/0x4Ca9b16E6a107717A7c68F615ca4D5EFE4F2Ee4a) |
+| Deploy tx | `0xaceda135976948abca4eeac824c584862e55270f71440c2619d746a030d31258` | [tx](https://atlantic.pharosscan.xyz/tx/0xaceda135976948abca4eeac824c584862e55270f71440c2619d746a030d31258) |
+| fund (user deposits 0.002) | `0xf081e91d2c02a283b34d22dc42f4cb483176771c2fded0339de7112187f90a6c` | [tx](https://atlantic.pharosscan.xyz/tx/0xf081e91d2c02a283b34d22dc42f4cb483176771c2fded0339de7112187f90a6c) |
+| **spendUnderMandate** (agent spends 0.001 within the user's signed envelope) | `0x3efd2700d2681540664ebc397cfd9ab00ff82e28aaaf49432468350568d9bfde` | [tx](https://atlantic.pharosscan.xyz/tx/0x3efd2700d2681540664ebc397cfd9ab00ff82e28aaaf49432468350568d9bfde) |
+
+> The user signed the mandate off-chain (EIP-712, no gas); the agent could only move 0.001 of the 0.002
+> cap, to the signed recipient, before expiry — the envelope is enforced in the contract. 0.001 remaining.
+
+## agent-bond (staked sybil resistance)
+
+| Item | Address / tx | Link |
+|------|--------------|------|
+| **AgentBond** (cooldown 3600s) | `0xC59113F22BE46624D8ceFC4A030bCC098a8953Af` | [addr](https://atlantic.pharosscan.xyz/address/0xC59113F22BE46624D8ceFC4A030bCC098a8953Af) |
+| Deploy tx | `0x8c65f34299fe027605631af021bbab7b8b30d0a4ce1dfb155c053fb448a50426` | [tx](https://atlantic.pharosscan.xyz/tx/0x8c65f34299fe027605631af021bbab7b8b30d0a4ce1dfb155c053fb448a50426) |
+| bondUp (lock 0.002) | `0x8334871da218f0abbe9a20b0b287434d8ffd3816071f4143a8d76514d0d0b0a6` | [tx](https://atlantic.pharosscan.xyz/tx/0x8334871da218f0abbe9a20b0b287434d8ffd3816071f4143a8d76514d0d0b0a6) |
+| requestUnbond (active bond drops to 0.001 immediately) | `0xa3f72a0286fa4c25086aa44faee86f57396bfc03c53bac182d92cf891b46c2bc` | [tx](https://atlantic.pharosscan.xyz/tx/0xa3f72a0286fa4c25086aa44faee86f57396bfc03c53bac182d92cf891b46c2bc) |
+
+> Skin-in-the-game: an agent locks a bond; consumers require `bondOf ≥ min` (proven: TRUSTED at 0.001,
+> BLOCK at 0.01). Requesting an exit drops the active bond at once; a cooldown delays the claim, so
+> capital can't be recycled instantly across sybil identities.
 
 ## stylus-compute
 

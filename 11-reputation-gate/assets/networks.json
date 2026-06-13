@@ -8,8 +8,8 @@
     "default": true,
     "deployed": {
       "reputation": "0x8010e567b6f68dcfD19312644F1c3E6249b43ef7",
-      "validationRegistry": "0xc9142C347b51Bd2f89f943BcEae5D302A14f5B88",
-      "reputationGate": "0xDec9B79F0f957F07F4896d2a2355507A7C8f5849"
+      "validationRegistry": "0xd3F1DEf0c294405Cbd02b8b84D1De861A8C058DC",
+      "reputationGate": "0x425d3F086D8e98B7462cc987ED9B1aF9F396608d"
     }
   },
   "pacific-mainnet": {

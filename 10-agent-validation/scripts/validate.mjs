@@ -64,7 +64,7 @@ async function main() {
       const signer = getSigner('SERVER_PRIVATE_KEY', provider);
       const { ContractFactory } = await import('ethers');
       const f = new ContractFactory(VR.abi, VR.bytecode, signer);
-      const c = await f.deploy(identityAddr);
+      const c = await f.deploy(identityAddr, BigInt(args.maxPending ?? 100));
       console.log(`deploying ValidationRegistry8004 (identity=${identityAddr})… ${c.deploymentTransaction().hash}`);
       await c.waitForDeployment();
       const addr = await c.getAddress();

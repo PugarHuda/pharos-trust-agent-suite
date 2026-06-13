@@ -24,7 +24,7 @@ function step(title, dir, cmd) {
   catch (e) { console.log((e.stdout || '').trim() || `(exited ${e.status})`); } // non-zero exit (e.g. shield fail / gate block) is expected
 }
 
-console.log('\x1b[1m Pharos Trust-First Agent Suite — live demo (11 skills, 208 tests, CI green)\x1b[0m');
+console.log('\x1b[1m Pharos Trust-First Agent Suite — live demo (13 skills, 236 tests, CI green)\x1b[0m');
 
 step('1. agent-utils — live BTC/USD price (oracle, read-only)', '07-agent-utils',
   'node scripts/utils.mjs price --feed BTC/USD');
@@ -48,15 +48,22 @@ const ESCROW = '0x5919e995b29Bf81B322171769C9e63c5964258A7';
 step('6d. agent-escrow — a hire settled on-chain (read the released job)', '09-agent-escrow',
   `node scripts/escrow.mjs status --escrow ${ESCROW} --job live-release-1`);
 
-const VALREG = '0xc9142C347b51Bd2f89f943BcEae5D302A14f5B88';
+const VALREG = '0xd3F1DEf0c294405Cbd02b8b84D1De861A8C058DC';
 const ESCROW_JOB = '0x31d03e57eacd074b8ec94b27d8c8440cc245600d6d87c93314f4ac2624d35177';
 step('6e. agent-validation — ERC-8004 validator scored that hired work (read)', '10-agent-validation',
   `node scripts/validate.mjs get --validation ${VALREG} --data ${ESCROW_JOB}`);
 
-const GATE = '0xDec9B79F0f957F07F4896d2a2355507A7C8f5849';
+const GATE = '0x425d3F086D8e98B7462cc987ED9B1aF9F396608d';
 const GOOD_PROVIDER = '0x6d42BF50c05aC99a5Ef3b85783B8DE75e32cb630';
 step('6f. reputation-gate — composite trust gate (reputation 10 + validation 95 → TRUSTED)', '11-reputation-gate',
   `node scripts/gate.mjs check --gate ${GATE} --provider ${GOOD_PROVIDER} --min-reputation 10 --data ${ESCROW_JOB} --min-validation 90`);
+
+const BOND = '0xC59113F22BE46624D8ceFC4A030bCC098a8953Af';
+const BONDED_AGENT = '0x39D2bae5EAedA9283535dDC98F1991c81eD5Cd7E';
+step('6g. agent-bond — sybil resistance: a bonded agent has skin in the game (read)', '13-agent-bond',
+  `node scripts/bond.mjs check --bond ${BOND} --agent ${BONDED_AGENT} --min 0.0001`);
+step('6h. pharos-bazaar — export an x402-Bazaar catalog (reputation attached)', '08-pharos-bazaar',
+  `node scripts/bazaar.mjs export --registry ${REG} --reputation ${REP} --tag price-feed`);
 
 // Opt-in live WRITE segment (broadcasts real txs; needs 01-agent-treasury/.env).
 // Default demo is read-only/safe; pass --write to include this on camera.

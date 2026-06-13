@@ -7,8 +7,8 @@ recommended (it's where the UX/clarity score is won).
 ## Pre-flight checklist
 
 - [x] Public GitHub repo: https://github.com/PugarHuda/pharos-trust-agent-suite
-- [x] 11 skills in official `SKILL.md` format, 208 passing tests, **green CI** (`.github/workflows/test.yml`)
-- [x] On-chain proof on Atlantic incl. a **full gasless x402 → reputation loop**, a **full escrow lifecycle**, a **real ERC-8004 validation**, and a **reputation-gated payment** (addresses + tx in `DEPLOYMENTS.md`)
+- [x] 13 skills in official `SKILL.md` format, 236 passing tests, **green CI** (`.github/workflows/test.yml`)
+- [x] On-chain proof on Atlantic incl. a **full gasless x402 → reputation loop**, a **full escrow lifecycle**, a **real ERC-8004 validation**, a **reputation-gated payment**, a **signed AP2-style Intent Mandate spend**, and a **staked bond** (addresses + tx in `DEPLOYMENTS.md`)
 - [x] Live read-only **web dashboard** (`web/`) — reads the deployed contracts in-browser; deploy with `vercel --prod`
 - [ ] **Demo video (strongly recommended)** — record per `DEMO.md` / `NARRATION.md` (contracts are live; film the real tx on Pharosscan), or screen-record the dashboard
 - [ ] Submit BUIDL on DoraHacks (link below)
@@ -50,7 +50,7 @@ same repo link. Confirm any exact registry/template in the dev Telegram (t.me/+U
 
 ## Ready-to-paste DoraHacks description
 
-> **Pharos Trust-First Agent Suite** — eleven composable Skills that form the trust & infrastructure
+> **Pharos Trust-First Agent Suite** — thirteen composable Skills that form the trust & infrastructure
 > layer for the Pharos agent economy: the things every other agent needs but few build.
 >
 > **What makes it different from the field:** the most crowded category this round is agent "safety", and
@@ -89,13 +89,20 @@ same repo link. Confirm any exact registry/template in the dev Telegram (t.me/+U
 > 11. **reputation-gate** — makes reputation **economic, not just informational**: an on-chain gate (the
 >    **ERC-8183** ReputationGateHook pattern, live on Base from Virtuals + the Ethereum Foundation) that
 >    forwards funds **only** to a counterparty whose reputation — and optionally an independent validation
->    of the specific work — clears a threshold. *Live on Atlantic; a gated payment succeeded to a trusted
->    provider, a 0-reputation address is blocked, and composite trust (reputation + validation) is proven.*
+>    of the specific work — clears a threshold. *Live; a gated payment succeeded, a 0-reputation address
+>    is blocked, composite trust (reputation + validation) proven.*
+> 12. **intent-mandate** — a cryptographic leash for agents, modeled on **Google's AP2** Intent Mandate: a
+>    user signs an EIP-712 envelope (agent, cap, recipient, expiry) and the agent can spend their funds
+>    ONLY inside it. *Live; a signed-mandate spend was enforced on-chain (over-spend/expiry/wrong-recipient
+>    all revert).*
+> 13. **agent-bond** — sybil resistance via skin-in-the-game (the **ERC-8004-recommended** registration
+>    bond / minimum stake): agents lock a bond with an unbonding cooldown so consumers can require capital
+>    at risk. *Live; bond + trust checks proven on-chain.*
 >
 > The skills are wired together in code, and proven on Atlantic with a **full agent-commerce loop** —
 > discover → hire (escrow) → gasless x402 pay/settle → record → rate → on-chain reputation → ERC-8004
-> validation → reputation-gated funding — plus a treasury successful + blocked spend. It is the **only
-> complete ERC-8004 + ERC-8183 + x402 stack** in the field, and the only one where reputation actually
-> gates money on-chain. **208 passing tests with green CI**; hardened across four adversarial QA rounds
-> (see QA.md). A zero-backend **live web dashboard** (`web/`) reads the deployed contracts in-browser.
-> Nine contracts + all tx hashes in DEPLOYMENTS.md.
+> validation → reputation-gated funding — plus an AP2-style signed-intent spend, a staked bond, and a
+> treasury successful + blocked spend. It is the **only complete ERC-8004 + ERC-8183 + AP2 + x402 stack**
+> in the field, and the only one where reputation actually gates money on-chain. **236 passing tests with
+> green CI**; hardened across four adversarial QA rounds (see QA.md). A zero-backend **live web dashboard**
+> (`web/`) reads the deployed contracts in-browser. Eleven contracts + all tx hashes in DEPLOYMENTS.md.

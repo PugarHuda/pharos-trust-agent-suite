@@ -1,0 +1,458 @@
+{
+  "contractName": "IntentMandate",
+  "compiler": "0.8.35+commit.47b9dedd.Emscripten.clang",
+  "abi": [
+    {
+      "inputs": [],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [],
+      "name": "BadSignature",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ExceedsMandate",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "InsufficientBalance",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "MandateExpired",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "MandateIsRevoked",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "NotAuthorizedAgent",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "NotMandateUser",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "RecipientNotAllowed",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "Reentrancy",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "TransferFailed",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ZeroValue",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "Funded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "digest",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        }
+      ],
+      "name": "MandateRevoked",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "digest",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "recipient",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "totalSpent",
+          "type": "uint256"
+        }
+      ],
+      "name": "MandateSpent",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "Withdrawn",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "DOMAIN_SEPARATOR",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "balanceOf",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "user",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "agent",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "recipient",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "maxAmount",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint64",
+              "name": "expiry",
+              "type": "uint64"
+            },
+            {
+              "internalType": "uint256",
+              "name": "nonce",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct IntentMandate.Mandate",
+          "name": "m",
+          "type": "tuple"
+        }
+      ],
+      "name": "digestOf",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "fund",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "user",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "agent",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "recipient",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "maxAmount",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint64",
+              "name": "expiry",
+              "type": "uint64"
+            },
+            {
+              "internalType": "uint256",
+              "name": "nonce",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct IntentMandate.Mandate",
+          "name": "m",
+          "type": "tuple"
+        }
+      ],
+      "name": "remaining",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "user",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "agent",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "recipient",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "maxAmount",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint64",
+              "name": "expiry",
+              "type": "uint64"
+            },
+            {
+              "internalType": "uint256",
+              "name": "nonce",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct IntentMandate.Mandate",
+          "name": "m",
+          "type": "tuple"
+        }
+      ],
+      "name": "revoke",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "name": "revoked",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "user",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "agent",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "recipient",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "maxAmount",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint64",
+              "name": "expiry",
+              "type": "uint64"
+            },
+            {
+              "internalType": "uint256",
+              "name": "nonce",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct IntentMandate.Mandate",
+          "name": "m",
+          "type": "tuple"
+        },
+        {
+          "internalType": "bytes",
+          "name": "signature",
+          "type": "bytes"
+        },
+        {
+          "internalType": "address",
+          "name": "recipient",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "spendUnderMandate",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "name": "spent",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "withdraw",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x60a060405234801561000f575f5ffd5b50604080518082018252600d81526c496e74656e744d616e6461746560981b6020918201528151808301835260018152603160f81b9082015281517f8b73c3c69bb8fe3d512ecc4cf759cc79239f7b179b0ffacaa9a75d522b39400f918101919091527f895ab3dda53d44cc0421dc757291fa5298b9d98983153163aff83085fd5cc97e918101919091527fc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc660608201524660808201523060a082015260c00160408051601f198184030181529190528051602090910120608052608051610c6b6101095f395f8181610108015261042b0152610c6b5ff3fe60806040526004361061008f575f3560e01c8063a2dfbc3f11610057578063a2dfbc3f14610182578063ae20bed3146101a1578063b60d4288146101cc578063d23034f1146101d4578063d908dfbf146101f3575f5ffd5b80632e1a7d4d14610093578063328a93e8146100b45780633644e515146100f757806370a08231146101385780639fa9496f14610163575b5f5ffd5b34801561009e575f5ffd5b506100b26100ad366004610ab3565b610212565b005b3480156100bf575f5ffd5b506100e26100ce366004610ab3565b60026020525f908152604090205460ff1681565b60405190151581526020015b60405180910390f35b348015610102575f5ffd5b5061012a7f000000000000000000000000000000000000000000000000000000000000000081565b6040519081526020016100ee565b348015610143575f5ffd5b5061012a610152366004610ae5565b5f6020819052908152604090205481565b34801561016e575f5ffd5b5061012a61017d366004610b1b565b610350565b34801561018d575f5ffd5b506100b261019c366004610b35565b610479565b3480156101ac575f5ffd5b5061012a6101bb366004610ab3565b60016020525f908152604090205481565b6100b26107ec565b3480156101df575f5ffd5b506100b26101ee366004610b1b565b610866565b3480156101fe575f5ffd5b5061012a61020d366004610b1b565b6108f6565b6003546001036102355760405163558a1e0360e11b815260040160405180910390fd5b60016003555f81900361025b57604051637c946ed760e01b815260040160405180910390fd5b335f9081526020819052604090205481111561028a57604051631e9acf1760e31b815260040160405180910390fd5b335f90815260208190526040812080548392906102a8908490610be2565b90915550506040515f90339083908381818185875af1925050503d805f81146102ec576040519150601f19603f3d011682016040523d82523d5f602084013e6102f1565b606091505b5050905080610313576040516312171d8360e31b815260040160405180910390fd5b60405182815233907f7084f5476618d8e60b11ef0d7d3f06914655adb8793e28ff7f018d4c76d505d59060200160405180910390a250505f600355565b5f807f8eaea4c21026d5b738f41302b3105806f0c64e458d28342d05b897edb4b4a5476103806020850185610ae5565b6103906040860160208701610ae5565b6103a06060870160408801610ae5565b60608701356103b560a0890160808a01610bfb565b6040805160208101979097526001600160a01b039586169087015292841660608601529216608084015260a08381019290925267ffffffffffffffff1660c083015284013560e08201526101000160408051601f1981840301815290829052805160209182012061190160f01b918301919091527f0000000000000000000000000000000000000000000000000000000000000000602283015260428201819052915060620160405160208183030381529060405280519060200120915050919050565b60035460010361049c5760405163558a1e0360e11b815260040160405180910390fd5b60016003555f8190036104c257604051637c946ed760e01b815260040160405180910390fd5b6104d26040860160208701610ae5565b6001600160a01b0316336001600160a01b031614610503576040516350699b3960e01b815260040160405180910390fd5b61051360a0860160808701610bfb565b67ffffffffffffffff1642111561053d576040516327267dfd60e01b815260040160405180910390fd5b61054d6060860160408701610ae5565b6001600160a01b0316826001600160a01b03161415801561058657505f61057a6060870160408801610ae5565b6001600160a01b031614155b156105a45760405163133307bb60e21b815260040160405180910390fd5b5f6105ae86610350565b5f8181526002602052604090205490915060ff16156105e0576040516324c94f5360e21b815260040160405180910390fd5b6105ed6020870187610ae5565b6001600160a01b031661060182878761097c565b6001600160a01b03161461062857604051635cd5d23360e01b815260040160405180910390fd5b5f81815260016020526040812054610641908490610c22565b905086606001358111156106685760405163637ea9e160e11b815260040160405180910390fd5b825f8061067860208b018b610ae5565b6001600160a01b03166001600160a01b031681526020019081526020015f205410156106b757604051631e9acf1760e31b815260040160405180910390fd5b5f828152600160209081526040822083905584919081906106da908b018b610ae5565b6001600160a01b03166001600160a01b031681526020019081526020015f205f8282546107079190610be2565b90915550506040515f906001600160a01b0386169085908381818185875af1925050503d805f8114610754576040519150601f19603f3d011682016040523d82523d5f602084013e610759565b606091505b505090508061077b576040516312171d8360e31b815260040160405180910390fd5b6001600160a01b03851661079260208a018a610ae5565b6001600160a01b0316847f390467e84e11c043e5ae40eb0651e77ef1da1d5d50742afadcc6a41cc70f881d87866040516107d6929190918252602082015260400190565b60405180910390a450505f600355505050505050565b345f0361080c57604051637c946ed760e01b815260040160405180910390fd5b335f908152602081905260408120805434929061082a908490610c22565b909155505060405134815233907f5af8184bef8e4b45eb9f6ed7734d04da38ced226495548f46e0c8ff8d7d9a5249060200160405180910390a2565b6108736020820182610ae5565b6001600160a01b0316336001600160a01b0316146108a457604051639073c63960e01b815260040160405180910390fd5b5f6108ae82610350565b5f81815260026020526040808220805460ff1916600117905551919250339183917fafd4f68366bac1811b7d8bd97a1a1091a281ec07d10126d72babb31ebc30f0cb91a35050565b5f5f61090183610350565b5f8181526002602052604090205490915060ff1680610938575061092b60a0840160808501610bfb565b67ffffffffffffffff1642115b1561094557505f92915050565b5f8181526001602052604090205460608401358110156109725761096d816060860135610be2565b610974565b5f5b949350505050565b5f6041821461099e57604051635cd5d23360e01b815260040160405180910390fd5b8235602084013560408501355f1a7f7fffffffffffffffffffffffffffffff5d576e7357a4501ddfe92f46681b20a08211156109ed57604051635cd5d23360e01b815260040160405180910390fd5b8060ff16601b14158015610a0557508060ff16601c14155b15610a2357604051635cd5d23360e01b815260040160405180910390fd5b604080515f808252602082018084528a905260ff841692820192909252606081018590526080810184905260019060a0016020604051602081039080840390855afa158015610a74573d5f5f3e3d5ffd5b5050604051601f1901519150506001600160a01b038116610aa857604051635cd5d23360e01b815260040160405180910390fd5b979650505050505050565b5f60208284031215610ac3575f5ffd5b5035919050565b80356001600160a01b0381168114610ae0575f5ffd5b919050565b5f60208284031215610af5575f5ffd5b610afe82610aca565b9392505050565b5f60c08284031215610b15575f5ffd5b50919050565b5f60c08284031215610b2b575f5ffd5b610afe8383610b05565b5f5f5f5f5f6101208688031215610b4a575f5ffd5b610b548787610b05565b945060c086013567ffffffffffffffff811115610b6f575f5ffd5b8601601f81018813610b7f575f5ffd5b803567ffffffffffffffff811115610b95575f5ffd5b886020828401011115610ba6575f5ffd5b60209190910194509250610bbc60e08701610aca565b94979396509194610100013592915050565b634e487b7160e01b5f52601160045260245ffd5b81810381811115610bf557610bf5610bce565b92915050565b5f60208284031215610c0b575f5ffd5b813567ffffffffffffffff81168114610afe575f5ffd5b80820180821115610bf557610bf5610bce56fea26469706673582212207e1dd717df3a6f3dd77a0c709103d342096b8fb7e6ede889be416f6fdd6c188564736f6c63430008230033"
+}

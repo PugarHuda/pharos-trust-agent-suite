@@ -16,6 +16,11 @@ import { IValidationRegistry8004 } from "./IValidationRegistry8004.sol";
 contract ValidationRegistry8004 is IValidationRegistry8004 {
     IIdentityRegistry8004 public immutable identity;
 
+    /// @notice Cap on outstanding (requested-but-unanswered) validations per server agent. Bounds the
+    ///         storage a single agent can force, mitigating the ERC-8004 "unbounded validation requests"
+    ///         storage-exhaustion risk. A slot frees as soon as a request is answered.
+    uint256 public immutable maxPendingPerServer;
+
     struct Validation {
         uint256 validatorAgentId;
         uint256 serverAgentId;
@@ -25,6 +30,7 @@ contract ValidationRegistry8004 is IValidationRegistry8004 {
     }
 
     mapping(bytes32 => Validation) private _validations; // dataHash => validation
+    mapping(uint256 => uint256) public pendingByServer;   // serverAgentId => outstanding requests
 
     error AlreadyRequested();
     error UnknownValidator();
@@ -35,9 +41,11 @@ contract ValidationRegistry8004 is IValidationRegistry8004 {
     error AlreadyResponded();
     error NotValidator();
     error BadResponse();
+    error TooManyPendingRequests();
 
-    constructor(address identityRegistry) {
+    constructor(address identityRegistry, uint256 maxPending) {
         identity = IIdentityRegistry8004(identityRegistry);
+        maxPendingPerServer = maxPending;
     }
 
     /// @inheritdoc IValidationRegistry8004
@@ -50,6 +58,8 @@ contract ValidationRegistry8004 is IValidationRegistry8004 {
         // Only the server agent (owner or its operating wallet) may request validation of its own work,
         // so no third party can squat a dataHash to misdirect or block the real validation.
         if (msg.sender != serverOwner && msg.sender != identity.getAgentWallet(serverAgentId)) revert NotServerAgent();
+        if (pendingByServer[serverAgentId] >= maxPendingPerServer) revert TooManyPendingRequests();
+        pendingByServer[serverAgentId] += 1;
 
         _validations[dataHash] = Validation({
             validatorAgentId: validatorAgentId,
@@ -72,6 +82,7 @@ contract ValidationRegistry8004 is IValidationRegistry8004 {
 
         v.response = response;
         v.responded = true;
+        pendingByServer[v.serverAgentId] -= 1; // a slot frees as soon as the request is answered
         emit ValidationResponse(v.validatorAgentId, v.serverAgentId, dataHash, response);
     }
 
