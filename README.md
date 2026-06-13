@@ -1,5 +1,7 @@
 # Pharos Trust-First Agent Suite — Skill Hackathon (Phase 1)
 
+[![tests](https://github.com/PugarHuda/pharos-trust-agent-suite/actions/workflows/test.yml/badge.svg)](https://github.com/PugarHuda/pharos-trust-agent-suite/actions/workflows/test.yml)
+
 Six composable Skills for the **Pharos Skill-to-Agent Dual Cascade Hackathon**, built in the
 official Pharos Skill format (`SKILL.md` + `references/` + `assets/`). The suite is designed as a
 **trust layer for the Pharos agent economy**: the things every other agent needs but few will build.
