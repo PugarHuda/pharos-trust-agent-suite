@@ -1,2 +1,5 @@
 node_modules/
 out/
+piper/
+voices/
+piper.tar.gz

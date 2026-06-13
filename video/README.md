@@ -4,9 +4,10 @@ Generates a real video file of the interactive walkthrough (`web/demo.html`) —
 headless, so it produces the same video locally or in CI. Useful when the submission wants an uploaded
 video file rather than a live URL.
 
-> **Audio note:** Playwright's recorder captures video only (no audio) — the on-screen **captions** carry
-> the narration. For a voice-over track, either play `web/demo.html` locally and screen-record with system
-> audio, or mux a TTS track onto the `.webm`/`.mp4` with ffmpeg.
+> **Voice-over:** `record-vo.mjs` builds a **synced voice-over** track. It prefers **Piper** (neural,
+> natural-sounding) when `PIPER_BIN` + `PIPER_MODEL` are set, and falls back to **espeak-ng** otherwise.
+> The GitHub Action downloads Piper + a voice model automatically (default `en_US-lessac-medium`). The
+> plain silent recorder is `record.mjs`.
 
 ## Run locally
 
@@ -14,11 +15,13 @@ video file rather than a live URL.
 cd video
 npm install
 npx playwright install chromium      # one-time browser download
-npm run record                       # → out/pharos-demo.webm (+ .mp4 if ffmpeg is installed)
+npm run record                       # silent → out/pharos-demo.webm (+ .mp4 if ffmpeg)
+npm run record:vo                    # WITH voice-over → out/pharos-demo.mp4 (needs ffmpeg + a TTS engine)
 ```
 
-Options (env): `SPEED=1|1.5|2` (default `2`), `WIDTH`/`HEIGHT` (default `1280x720`).
-For a real-time 1× recording: `SPEED=1 npm run record`.
+Options (env): `SPEED=1|1.5|2` (default `2`, silent recorder), `WIDTH`/`HEIGHT` (default `1280x720`).
+For natural voice locally, point Piper at a model: `PIPER_BIN=/path/piper PIPER_MODEL=/path/voice.onnx npm run record:vo`
+(otherwise it uses espeak-ng if installed). The silent recorder takes `SPEED=1` for a real-time 1× video.
 
 ## Run in GitHub Actions (no local setup)
 

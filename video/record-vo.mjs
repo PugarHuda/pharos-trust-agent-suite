@@ -15,6 +15,7 @@
 import http from 'node:http';
 import { createReadStream } from 'node:fs';
 import { access, mkdir, rm, writeFile, rename } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import { join, dirname, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
@@ -31,8 +32,22 @@ const WIDTH = parseInt(process.env.WIDTH || '1280', 10);
 const HEIGHT = parseInt(process.env.HEIGHT || '720', 10);
 
 const MIME = { '.html':'text/html','.js':'text/javascript','.json':'application/json','.css':'text/css','.svg':'image/svg+xml','.png':'image/png','.ico':'image/x-icon' };
-const sh = (cmd, args) => spawnSync(cmd, args, { encoding: 'utf8' });
+const sh = (cmd, args, opts={}) => spawnSync(cmd, args, { encoding: 'utf8', ...opts });
 const need = (cmd) => { const r = sh(cmd, ['-version'] ); if (r.status !== 0 && r.error) { console.error(`missing required tool: ${cmd}`); process.exit(2); } };
+
+// Synthesize `text` → `wav`. Prefers Piper (neural, natural) when PIPER_BIN + PIPER_MODEL exist;
+// otherwise falls back to espeak-ng. Returns the engine used, or null on total failure.
+const PIPER_BIN = process.env.PIPER_BIN, PIPER_MODEL = process.env.PIPER_MODEL;
+function synth(text, wav) {
+  if (PIPER_BIN && PIPER_MODEL && existsSync(PIPER_BIN) && existsSync(PIPER_MODEL)) {
+    const env = { ...process.env, LD_LIBRARY_PATH: `${dirname(PIPER_BIN)}:${process.env.LD_LIBRARY_PATH || ''}` };
+    const r = sh(PIPER_BIN, ['--model', PIPER_MODEL, '--output_file', wav], { input: text, env });
+    if (r.status === 0 && existsSync(wav)) return 'piper';
+    console.error('piper failed → espeak fallback:', (r.stderr || '').slice(0, 160));
+  }
+  const r2 = sh('espeak-ng', ['-s', process.env.RATE || '168', '-v', 'en-us+m3', '-z', '-w', wav, text]);
+  return (r2.status === 0 && existsSync(wav)) ? 'espeak' : null;
+}
 
 function serve(root) {
   return new Promise((resolve) => {
@@ -54,7 +69,7 @@ function probeDur(file) {
 }
 
 (async () => {
-  need('espeak-ng'); need('ffmpeg'); need('ffprobe');
+  need('ffmpeg'); need('ffprobe'); // a TTS engine (piper or espeak-ng) is checked per-call in synth()
   await rm(OUT, { recursive: true, force: true });
   await mkdir(AUD, { recursive: true });
 
@@ -73,10 +88,12 @@ function probeDur(file) {
   // 2) synthesize + measure; 3) compute per-scene durations (ms)
   const durations = [];
   const segPaths = [];
+  let engineUsed = null;
   for (let i = 0; i < captions.length; i++) {
     const wav = join(AUD, `c${i}.wav`);
-    const r = sh('espeak-ng', ['-s', RATE, '-v', 'en-us+m3', '-z', '-w', wav, captions[i]]);
-    if (r.status !== 0) { console.error('espeak-ng failed:', r.stderr); process.exit(1); }
+    const eng = synth(captions[i], wav);
+    if (!eng) { console.error('TTS failed (no piper and no espeak-ng available)'); process.exit(1); }
+    engineUsed = eng;
     const d = probeDur(wav);
     const sceneSec = Math.max(3.4, d + PAD);
     durations.push(Math.round(sceneSec * 1000));
@@ -84,8 +101,9 @@ function probeDur(file) {
     const seg = join(AUD, `seg${i}.wav`);
     sh('ffmpeg', ['-y','-i', wav, '-af','apad','-t', sceneSec.toFixed(3), '-ar','24000','-ac','1','-c:a','pcm_s16le', seg]);
     segPaths.push(seg);
-    console.log(`  scene ${i}: VO ${d.toFixed(1)}s → scene ${sceneSec.toFixed(1)}s`);
+    console.log(`  scene ${i} [${eng}]: VO ${d.toFixed(1)}s → scene ${sceneSec.toFixed(1)}s`);
   }
+  console.log(`voice engine: ${engineUsed}`);
 
   // build the voice-over track: lead silence + segments
   const lead = join(AUD, 'lead.wav');

@@ -2,14 +2,23 @@ name: demo-video
 
 # Records web/demo.html to a video file with Playwright and uploads it as an artifact.
 # Run on demand: Actions → demo-video → Run workflow. Anyone can reproduce the video from the repo.
+# Voice-over uses Piper (neural, natural) by default, falling back to espeak-ng if the download fails.
 
 on:
   workflow_dispatch:
     inputs:
       voiceover:
-        description: "Include synced voice-over (true) or silent captions only (false)"
+        description: "Include a synced voice-over (true) or silent captions only (false)"
         type: boolean
         default: true
+      engine:
+        description: "Voice engine"
+        type: choice
+        options: [piper, espeak]
+        default: piper
+      voice:
+        description: "Piper voice (e.g. en_US-lessac-medium, en_US-amy-medium, en_GB-alba-medium)"
+        default: "en_US-lessac-medium"
 
 jobs:
   record:
@@ -19,22 +28,45 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: install audio tools
+      - name: install audio tools (ffmpeg + espeak-ng fallback)
         run: sudo apt-get update && sudo apt-get install -y espeak-ng ffmpeg
+
+      - name: download Piper (neural voice)
+        if: ${{ github.event.inputs.voiceover != 'false' && github.event.inputs.engine != 'espeak' }}
+        working-directory: video
+        continue-on-error: true   # if this fails, record falls back to espeak-ng automatically
+        run: |
+          set -e
+          curl -fL -o piper.tar.gz https://github.com/rhasspy/piper/releases/download/2023.11.14-2/piper_linux_x86_64.tar.gz
+          tar xzf piper.tar.gz
+          chmod +x piper/piper
+          mkdir -p voices
+          V="${{ github.event.inputs.voice }}"
+          LOCALE=$(echo "$V" | cut -d- -f1); SPK=$(echo "$V" | cut -d- -f2); Q=$(echo "$V" | cut -d- -f3); LNG=$(echo "$LOCALE" | cut -d_ -f1)
+          BASE="https://huggingface.co/rhasspy/piper-voices/resolve/main/$LNG/$LOCALE/$SPK/$Q/$V"
+          curl -fL -o "voices/$V.onnx" "$BASE.onnx"
+          curl -fL -o "voices/$V.onnx.json" "$BASE.onnx.json"
+          LD_LIBRARY_PATH="$PWD/piper" piper/piper --version || true
+
       - name: install recorder deps
         working-directory: video
         run: npm install --no-audit --no-fund
       - name: install chromium
         working-directory: video
         run: npx playwright install --with-deps chromium
+
       - name: record walkthrough (with voice-over)
         if: ${{ github.event.inputs.voiceover != 'false' }}
         working-directory: video
+        env:
+          PIPER_BIN: ${{ github.workspace }}/video/piper/piper
+          PIPER_MODEL: ${{ github.workspace }}/video/voices/${{ github.event.inputs.voice }}.onnx
         run: npm run record:vo
       - name: record walkthrough (silent)
         if: ${{ github.event.inputs.voiceover == 'false' }}
         working-directory: video
         run: SPEED=1 npm run record
+
       - name: upload video
         uses: actions/upload-artifact@v4
         with:
