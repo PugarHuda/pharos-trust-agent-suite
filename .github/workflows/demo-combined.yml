@@ -1,0 +1,79 @@
+name: demo-combined
+
+# Produces ONE video: Part 1 = narrated walkthrough (Piper voice-over, web/demo.html) → divider →
+# Part 2 = a real terminal actually running `node demo.mjs` (all 13 skills execute live on Atlantic).
+# Run on demand: Actions → demo-combined → Run workflow. Uploads pharos-combined.mp4 (+ both parts).
+
+on:
+  workflow_dispatch:
+    inputs:
+      voice:
+        description: "Piper voice for the narration"
+        default: "en_US-lessac-medium"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: install media tools
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg ttyd espeak-ng fontconfig fonts-dejavu-core
+
+      - name: install all skill deps (demo.mjs shells into each)
+        run: |
+          set -e
+          for d in 01-agent-treasury 02-agent-shield 03-agent-strategy 04-a2a-mesh \
+                   05-stylus-compute 06-x402-facilitator 07-agent-utils 08-pharos-bazaar \
+                   09-agent-escrow 10-agent-validation 11-reputation-gate 12-intent-mandate 13-agent-bond; do
+            (cd "$d" && npm install --no-audit --no-fund)
+          done
+
+      - name: install recorder deps + chromium
+        working-directory: video
+        run: npm install --no-audit --no-fund && npx playwright install --with-deps chromium
+
+      - name: install vhs
+        run: go install github.com/charmbracelet/vhs@v0.8.0
+
+      - name: download Piper (neural voice)
+        working-directory: video
+        continue-on-error: true
+        run: |
+          set -e
+          curl -fL -o piper.tar.gz https://github.com/rhasspy/piper/releases/download/2023.11.14-2/piper_linux_x86_64.tar.gz
+          tar xzf piper.tar.gz && chmod +x piper/piper && mkdir -p voices
+          V="${{ github.event.inputs.voice }}"
+          LOCALE=$(echo "$V" | cut -d- -f1); SPK=$(echo "$V" | cut -d- -f2); Q=$(echo "$V" | cut -d- -f3); LNG=$(echo "$LOCALE" | cut -d_ -f1)
+          BASE="https://huggingface.co/rhasspy/piper-voices/resolve/main/$LNG/$LOCALE/$SPK/$Q/$V"
+          curl -fL -o "voices/$V.onnx" "$BASE.onnx"
+          curl -fL -o "voices/$V.onnx.json" "$BASE.onnx.json"
+
+      - name: Part 1 — narrated walkthrough (Playwright + Piper)
+        working-directory: video
+        env:
+          PIPER_BIN: ${{ github.workspace }}/video/piper/piper
+          PIPER_MODEL: ${{ github.workspace }}/video/voices/${{ github.event.inputs.voice }}.onnx
+        run: npm run record:vo
+
+      - name: Part 2 — real terminal (VHS runs node demo.mjs)
+        run: |
+          export PATH="$PATH:$(go env GOPATH)/bin"
+          vhs video/demo.tape
+
+      - name: combine the two parts
+        working-directory: video
+        run: npm run combine
+
+      - name: upload combined video
+        uses: actions/upload-artifact@v4
+        with:
+          name: pharos-combined
+          path: |
+            video/out/pharos-combined.mp4
+            video/out/pharos-demo.mp4
+            video/out/pharos-terminal.mp4
+          if-no-files-found: error

@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "record": "node record.mjs",
-    "record:vo": "node record-vo.mjs"
+    "record:vo": "node record-vo.mjs",
+    "combine": "node combine.mjs"
   },
   "engines": { "node": ">=18" },
   "dependencies": {

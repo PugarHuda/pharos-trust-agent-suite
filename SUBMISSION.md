@@ -22,6 +22,10 @@ the tab in one take (~3½ min). It auto-plays all 13 skills with synced captions
 browser voice-over, and real on-chain values + Pharosscan links — no manual typing, nothing can fail on
 camera. Press **F** for fullscreen first. Upload to YouTube/Loom (unlisted is fine) and copy the link.
 
+**One combined video — GitHub Actions → demo-combined.** Produces a single `pharos-combined.mp4`:
+Part 1 the narrated (Piper voice-over) walkthrough, then Part 2 a real terminal running `node demo.mjs`
+(all 13 skills live). The best single file to submit.
+
 **Real terminal (most credible) — GitHub Actions → demo-terminal.** Records a genuine terminal *actually
 running* `node demo.mjs`, which executes the read-only CLI of **all 13 skills live** against Atlantic.
 Download the **pharos-terminal** artifact. (Run it yourself: `node demo.mjs`.)
