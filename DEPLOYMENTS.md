@@ -57,3 +57,15 @@ when run.
 |------|----|------|
 | Live oracle read (BTC/USD) | read-only `eth_call` — no tx | [feed](https://atlantic.pharosscan.xyz/address/0x82d0e03ea6d94120B92EA4Ea236DcFA273D42994) |
 | Example oracle-driven swap | _pending (needs a router on Atlantic)_ | |
+
+## x402-facilitator + pharos-bazaar — full agent-commerce loop (LIVE)
+
+The complete **discover → pay (gasless) → settle → record → rate** loop, proven on Atlantic.
+
+| Item | Address / tx | Link |
+|------|--------------|------|
+| MockUSDC3009 (EIP-3009 settlement token) | `0xBd80E06F0325C4758e06d8a9522588363C4c75a4` | [addr](https://atlantic.pharosscan.xyz/address/0xBd80E06F0325C4758e06d8a9522588363C4c75a4) |
+| **x402 settle** (`transferWithAuthorization`, gasless for payer) | `0x873f98cf344dcffb8268fba0673933091be9805d4944c693616c433306a5225b` | [tx](https://atlantic.pharosscan.xyz/tx/0x873f98cf344dcffb8268fba0673933091be9805d4944c693616c433306a5225b) |
+| record the settlement in the mesh (payer-signed) | `0xbc8940027763de6d9a2d645d3188713609e1736bdcd8f15d600b4a75fcf49c0b` | [tx](https://atlantic.pharosscan.xyz/tx/0xbc8940027763de6d9a2d645d3188713609e1736bdcd8f15d600b4a75fcf49c0b) |
+| payer rates the provider | `0xc97221b6c1797be3b61986976b183d8522481f2ad1b86e92c73cd1c6689d5fb0` | [tx](https://atlantic.pharosscan.xyz/tx/0xc97221b6c1797be3b61986976b183d8522481f2ad1b86e92c73cd1c6689d5fb0) |
+| Result | payer signed once (no gas); relayer moved **0.001 USDC** to the merchant; the settlement hash became the rateable `ref`; provider reputation rose to **10/100**. The whole loop is on-chain. | — |
