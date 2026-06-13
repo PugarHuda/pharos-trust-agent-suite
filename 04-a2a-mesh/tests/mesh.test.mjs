@@ -274,6 +274,37 @@ test('recordPaymentSigned: a malleable (high-s) signature is rejected', async ()
   );
 });
 
+// ---- ERC-8004 adapter ----
+
+test('Reputation8004Adapter exposes our score via the ERC-8004 getSummary interface', async () => {
+  const { chain, reputation, REP } = await setup();
+  const ADP = ARTIFACTS.Reputation8004Adapter;
+  const adapter = await chain.deploy(ADP, RECORDER, [bytesToHex(reputation.bytes)]);
+  // record + rate so PROVIDER_A has a score of 5 (1 rating)
+  await chain.send(REP, reputation, RECORDER, 'recordPayment', [REF1, CONSUMER, PROVIDER_A, 1000n]);
+  await chain.send(REP, reputation, CONSUMER, 'rate', [REF1, 5]);
+
+  const agentId = BigInt(PROVIDER_A); // agentId = uint160(provider)
+  const summary = await chain.call(ADP, adapter, 'getSummary', [agentId, [], '', '']);
+  assert.equal(summary.count, 1n);
+  assert.equal(summary.summaryValue, 5n);        // 0..100 score
+  assert.equal(summary.summaryValueDecimals, 0n);
+
+  const lastIdx = await chain.call(ADP, adapter, 'getLastIndex', [agentId, CONSUMER]);
+  assert.equal(lastIdx[0], 1n); // one counted rating from this client
+});
+
+test('Reputation8004Adapter: giveFeedback is payment-gated (reverts), getClients not enumerable', async () => {
+  const { chain, reputation } = await setup();
+  const ADP = ARTIFACTS.Reputation8004Adapter;
+  const adapter = await chain.deploy(ADP, RECORDER, [bytesToHex(reputation.bytes)]);
+  await assert.rejects(
+    chain.send(ADP, adapter, RECORDER, 'giveFeedback', [BigInt(PROVIDER_A), 100n, 0, 'x402', 'price-feed', '', '', '0x' + '00'.repeat(32)]),
+    /FeedbackIsPaymentGated/,
+  );
+  await assert.rejects(chain.call(ADP, adapter, 'getClients', [BigInt(PROVIDER_A)]), /ClientsNotEnumerable/);
+});
+
 test('getByTagPaged returns a bounded slice', async () => {
   const { chain, registry, R } = await setup();
   for (let i = 0; i < 5; i++) {

@@ -31,8 +31,13 @@ Owner / deployer: `0x39D2bae5EAedA9283535dDC98F1991c81eD5Cd7E`
 | rate (payer-only, score 5) | `0xcef892b3ae1604ffaa17369ed03d1ae4c7608c35ceec522329a74ab9fa530de9` | [tx](https://atlantic.pharosscan.xyz/tx/0xcef892b3ae1604ffaa17369ed03d1ae4c7608c35ceec522329a74ab9fa530de9) |
 | Anti-sybil proof | Payment recorded from the **payer's EIP-712 signature** (a relayer cannot fabricate it, and payments are keyed by (payer,ref) so a ref can't be griefed); a non-payer's `rate` reverts `NotPayer`; only the verified payer's rating moved the score. `discover` ranks the service by on-chain reputation (5/100). | — |
 
+| **Reputation8004Adapter** (ERC-8004 read surface → live Reputation) | `0x6B99B00BD52Bc134D5658745E64DF1938592e468` | [addr](https://atlantic.pharosscan.xyz/address/0x6B99B00BD52Bc134D5658745E64DF1938592e468) |
+| Bazaar seeded services | extra `price-feed` (acme, 800), `compute` (5000), `data-api` (200) registered so `bazaar discover` shows a populated, reputation-ranked marketplace | [register](https://atlantic.pharosscan.xyz/tx/0x50c9f01c12a9ba9e2ede28f41ecda2e61fda6cfd240bf60b8208767a51a51e2b) |
+
 > Mesh was redeployed across QA rounds to keep live bytecode == audited source: trusted-recorder →
-> EIP-712 `recordPaymentSigned` → (payer,ref)-keyed griefing-proof (current).
+> EIP-712 `recordPaymentSigned` → (payer,ref)-keyed griefing-proof (current). The ERC-8004 adapter
+> (deployed 2026-06-13) exposes the live Reputation through the standard `getSummary` interface —
+> verified live: `getSummary(agentId(0x6d42…)) → count 1, value 5, decimals 0`.
 
 ## stylus-compute
 

@@ -1,0 +1,287 @@
+{
+  "contractName": "Reputation8004Adapter",
+  "compiler": "0.8.35+commit.47b9dedd.Emscripten.clang",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "reputation_",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [],
+      "name": "ClientsNotEnumerable",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "FeedbackIsPaymentGated",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "agentId",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "clientAddress",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint64",
+          "name": "feedbackIndex",
+          "type": "uint64"
+        },
+        {
+          "indexed": false,
+          "internalType": "int128",
+          "name": "value",
+          "type": "int128"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint8",
+          "name": "valueDecimals",
+          "type": "uint8"
+        },
+        {
+          "indexed": true,
+          "internalType": "string",
+          "name": "indexedTag1",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "tag1",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "tag2",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "endpoint",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "feedbackURI",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "feedbackHash",
+          "type": "bytes32"
+        }
+      ],
+      "name": "NewFeedback",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "agentId",
+          "type": "uint256"
+        }
+      ],
+      "name": "agentToProvider",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "getClients",
+      "outputs": [
+        {
+          "internalType": "address[]",
+          "name": "",
+          "type": "address[]"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "agentId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "clientAddress",
+          "type": "address"
+        }
+      ],
+      "name": "getLastIndex",
+      "outputs": [
+        {
+          "internalType": "uint64",
+          "name": "",
+          "type": "uint64"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "agentId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address[]",
+          "name": "",
+          "type": "address[]"
+        },
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "name": "getSummary",
+      "outputs": [
+        {
+          "internalType": "uint64",
+          "name": "count",
+          "type": "uint64"
+        },
+        {
+          "internalType": "int128",
+          "name": "summaryValue",
+          "type": "int128"
+        },
+        {
+          "internalType": "uint8",
+          "name": "summaryValueDecimals",
+          "type": "uint8"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "internalType": "int128",
+          "name": "",
+          "type": "int128"
+        },
+        {
+          "internalType": "uint8",
+          "name": "",
+          "type": "uint8"
+        },
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "name": "giveFeedback",
+      "outputs": [],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "provider",
+          "type": "address"
+        }
+      ],
+      "name": "providerToAgent",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "reputation",
+      "outputs": [
+        {
+          "internalType": "contract IMeshReputation",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x60a060405234801561000f575f5ffd5b5060405161079838038061079883398101604081905261002e9161003f565b6001600160a01b031660805261006c565b5f6020828403121561004f575f5ffd5b81516001600160a01b0381168114610065575f5ffd5b9392505050565b6080516106ff6100995f395f818161014d015281816101f601528181610283015261030c01526106ff5ff3fe608060405234801561000f575f5ffd5b506004361061007a575f3560e01c80637a7f9763116100585780637a7f9763146100e057806381bbba5814610109578063c52164c614610148578063f2d817591461016f575f5ffd5b80631fd522dd1461007e5780633c036a7e146100ab57806342dd519c146100c0575b5f5ffd5b61009861008c3660046103c2565b6001600160a01b031690565b6040519081526020015b60405180910390f35b6100be6100b9366004610441565b61019b565b005b6100d36100ce36600461054c565b6101b4565b6040516100a29190610563565b6100f16100ee36600461054c565b90565b6040516001600160a01b0390911681526020016100a2565b61011c6101173660046105ae565b6101cf565b6040805167ffffffffffffffff9094168452600f9290920b602084015260ff16908201526060016100a2565b6100f17f000000000000000000000000000000000000000000000000000000000000000081565b61018261017d366004610688565b610301565b60405167ffffffffffffffff90911681526020016100a2565b60405163305bff1d60e21b815260040160405180910390fd5b606060405163a1b10c3960e01b815260040160405180910390fd5b5f8080808a6040516312020b2f60e11b81526001600160a01b0380831660048301529192507f000000000000000000000000000000000000000000000000000000000000000090911690632404165e90602401602060405180830381865afa15801561023d573d5f5f3e3d5ffd5b505050506040513d601f19601f8201168201806040525081019061026191906106b2565b60405163099d7a2b60e11b81526001600160a01b0383811660048301529195507f00000000000000000000000000000000000000000000000000000000000000009091169063133af45690602401602060405180830381865afa1580156102ca573d5f5f3e3d5ffd5b505050506040513d601f19601f820116820180604052508101906102ee91906106b2565b92505f9150509750975097945050505050565b5f6001600160a01b037f000000000000000000000000000000000000000000000000000000000000000016638c7dca8083856040516001600160e01b031960e085901b1681526001600160a01b03928316600482015291166024820152604401602060405180830381865afa15801561037c573d5f5f3e3d5ffd5b505050506040513d601f19601f820116820180604052508101906103a091906106b2565b9392505050565b80356001600160a01b03811681146103bd575f5ffd5b919050565b5f602082840312156103d2575f5ffd5b6103a0826103a7565b8035600f81900b81146103bd575f5ffd5b803560ff811681146103bd575f5ffd5b5f5f83601f84011261040c575f5ffd5b50813567ffffffffffffffff811115610423575f5ffd5b60208301915083602082850101111561043a575f5ffd5b9250929050565b5f5f5f5f5f5f5f5f5f5f5f5f6101008d8f03121561045d575f5ffd5b8c359b5061046d60208e016103db565b9a5061047b60408e016103ec565b995067ffffffffffffffff60608e01351115610495575f5ffd5b6104a58e60608f01358f016103fc565b909950975067ffffffffffffffff60808e013511156104c2575f5ffd5b6104d28e60808f01358f016103fc565b909750955067ffffffffffffffff60a08e013511156104ef575f5ffd5b6104ff8e60a08f01358f016103fc565b909550935067ffffffffffffffff60c08e0135111561051c575f5ffd5b61052c8e60c08f01358f016103fc565b9c9f9b9e50999c989b979a9699959894979396939460e001359392505050565b5f6020828403121561055c575f5ffd5b5035919050565b602080825282518282018190525f918401906040840190835b818110156105a35783516001600160a01b031683526020938401939092019160010161057c565b509095945050505050565b5f5f5f5f5f5f5f6080888a0312156105c4575f5ffd5b87359650602088013567ffffffffffffffff8111156105e1575f5ffd5b8801601f81018a136105f1575f5ffd5b803567ffffffffffffffff811115610607575f5ffd5b8a60208260051b840101111561061b575f5ffd5b60209190910196509450604088013567ffffffffffffffff81111561063e575f5ffd5b61064a8a828b016103fc565b909550935050606088013567ffffffffffffffff811115610669575f5ffd5b6106758a828b016103fc565b989b979a50959850939692959293505050565b5f5f60408385031215610699575f5ffd5b823591506106a9602084016103a7565b90509250929050565b5f602082840312156106c2575f5ffd5b505191905056fea264697066735822122028f2d16385aa1b7985d7c03dce460dbe8a89d279be12fed80cda231ad19291a064736f6c63430008230033"
+}

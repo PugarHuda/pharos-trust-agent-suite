@@ -8,7 +8,7 @@
     "x402": "./scripts/x402.mjs"
   },
   "scripts": {
-    "test": "node --test tests/x402.test.mjs",
+    "test": "node --test tests/x402.test.mjs tests/risk.test.mjs",
     "serve": "node scripts/server.mjs"
   },
   "engines": {

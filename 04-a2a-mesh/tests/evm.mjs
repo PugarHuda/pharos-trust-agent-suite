@@ -38,6 +38,8 @@ function compile(files) {
 export const ARTIFACTS = compile([
   { name: 'ServiceRegistry.sol', path: join(ROOT, 'contracts', 'ServiceRegistry.sol') },
   { name: 'Reputation.sol', path: join(ROOT, 'contracts', 'Reputation.sol') },
+  { name: 'Reputation8004Adapter.sol', path: join(ROOT, 'contracts', 'Reputation8004Adapter.sol') },
+  { name: 'IReputationRegistry8004.sol', path: join(ROOT, 'contracts', 'IReputationRegistry8004.sol') },
 ]);
 
 export function addr(hex) { return new Address(hexToBytes(hex)); }

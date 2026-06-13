@@ -72,6 +72,18 @@ expiry/not-yet-valid, forged-payer rejection, scheme/network mismatch).
 - **a2a-mesh**: settle a payment here, feed the settlement tx hash into `mesh record-signed` as the
   `interactionRef` so the payer can rate the provider — payment-gated reputation, end to end.
 - **agent-treasury**: an agent's payment can be routed through the treasury so it respects the policy.
+- **pharos-bazaar**: this is the payment rail behind the Bazaar's `hire` flow.
+
+## Example: a paid x402 resource (monetize the trust layer)
+
+`scripts/risk-server.mjs` is a runnable **paid API**: it returns an agent-action **risk score**
+(backed by the stylus-compute model) only after an x402 payment — the canonical x402 use case
+(risk-scoring API, ~$0.001/call). No payment → HTTP 402 + how-to-pay; valid payment → the score.
+
+```bash
+PAY_TO=0xMERCHANT TOKEN=0xUSDC node scripts/risk-server.mjs --port 4030
+# GET /risk?features=0.2,1,0.1,0  ->  402 until paid, then { risk, payer }
+```
 
 ## Notes
 
