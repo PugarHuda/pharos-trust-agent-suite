@@ -1,4 +1,12 @@
-# Live dashboard — Pharos Trust-First Agent Suite
+# Live dashboard + walkthrough — Pharos Trust-First Agent Suite
+
+Two pages:
+- **`demo.html`** — a self-playing, **narrated**, pointer-driven walkthrough of all 13 skills (~3½ min):
+  synced captions, an animated pointer that highlights each result, browser voice-over (Web Speech API),
+  a live block-height badge, and real on-chain values + Pharosscan links. Press play, or **screen-record
+  it** to produce a demo-video file. Controls: ⏯ play/pause, ◀ ▶ scenes, speed, voice toggle, **F** fullscreen.
+- **`index.html`** — the live dashboard (below).
+
 
 A **single-file, zero-backend, read-only** dashboard that proves the suite is live. It calls the
 deployed Atlantic contracts directly from the browser via JSON-RPC — no server, no keys, no build step.

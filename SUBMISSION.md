@@ -14,9 +14,15 @@ recommended (it's where the UX/clarity score is won).
 - [ ] Submit BUIDL on DoraHacks (link below)
 - [ ] Register on Anvita Flow (flow.anvita.xyz)
 
-## 1. Demo video (the one hard requirement left)
+## 1. Demo video
 
-Follow `DEMO.md`. Fastest path now that everything is live:
+**Easiest path — the interactive walkthrough is your video.** Open [`web/demo.html`](web/demo.html)
+(deploy `web/` or `npx serve web`), press **▶ Play the walkthrough (with voice-over)**, and screen-record
+the tab in one take (~3½ min). It auto-plays all 13 skills with synced captions, a moving pointer, real
+browser voice-over, and real on-chain values + Pharosscan links — no manual typing, nothing can fail on
+camera. Press **F** for fullscreen first. Upload to YouTube/Loom (unlisted is fine) and copy the link.
+
+**Alternative — live terminal.** Follow `DEMO.md` / `NARRATION.md`:
 1. Screen-record a terminal + a Pharosscan tab.
 2. Run the real CLIs against the deployed contracts (addresses in `DEPLOYMENTS.md`):
    - `treasury status` → `spend` (✅ allowed) then a blocked spend (❌ `ContractNotAllowed`).
