@@ -9,7 +9,7 @@ recommended (it's where the UX/clarity score is won).
 - [x] Public GitHub repo: https://github.com/PugarHuda/pharos-trust-agent-suite
 - [x] 13 skills in official `SKILL.md` format, 236 passing tests, **green CI** (`.github/workflows/test.yml`)
 - [x] On-chain proof on Atlantic incl. a **full gasless x402 → reputation loop**, a **full escrow lifecycle**, a **real ERC-8004 validation**, a **reputation-gated payment**, a **signed AP2-style Intent Mandate spend**, and a **staked bond** (addresses + tx in `DEPLOYMENTS.md`)
-- [x] Live read-only **web dashboard** (`web/`) — reads the deployed contracts in-browser; deploy with `vercel --prod`
+- [x] Live read-only **web dashboard + walkthrough** deployed on GitHub Pages → https://pugarhuda.github.io/pharos-trust-agent-suite/ (`/demo.html` for the narrated tour)
 - [ ] **Demo video (strongly recommended)** — record per `DEMO.md` / `NARRATION.md` (contracts are live; film the real tx on Pharosscan), or screen-record the dashboard
 - [ ] Submit BUIDL on DoraHacks (link below)
 - [ ] Register on Anvita Flow (flow.anvita.xyz)

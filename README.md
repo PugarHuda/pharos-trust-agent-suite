@@ -9,6 +9,9 @@ official Pharos Skill format (`SKILL.md` + `references/` + `assets/`). The suite
 > Hackathon: Skill-to-Agent Dual Cascade (Phase 1) · Prize pool 50,000 PROS (Phase 1: 20,000 PROS / 40 winners)
 > Network: Pharos Atlantic Testnet (chainId **688689**) · Submission deadline **2026-06-17 17:00**
 
+> 🌐 **Live now:** dashboard → **https://pugarhuda.github.io/pharos-trust-agent-suite/** ·
+> narrated walkthrough → **https://pugarhuda.github.io/pharos-trust-agent-suite/demo.html**
+>
 > 🖥️ **Live dashboard:** [`web/`](web/) — a zero-backend page that reads the deployed Atlantic
 > contracts *in the browser*: run the Bazaar live, click the on-chain commerce loop, and play with the
 > Stylus risk gate. `npx serve web` or deploy in one command (see [`web/README.md`](web/README.md)).
