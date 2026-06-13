@@ -1,7 +1,7 @@
 # Voice-over script — synced to `node demo.mjs`
 
 Read this while screen-recording `node demo.mjs --write` (terminal + a Pharosscan tab).
-Target ~3:30. Each block lines up with one section the driver prints, in order. Pause ~1s between
+Target ~4:00. Each block lines up with one section the driver prints, in order. Pause ~1s between
 sections. All 13 skills, 236 tests, 11 live contracts on Atlantic.
 
 ---
@@ -59,12 +59,25 @@ sections. All 13 skills, 236 tests, 11 live contracts on Atlantic.
 > "Sybil resistance through skin-in-the-game: an agent locks a bond, and consumers require a minimum
 > stake before trusting it. To run many fake identities you'd have to lock many bonds at once."
 
-**[2:52–3:05 · Section 6h — x402 Bazaar export]**
+**[2:52–3:04 · Section 6h — x402 Bazaar export]**
 > "And to plug into the wider machine economy, the bazaar exports an x402-Bazaar — Coinbase
 > Agent.market — compatible catalog, but with our on-chain reputation attached: the trust signal vanilla
 > x402 discovery lacks."
 
-**[3:05–3:20 · Sections 6b/6c — treasury LIVE writes]**
+**[3:04–3:14 · Section 6i — a2a-mesh]**
+> "The reputation comes from the a2a-mesh — read straight from the contract: ten out of a hundred, from
+> two real paid interactions. It only accrues from payments, so it can't be faked."
+
+**[3:14–3:24 · Section 6j — x402 facilitator]**
+> "The payment rail is a self-hostable x402 facilitator — gasless EIP-3009 settlement; here are the
+> schemes it supports on Pharos."
+
+**[3:24–3:36 · Section 6k — intent-mandate (AP2)]**
+> "And a cryptographic leash, modeled on Google's AP2: the user signs an envelope — this agent, up to
+> this amount, before this expiry. The contract confirms the remaining authorized amount; the agent
+> cannot exceed it."
+
+**[3:36–3:50 · Sections 6b/6c — treasury LIVE writes]**
 > "Watch real transactions. A policy-allowed spend executes and confirms on Pharosscan."
 
 *(click the `spendToken` tx link)*
@@ -72,7 +85,7 @@ sections. All 13 skills, 236 tests, 11 live contracts on Atlantic.
 > "Then the agent tries to send funds to an address that is NOT on the allow-list — and the guardrail
 > reverts it before it's even broadcast. A jailbroken prompt cannot get past this."
 
-**[3:20–3:40 · Section 7 — the full loop on Pharosscan]**
+**[3:50–4:10 · Section 7 — the full loop on Pharosscan]**
 > "Finally, the whole loop, already on-chain. A gasless x402 payment settled with one signature — the
 > payer spent no gas. That settlement was recorded as a rateable interaction, and the payer's rating moved
 > the provider's reputation — reputation you cannot fake, because it costs a real payment."

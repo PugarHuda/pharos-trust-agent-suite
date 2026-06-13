@@ -7,6 +7,10 @@ Two pages:
   it** to produce a demo-video file. Controls: ⏯ play/pause, ◀ ▶ scenes, speed, voice toggle, **F** fullscreen.
 - **`index.html`** — the live dashboard (below).
 
+> **Judges:** the fastest "try it" is to open `demo.html` and press ▶. A ready-made video file
+> (`pharos-combined.mp4` = narrated walkthrough + real terminal) is produced by *Actions → demo-combined*.
+> To run the skills yourself: from the repo root, `node setup.mjs` then `node demo.mjs`.
+
 
 A **single-file, zero-backend, read-only** dashboard that proves the suite is live. It calls the
 deployed Atlantic contracts directly from the browser via JSON-RPC — no server, no keys, no build step.

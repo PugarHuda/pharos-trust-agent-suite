@@ -25,14 +25,19 @@ For natural voice locally, point Piper at a model: `PIPER_BIN=/path/piper PIPER_
 
 ## Run in GitHub Actions (no local setup)
 
-The workflow **`.github/workflows/demo-video.yml`** runs this on demand and uploads the `.mp4` as a
-downloadable artifact:
+Three on-demand workflows produce downloadable artifacts — anyone (incl. judges) can reproduce them from
+the public repo (the runner has ffmpeg preinstalled):
 
-1. GitHub → **Actions** → **demo-video** → **Run workflow**.
-2. When it finishes, open the run and download the **pharos-demo** artifact (contains `pharos-demo.mp4`).
+| Workflow | Produces | Artifact |
+|----------|----------|----------|
+| **demo-combined** | Part 1 narrated walkthrough → Part 2 real terminal, in one file | `pharos-combined.mp4` |
+| **demo-video** | the narrated (Piper voice-over) walkthrough only | `pharos-demo.mp4` |
+| **demo-terminal** | a real terminal actually running `node demo.mjs` (all 13 skills live) | `pharos-terminal.mp4` |
 
-The runner has ffmpeg preinstalled, so you always get an `.mp4`. This means anyone — including judges —
-can reproduce the exact video from the public repo.
+GitHub → **Actions** → pick a workflow → **Run workflow** → open the finished run → download the artifact.
+`demo-video` / `demo-combined` take a `voice` input (e.g. `en_US-amy-medium`).
+
+Locally: `npm run record:vo` (voice-over), `npm run record` (silent), `npm run combine` (merge the two).
 
 ## How it works
 

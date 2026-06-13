@@ -81,7 +81,7 @@ Agent Arena and the Invocation Race angle."
    fixed-point risk model runs as a Rust/WASM contract whose result `compute verify` confirms matches
    the JS reference exactly — verifiable heavy compute gating a treasury spend, only on Pharos.
 
-**Close:** "Five composable skills, 69 passing tests, real Atlantic testnet integration — a trust layer
+**Close:** "Thirteen composable skills, 236 passing tests, real Atlantic testnet integration — a trust layer
 for the Pharos agent economy."
 
 ---
@@ -91,7 +91,7 @@ for the Pharos agent economy."
 - Pre-fund keys and pre-deploy contracts **before** recording so you only show the interesting calls.
 - Keep a Pharosscan tab open; click each tx hash live — the on-chain proof is the point.
 - For blocked cases, make the revert reason visible (the CLIs print it). That frame wins.
-- Mention the numbers: **6 skills, 133 tests, CI green, live on Atlantic**.
+- Mention the numbers: **13 skills, 236 tests, CI green, 11 live contracts on Atlantic**.
 
 ---
 
@@ -102,7 +102,7 @@ All addresses/tx below are real and already on-chain (see `DEPLOYMENTS.md`). For
 need no gas), so nothing can fail on camera. `.env` is already set for the funded test wallet.
 
 **0:00–0:20 — Hook.** "Can an agent hold and spend money safely? Here's a trust layer for the Pharos
-agent economy: 6 composable skills, 133 tests, live on testnet." Show README badges + the
+agent economy: 13 composable skills, 236 tests, live on testnet." Show README badges + the
 `DEPLOYMENTS.md` address table.
 
 **0:20–1:00 — agent-treasury (the guardrail).** Dir `01-agent-treasury`.
@@ -142,7 +142,7 @@ Live Chainlink price drives a SWAP/NOOP decision (routed through treasury + shie
 `node scripts/x402.mjs pay ...` then `verify` → VALID (gasless agent payment). Dir `05-stylus-compute`:
 `node scripts/compute.mjs gate --features 1,1,1,1` → BLOCK (the risk model that gates a treasury spend).
 
-**2:55–3:00 — Close.** "Eight skills, wired together, 152 tests, green CI, real tx on Pharosscan — the
+**2:55–3:00 — Close.** "Thirteen skills, wired together, 236 tests, green CI, real tx on Pharosscan — the
 trust layer the agent economy needs. Cascades straight into the Agent Arena."
 
 ### Bonus segment — the full agent-commerce loop (all LIVE on Atlantic)

@@ -77,8 +77,8 @@ same repo link. Confirm any exact registry/template in the dev Telegram (t.me/+U
 > almost every such entry *returns advice* — a score or ALLOW/WARN/BLOCK verdict the agent can ignore. A
 > jailbroken agent ignores advice. This suite *enforces* on-chain: the treasury **reverts** an
 > out-of-policy spend before it can broadcast, and reputation is **payment-gated** so it cannot be faked.
-> It's the only entry that proves the *entire* agent-commerce loop on-chain — and it's nine composable
-> skills, not one.
+> It's the only entry that proves the *entire* agent-commerce loop on-chain — and it's thirteen
+> composable skills, not one.
 >
 > 1. **agent-treasury** — a smart-account treasury that enforces a spending policy **on-chain** (daily
 >    cap, token/contract allowlist, single-token session keys, kill-switch). A jailbroken agent still
@@ -126,3 +126,13 @@ same repo link. Confirm any exact registry/template in the dev Telegram (t.me/+U
 > in the field, and the only one where reputation actually gates money on-chain. **236 passing tests with
 > green CI**; hardened across five adversarial QA rounds (see QA.md). A zero-backend **live web dashboard**
 > (`web/`) reads the deployed contracts in-browser. Eleven contracts + all tx hashes in DEPLOYMENTS.md.
+>
+> **How to try it (judges):**
+> - **Watch (0 setup):** open `web/demo.html` and press ▶ — a narrated, pointer-driven tour of all 13
+>   skills with live on-chain values. (Or the combined video linked above.)
+> - **Verify it's real (0 setup):** every contract + transaction is a clickable Pharosscan link in
+>   `DEPLOYMENTS.md`; tests run on every push (green CI).
+> - **Run all 13 skills live (Node 18+, read-only, no keys):** `node setup.mjs` then `node demo.mjs`.
+> - **Test any skill offline:** `cd 02-agent-shield && npm install && npm test` (236 tests total).
+>
+> Repo: https://github.com/PugarHuda/pharos-trust-agent-suite
