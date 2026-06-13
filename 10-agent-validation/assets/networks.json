@@ -1,0 +1,25 @@
+{
+  "atlantic-testnet": {
+    "name": "Pharos Atlantic Testnet",
+    "chainId": 688689,
+    "rpcUrl": "https://atlantic.dplabs-internal.com",
+    "explorer": "https://atlantic.pharosscan.xyz",
+    "nativeToken": "PHRS",
+    "default": true,
+    "deployed": {
+      "identityRegistry": "0xa048D4F17282488B60D96E6FB01FbdA106F38B8A",
+      "validationRegistry": "0xc9142C347b51Bd2f89f943BcEae5D302A14f5B88"
+    }
+  },
+  "pacific-mainnet": {
+    "name": "Pharos Pacific Mainnet",
+    "chainId": 1672,
+    "rpcUrl": "https://rpc.pharos.xyz",
+    "explorer": "https://www.pharosscan.xyz",
+    "nativeToken": "PROS",
+    "deployed": {
+      "identityRegistry": null,
+      "validationRegistry": null
+    }
+  }
+}

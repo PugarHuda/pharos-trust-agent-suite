@@ -1,0 +1,26 @@
+{
+  "name": "agent-validation",
+  "version": "1.0.0",
+  "description": "ERC-8004 Validation Registry on Pharos: a validator agent posts an independent 0-100 verification score for another agent's work. Completes the ERC-8004 trio (Identity + Reputation + Validation).",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "validate": "./scripts/validate.mjs"
+  },
+  "scripts": {
+    "build": "node scripts/compile.mjs",
+    "test": "node --test tests/validation.test.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "ethers": "^6.13.0"
+  },
+  "devDependencies": {
+    "solc": "^0.8.26",
+    "@ethereumjs/evm": "^3.1.0",
+    "@ethereumjs/common": "^4.4.0",
+    "@ethereumjs/util": "^9.1.0"
+  }
+}

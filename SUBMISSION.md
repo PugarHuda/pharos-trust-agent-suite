@@ -7,8 +7,8 @@ recommended (it's where the UX/clarity score is won).
 ## Pre-flight checklist
 
 - [x] Public GitHub repo: https://github.com/PugarHuda/pharos-trust-agent-suite
-- [x] 9 skills in official `SKILL.md` format, 185 passing tests, **green CI** (`.github/workflows/test.yml`)
-- [x] On-chain proof on Atlantic incl. a **full gasless x402 → reputation loop** + a **full escrow lifecycle** (addresses + tx in `DEPLOYMENTS.md`)
+- [x] 10 skills in official `SKILL.md` format, 198 passing tests, **green CI** (`.github/workflows/test.yml`)
+- [x] On-chain proof on Atlantic incl. a **full gasless x402 → reputation loop**, a **full escrow lifecycle**, and a **real ERC-8004 validation** (addresses + tx in `DEPLOYMENTS.md`)
 - [x] Live read-only **web dashboard** (`web/`) — reads the deployed contracts in-browser; deploy with `vercel --prod`
 - [ ] **Demo video (strongly recommended)** — record per `DEMO.md` / `NARRATION.md` (contracts are live; film the real tx on Pharosscan), or screen-record the dashboard
 - [ ] Submit BUIDL on DoraHacks (link below)
@@ -50,7 +50,7 @@ same repo link. Confirm any exact registry/template in the dev Telegram (t.me/+U
 
 ## Ready-to-paste DoraHacks description
 
-> **Pharos Trust-First Agent Suite** — nine composable Skills that form the trust & infrastructure layer
+> **Pharos Trust-First Agent Suite** — ten composable Skills that form the trust & infrastructure layer
 > for the Pharos agent economy: the things every other agent needs but few build.
 >
 > **What makes it different from the field:** the most crowded category this round is agent "safety", and
@@ -82,10 +82,14 @@ same repo link. Confirm any exact registry/template in the dev Telegram (t.me/+U
 >    code (release on approval / refund on timeout / arbiter split on dispute), all pull-payments, no
 >    admin. The `jobId` doubles as the mesh reputation `ref`, so a settled hire mints un-fakeable
 >    reputation. *Live on Atlantic; full lifecycle (release + dispute→resolve→withdraw) proven on-chain.*
+> 10. **agent-validation** — the **ERC-8004 Validation Registry**: a validator agent posts an independent
+>    0–100 score for another agent's work. This **completes the full ERC-8004 trio** (Identity +
+>    Reputation + Validation). *Live on Atlantic, wired to the Identity Registry; a validator scored the
+>    escrowed work 95/100 on-chain (the validated dataHash IS the live escrow jobId).*
 >
 > The skills are wired together in code, and proven on Atlantic with a **full agent-commerce loop** —
-> discover → hire (escrow) → gasless x402 pay/settle → record → rate → on-chain reputation — plus a
-> treasury successful + blocked spend and a full escrow lifecycle. Aligned with **ERC-8004** (Trustless
-> Agents) + **x402**. **185 passing tests with green CI**; hardened across four adversarial QA rounds
-> (see QA.md). A zero-backend **live web dashboard** (`web/`) reads the deployed contracts in-browser.
-> Seven contracts + all tx hashes in DEPLOYMENTS.md.
+> discover → hire (escrow) → gasless x402 pay/settle → record → rate → on-chain reputation → ERC-8004
+> validation — plus a treasury successful + blocked spend and a full escrow lifecycle. It is the **only
+> complete ERC-8004 + x402 stack** in the field. **198 passing tests with green CI**; hardened across
+> four adversarial QA rounds (see QA.md). A zero-backend **live web dashboard** (`web/`) reads the
+> deployed contracts in-browser. Eight contracts + all tx hashes in DEPLOYMENTS.md.

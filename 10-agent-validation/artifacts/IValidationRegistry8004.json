@@ -1,0 +1,143 @@
+{
+  "contractName": "IValidationRegistry8004",
+  "compiler": "0.8.35+commit.47b9dedd.Emscripten.clang",
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "validatorAgentId",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "serverAgentId",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "dataHash",
+          "type": "bytes32"
+        }
+      ],
+      "name": "ValidationRequest",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "validatorAgentId",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "serverAgentId",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "dataHash",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint8",
+          "name": "response",
+          "type": "uint8"
+        }
+      ],
+      "name": "ValidationResponse",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "dataHash",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getValidation",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "validatorAgentId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "serverAgentId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint8",
+          "name": "response",
+          "type": "uint8"
+        },
+        {
+          "internalType": "bool",
+          "name": "requested",
+          "type": "bool"
+        },
+        {
+          "internalType": "bool",
+          "name": "responded",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "validatorAgentId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "serverAgentId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "dataHash",
+          "type": "bytes32"
+        }
+      ],
+      "name": "validationRequest",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "dataHash",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint8",
+          "name": "response",
+          "type": "uint8"
+        }
+      ],
+      "name": "validationResponse",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x"
+}

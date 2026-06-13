@@ -1,0 +1,212 @@
+{
+  "contractName": "ValidationRegistry8004",
+  "compiler": "0.8.35+commit.47b9dedd.Emscripten.clang",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "identityRegistry",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [],
+      "name": "AlreadyRequested",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "AlreadyResponded",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "BadResponse",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "NotServerAgent",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "NotValidator",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "SelfValidation",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "UnknownServer",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "UnknownValidation",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "UnknownValidator",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "validatorAgentId",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "serverAgentId",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "dataHash",
+          "type": "bytes32"
+        }
+      ],
+      "name": "ValidationRequest",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "validatorAgentId",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "serverAgentId",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "dataHash",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint8",
+          "name": "response",
+          "type": "uint8"
+        }
+      ],
+      "name": "ValidationResponse",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "dataHash",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getValidation",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "validatorAgentId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "serverAgentId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint8",
+          "name": "response",
+          "type": "uint8"
+        },
+        {
+          "internalType": "bool",
+          "name": "requested",
+          "type": "bool"
+        },
+        {
+          "internalType": "bool",
+          "name": "responded",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "identity",
+      "outputs": [
+        {
+          "internalType": "contract IIdentityRegistry8004",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "validatorAgentId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "serverAgentId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "dataHash",
+          "type": "bytes32"
+        }
+      ],
+      "name": "validationRequest",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "dataHash",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint8",
+          "name": "response",
+          "type": "uint8"
+        }
+      ],
+      "name": "validationResponse",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x60a060405234801561000f575f5ffd5b5060405161082b38038061082b83398101604081905261002e9161003f565b6001600160a01b031660805261006c565b5f6020828403121561004f575f5ffd5b81516001600160a01b0381168114610065575f5ffd5b9392505050565b6080516107856100a65f395f81816053015281816101d401528181610278015281816103d001528181610478015261055b01526107855ff3fe608060405234801561000f575f5ffd5b506004361061004a575f3560e01c80632c159a1a1461004e5780634146624a146100925780639748c8cb146100a7578063a8091fc3146100ba575b5f5ffd5b6100757f000000000000000000000000000000000000000000000000000000000000000081565b6040516001600160a01b0390911681526020015b60405180910390f35b6100a56100a03660046106af565b610131565b005b6100a56100b53660046106e2565b610379565b6100ff6100c836600461070b565b5f90815260208190526040902080546001820154600290920154909260ff8083169261010081048216926201000090910490911690565b60408051958652602086019490945260ff9092169284019290925290151560608301521515608082015260a001610089565b5f8281526020819052604090206002810154610100900460ff1661016857604051631c3a9bb960e21b815260040160405180910390fd5b600281015462010000900460ff16156101945760405163251aba6960e11b815260040160405180910390fd5b60648260ff1611156101b9576040516349ecf37960e11b815260040160405180910390fd5b80546040516331a9108f60e11b81525f916001600160a01b037f00000000000000000000000000000000000000000000000000000000000000001691636352211e9161020b9160040190815260200190565b602060405180830381865afa158015610226573d5f5f3e3d5ffd5b505050506040513d601f19601f8201168201806040525081019061024a9190610722565b9050336001600160a01b038216148015906102fe575081546040516233950960e01b815260048101919091527f00000000000000000000000000000000000000000000000000000000000000006001600160a01b0316906233950990602401602060405180830381865afa1580156102c4573d5f5f3e3d5ffd5b505050506040513d601f19601f820116820180604052508101906102e89190610722565b6001600160a01b0316336001600160a01b031614155b1561031c57604051632ec5b44960e01b815260040160405180910390fd5b60028201805462ff00ff191660ff851690811762010000179091556001830154835460405192835286927f2ba5437896d7ada24fee1c73f4463485d299e02cd7f3f0fc1abf6cbad5890b579060200160405180910390a450505050565b5f81815260208190526040902060020154610100900460ff16156103b057604051632981f6c160e11b815260040160405180910390fd5b6040516331a9108f60e11b8152600481018490525f906001600160a01b037f00000000000000000000000000000000000000000000000000000000000000001690636352211e90602401602060405180830381865afa158015610415573d5f5f3e3d5ffd5b505050506040513d601f19601f820116820180604052508101906104399190610722565b6001600160a01b031603610460576040516357fdf40b60e01b815260040160405180910390fd5b6040516331a9108f60e11b8152600481018390525f907f00000000000000000000000000000000000000000000000000000000000000006001600160a01b031690636352211e90602401602060405180830381865afa1580156104c5573d5f5f3e3d5ffd5b505050506040513d601f19601f820116820180604052508101906104e99190610722565b90506001600160a01b03811661051257604051636042ec4560e11b815260040160405180910390fd5b828403610532576040516326dbd5c160e11b815260040160405180910390fd5b336001600160a01b038216148015906105e157506040516233950960e01b8152600481018490527f00000000000000000000000000000000000000000000000000000000000000006001600160a01b0316906233950990602401602060405180830381865afa1580156105a7573d5f5f3e3d5ffd5b505050506040513d601f19601f820116820180604052508101906105cb9190610722565b6001600160a01b0316336001600160a01b031614155b156105ff576040516304b68c8d60e31b815260040160405180910390fd5b6040805160a08101825285815260208082018681525f838501818152600160608601818152608087018481528a855295849052878420965187559351908601555160029094018054925193511515620100000262ff0000199415156101000261ffff1990941660ff969096169590951792909217929092169290921790915590518391859187917f12d3aa778085fe939928a17bfa73785c2df398b0acfcb54111df351095d3db5d91a450505050565b5f5f604083850312156106c0575f5ffd5b82359150602083013560ff811681146106d7575f5ffd5b809150509250929050565b5f5f5f606084860312156106f4575f5ffd5b505081359360208301359350604090920135919050565b5f6020828403121561071b575f5ffd5b5035919050565b5f60208284031215610732575f5ffd5b81516001600160a01b0381168114610748575f5ffd5b939250505056fea2646970667358221220d3e32f8a45069324039a0131a151d5c3ec363cfd8891dff6fa8539ee123637eb64736f6c63430008230033"
+}

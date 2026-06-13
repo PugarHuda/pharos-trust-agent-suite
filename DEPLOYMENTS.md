@@ -58,6 +58,23 @@ Owner / deployer: `0x39D2bae5EAedA9283535dDC98F1991c81eD5Cd7E`
 > dispute → arbiter resolve → pull `withdraw()` (funds returned to a real wallet). The `jobId` doubles
 > as the a2a-mesh reputation `ref`. Refund-on-timeout is covered by the 23-test suite.
 
+## agent-validation (ERC-8004 Validation Registry)
+
+| Item | Address / tx | Link |
+|------|--------------|------|
+| **ValidationRegistry8004** (wired to live Identity Registry) | `0xc9142C347b51Bd2f89f943BcEae5D302A14f5B88` | [addr](https://atlantic.pharosscan.xyz/address/0xc9142C347b51Bd2f89f943BcEae5D302A14f5B88) |
+| Deploy tx | `0xbfa67170fc64c4efda135c98a95e838fda0c9f1a4a3d6aeae197a86fae2f0196` | [tx](https://atlantic.pharosscan.xyz/tx/0xbfa67170fc64c4efda135c98a95e838fda0c9f1a4a3d6aeae197a86fae2f0196) |
+| register server agent (#2) | `0x93e2812da066afa7091197ad72b0f5d5fa9809e31fb90dd55fba1011156a036e` | [tx](https://atlantic.pharosscan.xyz/tx/0x93e2812da066afa7091197ad72b0f5d5fa9809e31fb90dd55fba1011156a036e) |
+| register validator agent (#3) | `0x30a7cd0039a452b92a0630aba3999943468e90d90db45df4602b0626206bd9bf` | [tx](https://atlantic.pharosscan.xyz/tx/0x30a7cd0039a452b92a0630aba3999943468e90d90db45df4602b0626206bd9bf) |
+| **validationRequest** (server #2 → validator #3, dataHash = escrow jobId) | `0x6e258ec47734ad10611726d660f9c038fcd99d5fdc47e8b819038686b9b2f817` | [tx](https://atlantic.pharosscan.xyz/tx/0x6e258ec47734ad10611726d660f9c038fcd99d5fdc47e8b819038686b9b2f817) |
+| **validationResponse** (validator posts 95/100) | `0x2c4e6fec3872f2bca7900bbc8b82265b2f66b2ee4da36c253ff341a8b0cc1761` | [tx](https://atlantic.pharosscan.xyz/tx/0x2c4e6fec3872f2bca7900bbc8b82265b2f66b2ee4da36c253ff341a8b0cc1761) |
+
+> Completes the **ERC-8004 trio** live: Identity (`0xa048D4F1…`) + Reputation (`0x8010e567…` /
+> adapter `0x6B99B00B…`) + **Validation** (`0xc9142C34…`). The validated `dataHash`
+> `0x31d03e57…` is the live `agent-escrow` released jobId — i.e. the hired work was independently
+> scored 95/100 by a registered validator. Only the designated validator could respond; only the
+> server agent could request (anti-griefing).
+
 ## stylus-compute
 
 | Item | Address / tx | Link |
