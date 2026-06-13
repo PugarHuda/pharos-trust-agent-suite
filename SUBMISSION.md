@@ -6,8 +6,8 @@ header; body says submission by Jun 16, judging Jun 17–22).
 ## Pre-flight checklist
 
 - [x] Public GitHub repo: https://github.com/PugarHuda/pharos-trust-agent-suite
-- [x] 6 skills in official `SKILL.md` format, 132 passing tests, CI (`.github/workflows/test.yml`)
-- [x] On-chain proof on Atlantic (addresses + tx hashes in `DEPLOYMENTS.md`)
+- [x] 8 skills in official `SKILL.md` format, 152 passing tests, **green CI** (`.github/workflows/test.yml`)
+- [x] On-chain proof on Atlantic incl. a **full gasless x402 → reputation loop** (addresses + tx in `DEPLOYMENTS.md`)
 - [ ] **Demo video (REQUIRED)** — record per `DEMO.md` (contracts are live; film the real tx on Pharosscan)
 - [ ] Submit BUIDL on DoraHacks (link below)
 - [ ] Register on Anvita Flow (flow.anvita.xyz)
@@ -64,8 +64,13 @@ same repo link. Confirm any exact registry/template in the dev Telegram (t.me/+U
 > 5. **stylus-compute** — a Rust/WASM risk classifier that gates a treasury spend, with a bit-identical
 >    JS reference so the on-chain result is independently verifiable.
 > 6. **x402-facilitator** — a self-hostable x402 facilitator (verify + **gasless** EIP-3009 settle),
->    filling the gap that Pharos documents x402 but ships no public facilitator.
+>    filling the gap that Pharos documents x402 but ships no public facilitator; incl. a paid risk-score API.
+> 7. **agent-utils** — high-frequency read-only utilities (price, gas advisor, token info, balance,
+>    address-safety) — the cheapest-to-adopt, most-called primitives, aimed at the Invocation Race.
+> 8. **pharos-bazaar** — the discover→pay→rate marketplace hub composing mesh + x402 (Pharos's answer to
+>    Coinbase's x402 Bazaar), reputation-ranked.
 >
-> The skills are wired together in code (strategy → shield → treasury; stylus gates a spend; mesh +
-> x402 settle → reputation), 132 passing tests with CI, and real on-chain artifacts on Atlantic testnet
-> (addresses + tx hashes in DEPLOYMENTS.md). Hardened across three adversarial QA rounds (see QA.md).
+> The skills are wired together in code, and proven on Atlantic with a **full agent-commerce loop** —
+> discover → gasless x402 pay/settle → record → rate → on-chain reputation — plus a treasury successful
+> + blocked spend. Aligned with **ERC-8004** (Trustless Agents). 152 passing tests with green CI;
+> hardened across three adversarial QA rounds (see QA.md). Addresses + tx hashes in DEPLOYMENTS.md.

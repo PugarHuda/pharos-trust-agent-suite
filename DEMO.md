@@ -132,5 +132,19 @@ Live Chainlink price drives a SWAP/NOOP decision (routed through treasury + shie
 `node scripts/x402.mjs pay ...` then `verify` → VALID (gasless agent payment). Dir `05-stylus-compute`:
 `node scripts/compute.mjs gate --features 1,1,1,1` → BLOCK (the risk model that gates a treasury spend).
 
-**2:55–3:00 — Close.** "Six skills, wired together, 133 tests, real tx on Pharosscan — the trust layer
-the agent economy needs. Cascades straight into the Agent Arena."
+**2:55–3:00 — Close.** "Eight skills, wired together, 152 tests, green CI, real tx on Pharosscan — the
+trust layer the agent economy needs. Cascades straight into the Agent Arena."
+
+### Bonus segment — the full agent-commerce loop (all LIVE on Atlantic)
+
+The strongest single frame: one continuous **discover → pay → settle → record → rate** loop, on-chain.
+Open these tx on Pharosscan in sequence:
+1. **discover/best** (read): `bazaar best --tag price-feed` picks the highest-reputation provider.
+2. **gasless x402 settle**: pharosscan.xyz/tx/`0x873f98cf344dcffb8268fba0673933091be9805d4944c693616c433306a5225b`
+   — the payer signed once (no gas); a relayer moved 0.001 USDC (EIP-3009 `transferWithAuthorization`).
+3. **record the settlement in the mesh** (payer-signed): `0xbc8940027763de6d9a2d645d3188713609e1736bdcd8f15d600b4a75fcf49c0b`
+4. **rate** (only the payer can): `0xc97221b6c1797be3b61986976b183d8522481f2ad1b86e92c73cd1c6689d5fb0` → provider reputation rises to **10/100**.
+5. **ERC-8004 read**: the same score is readable through the standard `getSummary` interface at adapter
+   `0x6B99B00BD52Bc134D5658745E64DF1938592e468`.
+Line: "An agent found a service, paid for it gaslessly, and the payment minted real, un-fakeable
+reputation — the agent economy in one transaction sequence, on Pharos."
