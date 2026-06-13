@@ -1,5 +1,11 @@
 # Demo-Video Script
 
+> **One-command live driver:** `node demo.mjs` (from the repo root) runs the suite's real, read-only
+> commands against the deployed Atlantic contracts in sequence with section headers, then prints the
+> on-chain tx links for the full agent-commerce loop. Run it on screen and narrate — everything shown
+> is live/real and safe (no writes, no keys). The scripts below are the longer-form storyboards.
+
+
 A demo video is **required** for the DoraHacks submission. The safety story is the differentiator, so
 the *blocked* cases are the money shots — show a guardrail a jailbroken prompt cannot bypass, proven
 on-chain.

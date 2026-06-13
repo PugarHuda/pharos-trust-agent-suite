@@ -35,10 +35,23 @@ A multi-agent adversarial QA pass hardened every skill against real findings —
 | IdentityRegistry8004 (ERC-8004 Identity) | [`0xa048D4F17282488B60D96E6FB01FbdA106F38B8A`](https://atlantic.pharosscan.xyz/address/0xa048D4F17282488B60D96E6FB01FbdA106F38B8A) |
 | MockUSDC3009 (EIP-3009 settlement token) | [`0xBd80E06F0325C4758e06d8a9522588363C4c75a4`](https://atlantic.pharosscan.xyz/address/0xBd80E06F0325C4758e06d8a9522588363C4c75a4) |
 
-Proven on-chain: a treasury **successful policy-allowed spend** *and* a **blocked** out-of-policy
-spend (with on-chain cap/budget accounting); a full A2A discover → pay → rate flow where the payment
-was recorded from a **payer EIP-712 signature** and a **non-payer's rating was rejected**; and a live
-Chainlink oracle read driving a strategy decision. Full tx hashes in `DEPLOYMENTS.md`.
+Proven on-chain (tx hashes in `DEPLOYMENTS.md`): a treasury **successful policy-allowed spend** *and* a
+**blocked** out-of-policy spend (with on-chain cap/budget accounting); the **full agent-commerce loop** —
+discover → **gasless x402 pay + settle** (EIP-3009 `transferWithAuthorization`) → record (payer EIP-712
+signature) → rate (non-payer rejected) → on-chain reputation; an **ERC-8004 Identity** agent registered
+and reputation readable via the standard `getSummary`; and a live Chainlink oracle read driving a strategy decision.
+
+### What's real vs. fixture vs. pending (full transparency)
+
+- **Real & live on Atlantic:** all 6 contracts above, the full x402→reputation loop, every read path.
+  162 tests pass locally **and in CI** on a clean runner.
+- **Test/demo fixtures (clearly labeled):** `MockERC20`, `MockUSDC3009` (an EIP-3009 token), `DrainRouter`
+  exist only to exercise/demonstrate the real contracts — Atlantic has **no faucet** for a real EIP-3009
+  USDC, so the live settle uses a deployed mock. Canonical Pharos token addresses are in every
+  `assets/networks.json`. No skill ships stubbed or fake logic.
+- **Documented-pending:** the `stylus-compute` **WASM artifact is not deployed** (an upstream
+  `ruint`-vs-rustc toolchain deadlock — see `05-stylus-compute/SKILL.md`); the Rust source is complete and
+  the algorithm is proven by the bit-identical, tested JS reference. The one piece not yet on-chain — disclosed, not faked.
 
 Each skill is a standalone Node package: `npm install && npm test`. No skill hardcodes a key or a
 network — keys come from env vars, networks from `assets/networks.json`. See `DEPLOY.md` for putting
