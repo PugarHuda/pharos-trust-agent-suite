@@ -14,7 +14,7 @@ metadata:
   version: "1.0.0"
   network: pharos-atlantic-testnet
   chainId: 688689
-  contract: "0xc9142C347b51Bd2f89f943BcEae5D302A14f5B88"
+  contract: "0xd3F1DEf0c294405Cbd02b8b84D1De861A8C058DC"
   identityRegistry: "0xa048D4F17282488B60D96E6FB01FbdA106F38B8A"
 ---
 
@@ -75,7 +75,7 @@ Keys come from a gitignored `.env` (auto-loaded): `$SERVER_PRIVATE_KEY` (request
 
 ## Live on Atlantic (chainId 688689)
 
-`ValidationRegistry8004` → [`0xc9142C347b51Bd2f89f943BcEae5D302A14f5B88`](https://atlantic.pharosscan.xyz/address/0xc9142C347b51Bd2f89f943BcEae5D302A14f5B88),
+`ValidationRegistry8004` (v2, with a per-server pending-request cap) → [`0xd3F1DEf0c294405Cbd02b8b84D1De861A8C058DC`](https://atlantic.pharosscan.xyz/address/0xd3F1DEf0c294405Cbd02b8b84D1De861A8C058DC),
 wired to the live Identity Registry `0xa048D4F17282488B60D96E6FB01FbdA106F38B8A`. A real validation is
 on-chain: validator agent #3 scored server agent #2's work **95/100**, where the `dataHash` is the live
 `agent-escrow` jobId — i.e. the hired work was independently validated. Tx hashes in `DEPLOYMENTS.md`.

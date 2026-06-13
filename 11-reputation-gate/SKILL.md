@@ -15,9 +15,9 @@ metadata:
   version: "1.0.0"
   network: pharos-atlantic-testnet
   chainId: 688689
-  contract: "0xDec9B79F0f957F07F4896d2a2355507A7C8f5849"
+  contract: "0x425d3F086D8e98B7462cc987ED9B1aF9F396608d"
   reputation: "0x8010e567b6f68dcfD19312644F1c3E6249b43ef7"
-  validationRegistry: "0xc9142C347b51Bd2f89f943BcEae5D302A14f5B88"
+  validationRegistry: "0xd3F1DEf0c294405Cbd02b8b84D1De861A8C058DC"
 ---
 
 # Reputation Gate
@@ -56,7 +56,7 @@ gate check  --gate 0x.. --provider 0x.. --min-reputation 10 \
 gate pay    --gate 0x.. --provider 0x.. --min-reputation 10 --amount 0.001
 ```
 
-Defaults to the suite's live Reputation (`0x8010e567…`) + Validation (`0xc9142C34…`) registries. Reads
+Defaults to the suite's live Reputation (`0x8010e567…`) + Validation v2 (`0xd3F1DEf0…`) registries. Reads
 need no key; `pay` forwards PHRS via `$PAYER_PRIVATE_KEY`. Global: `--network atlantic-testnet`.
 
 ## How it composes (the capstone)
@@ -76,8 +76,8 @@ agent-validation ──score┘        (pay only the trusted; block the rest, on
 
 ## Live on Atlantic (chainId 688689)
 
-`ReputationGate` → [`0xDec9B79F0f957F07F4896d2a2355507A7C8f5849`](https://atlantic.pharosscan.xyz/address/0xDec9B79F0f957F07F4896d2a2355507A7C8f5849),
-wired to the live Reputation + Validation registries. Proven on-chain: a **gated payment** succeeded to a
+`ReputationGate` (v2) → [`0x425d3F086D8e98B7462cc987ED9B1aF9F396608d`](https://atlantic.pharosscan.xyz/address/0x425d3F086D8e98B7462cc987ED9B1aF9F396608d),
+wired to the live Reputation + Validation v2 registries. Proven on-chain: a **gated payment** succeeded to a
 provider with reputation 10/100 (bar 10), the same gate **blocks** a 0-reputation address, and the
 **composite** check returns TRUSTED for a provider whose escrowed work was validated 95/100 — using the
 live `agent-escrow` jobId as the `dataHash`. Tx hashes in `DEPLOYMENTS.md`.

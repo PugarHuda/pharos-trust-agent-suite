@@ -1,5 +1,9 @@
 # Demo-Video Script
 
+> **⚠️ Canonical flow:** the up-to-date recording flow is **`node demo.mjs`** + word-for-word voice-over
+> in **`NARRATION.md`** — covering all **13 skills, 236 tests, 11 live contracts**. The storyboards below
+> are earlier long-form scripts (written when the suite was smaller); the numbers in them are historical.
+
 > **One-command live driver:** `node demo.mjs` (from the repo root) runs the suite's real, read-only
 > commands against the deployed Atlantic contracts in sequence with section headers, then prints the
 > on-chain tx links for the full agent-commerce loop. Run it on screen and narrate — everything shown

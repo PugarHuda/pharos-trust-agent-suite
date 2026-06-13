@@ -104,5 +104,5 @@ same repo link. Confirm any exact registry/template in the dev Telegram (t.me/+U
 > validation → reputation-gated funding — plus an AP2-style signed-intent spend, a staked bond, and a
 > treasury successful + blocked spend. It is the **only complete ERC-8004 + ERC-8183 + AP2 + x402 stack**
 > in the field, and the only one where reputation actually gates money on-chain. **236 passing tests with
-> green CI**; hardened across four adversarial QA rounds (see QA.md). A zero-backend **live web dashboard**
+> green CI**; hardened across five adversarial QA rounds (see QA.md). A zero-backend **live web dashboard**
 > (`web/`) reads the deployed contracts in-browser. Eleven contracts + all tx hashes in DEPLOYMENTS.md.

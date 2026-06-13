@@ -164,7 +164,7 @@ composable skills, 236 tests, eleven live contracts, and the only complete ERC-8
 ├── DEPLOY.md                  ← faucet → deploy → record addresses
 ├── DEMO.md                    ← demo-video script
 ├── SUBMISSION.md              ← DoraHacks + Anvita submission guide
-└── QA.md                      ← 3-round adversarial QA audit trail
+└── QA.md                      ← 5-round adversarial QA audit trail
 ```
 
 > **Research-driven (Phase 2 positioning).** Skills 7–8 target the **Invocation Race** (rewards

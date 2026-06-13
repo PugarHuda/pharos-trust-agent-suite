@@ -1,8 +1,9 @@
 # QA & Hardening Report
 
 Each skill went through an adversarial QA pass (one reviewer per skill) that read every source
-file, ran the suite, and probed edge cases. Real findings were fixed and locked in with tests. Test
-count rose from **69 → 110**. This document is the audit trail.
+file, ran the suite, and probed edge cases. Real findings were fixed and locked in with tests. Across
+five rounds the suite grew from 5 skills / **69 tests** to **13 skills / 236 tests** (green CI). This
+document is the audit trail.
 
 ## agent-treasury
 
@@ -115,9 +116,30 @@ Reviewed everything added after the suite grew to 8 skills. Test count 154 → *
 > running the suites. MockUSDC3009's signature/replay correctness is also confirmed empirically by the
 > live x402 settle on Atlantic.
 
+## Round 5 (new skills 9–13 + full-suite verification)
+
+The suite grew to **13 skills** (escrow, validation, reputation-gate, intent-mandate, agent-bond) driven
+by current standards research (ERC-8004 live, ERC-8183 ReputationGateHook, Google AP2, x402 Bazaar). Each
+new contract was built audit-first and reviewed; the whole repo was then re-verified end-to-end.
+
+| Area | Finding / check | Resolution |
+|------|-----------------|-----------|
+| **agent-escrow** | Anti-rug: a *delivered* job must not be timeout-refundable; all exits must be pull-payments with a single reentrancy-guarded call. | Only a still-`Funded` job can `refundTimeout`; `withdraw` is the lone external call (guarded). A reentrancy attacker contract is proven blocked; value-conservation asserted. 23 tests. |
+| **agent-validation** | **Storage exhaustion** — unbounded validation requests per server (an ERC-8004-documented risk). | Added a per-server pending-request cap (constructor `maxPending`); a freed slot on response. **Redeployed v2** so live bytecode == source; re-ran the live validation. +2 tests. |
+| **reputation-gate** | `gatedPay` pushes native value to an arbitrary provider — confirm no custody/reentrancy and that a failed transfer surfaces. | No stored balance (atomic forward); a rejecting-recipient test proves `TransferFailed` bubbles. Redeployed v2 to point at validation v2. 10 tests. |
+| **intent-mandate** | EIP-712 recovery must reject malleable signatures and any tampered field; funds must stay withdrawable by the user. | EIP-2 low-`s`/`v` guard; tampered-cap and wrong-signer cases revert `BadSignature`; `withdraw` is reentrancy-guarded. Verified with **real ethers-signed** mandates. 14 tests. |
+| **agent-bond** | A consumer must not see stake that is already exiting; claims must respect the cooldown and resist reentrancy. | Active bond drops *before* funds queue for exit; `claimUnbond` checks the cooldown and is guarded (attacker proven blocked). 10 tests. |
+| **pharos-bazaar export** | The x402-Bazaar catalog formatter is pure logic — must rank correctly and carry reputation. | `toBazaarListing`/`toBazaarCatalog` unit-tested for shape, ranking, and the reputation field. +2 tests. |
+| **Full-suite + liveness** | Re-ran **all 13 suites** and probed every live address. | **236/236 tests pass, 0 failures**; `eth_getCode` confirms **all 11 contracts deployed** on Atlantic (non-empty bytecode). |
+| **Consistency sweep** | After the v2 redeploys, some SKILL.md files / an interface comment still referenced the superseded v1 validation/gate addresses. | Updated all references to the v2 addresses; `DEMO.md` (legacy storyboard) banner-flagged as historical with `demo.mjs`/`NARRATION.md` as canonical. |
+
+> Every new skill is admin-free (no owner/upgrade/slashing), uses checks-effects-interactions with a
+> single guarded external call, and exposes typed custom-error reverts. All findings re-validated by
+> running the suites and against live Atlantic RPC.
+
 ## Notes
 
 - All findings above were verified and fixed against the in-memory EVM / live Atlantic RPC, then locked
-  in with tests (now 110 total, all passing).
+  in with tests (now **236 total across 13 skills, all passing**, green CI).
 - The reviewers ran in a restricted permission mode and so reported via static analysis; every fix here
   was re-validated by actually running the code and the suite.
