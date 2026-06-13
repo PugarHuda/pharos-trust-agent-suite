@@ -5,7 +5,8 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "record": "node record.mjs"
+    "record": "node record.mjs",
+    "record:vo": "node record-vo.mjs"
   },
   "engines": { "node": ">=18" },
   "dependencies": {

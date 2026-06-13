@@ -6,10 +6,10 @@ name: demo-video
 on:
   workflow_dispatch:
     inputs:
-      speed:
-        description: "Playback speed (1, 1.5, or 2)"
-        default: "1"
-        required: false
+      voiceover:
+        description: "Include synced voice-over (true) or silent captions only (false)"
+        type: boolean
+        default: true
 
 jobs:
   record:
@@ -19,17 +19,22 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+      - name: install audio tools
+        run: sudo apt-get update && sudo apt-get install -y espeak-ng ffmpeg
       - name: install recorder deps
         working-directory: video
         run: npm install --no-audit --no-fund
       - name: install chromium
         working-directory: video
         run: npx playwright install --with-deps chromium
-      - name: record walkthrough
+      - name: record walkthrough (with voice-over)
+        if: ${{ github.event.inputs.voiceover != 'false' }}
         working-directory: video
-        env:
-          SPEED: ${{ github.event.inputs.speed }}
-        run: npm run record
+        run: npm run record:vo
+      - name: record walkthrough (silent)
+        if: ${{ github.event.inputs.voiceover == 'false' }}
+        working-directory: video
+        run: SPEED=1 npm run record
       - name: upload video
         uses: actions/upload-artifact@v4
         with:

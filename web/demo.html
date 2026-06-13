@@ -44,7 +44,8 @@
   .out .bad{color:var(--red);font-weight:700}
   .out .warn{color:var(--amber)}
   .out .txlink{color:var(--cyan)}
-  .runbtn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:5px 11px;font-size:12.5px;font-weight:600}
+  .runbtn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:5px 11px;font-size:12.5px;font-weight:600;cursor:pointer}
+.runbtn.press{background:linear-gradient(90deg,var(--cyan),#19b3c7);color:#04181a;border-color:transparent}
   /* side card */
   .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;min-height:0}
   .card .tag{align-self:flex-start;font-size:11px;color:var(--cyan);border:1px solid var(--line);border-radius:6px;padding:2px 8px;letter-spacing:.05em;text-transform:uppercase}
@@ -100,7 +101,8 @@
   <div class="progress" id="progress"></div>
   <div class="main">
     <div class="term">
-      <div class="bar"><span class="b" style="background:#ff5f56"></span><span class="b" style="background:#ffbd2e"></span><span class="b" style="background:#27c93f"></span><span class="t" id="termtitle">pharos@atlantic</span></div>
+      <div class="bar"><span class="b" style="background:#ff5f56"></span><span class="b" style="background:#ffbd2e"></span><span class="b" style="background:#27c93f"></span><span class="t" id="termtitle">pharos@atlantic</span>
+        <button class="runbtn" id="runBtn" style="margin-left:auto">▶ run</button></div>
       <div class="body" id="termbody"></div>
     </div>
     <div class="card">
@@ -269,6 +271,9 @@ const SCENES = [
     badge:{cls:'info', text:'github.com/PugarHuda/pharos-trust-agent-suite'} },
 ];
 
+// Plain-text captions, exposed so the Playwright recorder can synthesize a synced voice-over track.
+window.__captions = SCENES.map(s => s.caption.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim());
+
 // ---- player state ----
 let idx = 0, playing = false, narrate = true, speed = 1, runId = 0;
 const $ = (id) => document.getElementById(id);
@@ -322,10 +327,21 @@ async function typeInto(el, text, cls) {
   }
 }
 
+const rawSleep = (ms) => new Promise(r => setTimeout(r, ms));
+async function clickRun() {
+  const btn = $('runBtn'); if (!btn) return;
+  pointAt(btn, true);                 // glide the cursor onto the ▶ run button
+  await rawSleep(760 / Math.max(1, speed));
+  btn.classList.add('press'); btn.click();           // a real DOM click
+  await rawSleep(180 / Math.max(1, speed));
+  btn.classList.remove('press');
+}
+
 let mySeq = 0;
 async function playScene(i) {
   mySeq = ++runId;
   idx = i;
+  const sceneStart = performance.now();
   const sc = SCENES[i];
   paintProgress();
   $('counter').textContent = `${i + 1} / ${SCENES.length}`;
@@ -343,6 +359,8 @@ async function playScene(i) {
   const cmdLine = document.createElement('div'); cmdLine.className = 'cmd';
   body.appendChild(cmdLine);
   speak(sc.caption);
+
+  if (sc.cmd) { await clickRun(); if (runId!==mySeq) return; }   // pointer really clicks ▶ run
 
   if (sc.cmd) {
     cmdLine.innerHTML = '<span class="p">pharos@atlantic</span>:~$ ';
@@ -374,9 +392,17 @@ async function playScene(i) {
   // move pointer to the meaningful element
   pointAt(firstLink || pivotEl || $('termbody'));
 
-  // dwell, then auto-advance
-  const dwell = Math.max(3600, sc.caption.replace(/<[^>]+>/g,'').length * 52);
-  await sleep(dwell); if (runId!==mySeq) return;
+  // dwell, then auto-advance. If a recorder injected exact per-scene durations, hold the scene for
+  // exactly that long (so a synced voice-over track lines up); otherwise use a caption-length heuristic.
+  const fixed = (window.__durations && window.__durations[i]) || 0;
+  if (fixed) {
+    const remain = fixed - (performance.now() - sceneStart);
+    if (remain > 0) await rawSleep(remain);
+  } else {
+    const dwell = Math.max(3600, sc.caption.replace(/<[^>]+>/g,'').length * 52);
+    await sleep(dwell);
+  }
+  if (runId!==mySeq) return;
   if (playing) {
     if (i + 1 < SCENES.length) playScene(i + 1);
     else { playing = false; updatePlayBtn(); window.WALKTHROUGH_DONE = true; } // hook for Playwright recorder
