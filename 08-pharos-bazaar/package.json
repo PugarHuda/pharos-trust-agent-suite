@@ -1,0 +1,11 @@
+{
+  "name": "pharos-bazaar",
+  "version": "1.0.0",
+  "description": "The discover -> pay -> rate hub for agent-to-agent commerce on Pharos. Composes a2a-mesh + x402-facilitator into one reputation-ranked marketplace.",
+  "license": "MIT",
+  "type": "module",
+  "bin": { "bazaar": "./scripts/bazaar.mjs" },
+  "scripts": { "test": "node --test tests/bazaar.test.mjs" },
+  "engines": { "node": ">=18" },
+  "dependencies": { "ethers": "^6.13.0" }
+}

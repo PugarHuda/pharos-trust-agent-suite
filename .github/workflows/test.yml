@@ -23,6 +23,8 @@ jobs:
           - 04-a2a-mesh
           - 05-stylus-compute
           - 06-x402-facilitator
+          - 07-agent-utils
+          - 08-pharos-bazaar
     name: ${{ matrix.skill }}
     steps:
       - uses: actions/checkout@v4

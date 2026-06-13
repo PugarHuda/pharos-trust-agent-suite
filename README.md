@@ -2,23 +2,25 @@
 
 [![tests](https://github.com/PugarHuda/pharos-trust-agent-suite/actions/workflows/test.yml/badge.svg)](https://github.com/PugarHuda/pharos-trust-agent-suite/actions/workflows/test.yml)
 
-Six composable Skills for the **Pharos Skill-to-Agent Dual Cascade Hackathon**, built in the
+Eight composable Skills for the **Pharos Skill-to-Agent Dual Cascade Hackathon**, built in the
 official Pharos Skill format (`SKILL.md` + `references/` + `assets/`). The suite is designed as a
 **trust layer for the Pharos agent economy**: the things every other agent needs but few will build.
 
 > Hackathon: Skill-to-Agent Dual Cascade (Phase 1) · Prize pool 50,000 PROS (Phase 1: 20,000 PROS / 40 winners)
 > Network: Pharos Atlantic Testnet (chainId **688689**) · Submission deadline **2026-06-15**
 
-## Status: six skills implemented · 132 passing tests
+## Status: eight skills implemented · 144 passing tests
 
 | # | Skill | One-liner | Status | Tests |
 |---|-------|-----------|--------|-------|
 | 1 | **agent-treasury** | Smart-account wallet with on-chain spending policy, session keys, kill-switch | Contract compiles; CLI on ethers; policy proven on in-memory EVM | 28 |
 | 2 | **agent-shield** | Pre-flight security: simulate, balance-diff, registry/poisoning verify, approval & skill scanning | Zero-dependency CLI; live-tested vs Atlantic RPC | 30 |
 | 3 | **agent-strategy** | Autonomous DeFi: oracle read → rule DSL → policy-bounded swap, one NL instruction | Live Chainlink read on Atlantic; full evaluator | 25 |
-| 4 | **a2a-mesh** | Agent-to-agent discovery + x402 payment + payment-gated on-chain reputation (EIP-712 trustless) | Two contracts compile; anti-sybil core tested | 21 |
+| 4 | **a2a-mesh** | Agent-to-agent discovery + x402 payment + payment-gated on-chain reputation (EIP-712 trustless, ERC-8004-aligned) | Two contracts compile; anti-sybil core tested | 22 |
 | 5 | **stylus-compute** | Rust/WASM risk classifier gating a treasury spend, with a bit-identical verifiable JS reference | Source + JS reference + CLI done; WASM build via Docker/gnu | 15 |
 | 6 | **x402-facilitator** | Self-hostable x402 facilitator (verify + gasless settle of EIP-3009 payments) — fills the missing-facilitator gap | verify/settle/server/CLI + tests; verify core proven | 13 |
+| 7 | **agent-utils** | High-frequency read-only utilities (price, gas advisor, token info, balance, address-safety) — cheapest to adopt, most-called | Zero-key CLI; live-verified on Atlantic | 7 |
+| 8 | **pharos-bazaar** | The discover→pay→rate marketplace hub composing mesh + x402 (Pharos's x402-Bazaar, reputation-ranked) | Live discovery vs deployed mesh; ranking tested | 4 |
 
 A multi-agent adversarial QA pass hardened every skill against real findings — see [`QA.md`](QA.md).
 
@@ -93,9 +95,21 @@ two as a "Trust Suite": **agent-treasury + agent-shield** (detection + enforceme
 ├── 03-agent-strategy/         ← rule DSL + oracle + swap builder + tests
 ├── 04-a2a-mesh/               ← ServiceRegistry + Reputation contracts + CLI + tests
 ├── 05-stylus-compute/         ← Rust/WASM risk classifier + JS reference + CLI + tests
+├── 06-x402-facilitator/       ← self-hostable x402 facilitator (verify + gasless settle) + tests
+├── 07-agent-utils/            ← read-only utilities (price/gas/token/balance/address-safety) + tests
+├── 08-pharos-bazaar/          ← discover→pay→rate marketplace hub (composes mesh + x402) + tests
 ├── DEPLOY.md                  ← faucet → deploy → record addresses
-└── DEMO.md                    ← demo-video script
+├── DEMO.md                    ← demo-video script
+├── SUBMISSION.md              ← DoraHacks + Anvita submission guide
+└── QA.md                      ← 3-round adversarial QA audit trail
 ```
+
+> **Research-driven (Phase 2 positioning).** Skills 7–8 target the **Invocation Race** (rewards
+> frequently-called skills): read-only utilities are the cheapest to adopt and most-called, and a
+> reputation-ranked **Bazaar** is the hub every agent routes through — mirroring Coinbase's x402 Bazaar
+> (100M+ agentic payments) on Pharos. The mesh reputation is aligned with **ERC-8004** (Trustless
+> Agents), which standardizes agent identity/reputation and defers payment to x402 — exactly this
+> suite's shape. See `04-a2a-mesh/references/erc-8004.md`.
 
 ## Quick start (any skill)
 
@@ -106,6 +120,8 @@ cd ../03-agent-strategy && npm install && npm test
 cd ../04-a2a-mesh && npm install && npm run build && npm test
 cd ../05-stylus-compute && npm install && npm test
 cd ../06-x402-facilitator && npm install && npm test
+cd ../07-agent-utils && npm install && npm test
+cd ../08-pharos-bazaar && npm install && npm test
 ```
 
 ## Canonical Pharos data used throughout

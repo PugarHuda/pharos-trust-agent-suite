@@ -1,0 +1,11 @@
+{
+  "name": "agent-utils",
+  "version": "1.0.0",
+  "description": "High-frequency read-only on-chain utilities for Pharos agents: price, gas, token info, balance, and address-safety. Zero keys, callable on every action.",
+  "license": "MIT",
+  "type": "module",
+  "bin": { "utils": "./scripts/utils.mjs" },
+  "scripts": { "test": "node --test tests/utils.test.mjs" },
+  "engines": { "node": ">=18" },
+  "dependencies": { "ethers": "^6.13.0" }
+}
