@@ -1,0 +1,41 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:480px;height:480px;overflow:hidden}
+  .card{width:480px;height:480px;position:relative;
+    background:radial-gradient(420px 360px at 50% 32%,#10243a 0%,#0a1320 55%,#070b12 100%);
+    font-family:"Segoe UI",system-ui,-apple-system,Arial,sans-serif;color:#e8f0fb;
+    display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .mark{width:210px;height:210px;margin-top:8px;filter:drop-shadow(0 6px 26px rgba(46,230,214,.28))}
+  .word{margin-top:30px;font-weight:800;font-size:46px;letter-spacing:1px;line-height:1}
+  .word .g{background:linear-gradient(90deg,#2ee6d6,#9d8bff);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{margin-top:12px;font-size:15px;letter-spacing:5px;color:#8aa0bd;font-weight:600}
+</style></head><body>
+<div class="card">
+  <svg class="mark" viewBox="0 0 200 200" fill="none">
+    <defs>
+      <linearGradient id="ring" x1="0" y1="0" x2="200" y2="200">
+        <stop offset="0" stop-color="#2ee6d6"/><stop offset="1" stop-color="#9d8bff"/>
+      </linearGradient>
+      <linearGradient id="beam" x1="100" y1="40" x2="100" y2="150">
+        <stop offset="0" stop-color="#2ee6d6"/><stop offset="1" stop-color="#19b3c7"/>
+      </linearGradient>
+    </defs>
+    <!-- hexagon ring -->
+    <path d="M100 12 L168 51 L168 129 L100 168 L32 129 L32 51 Z"
+          stroke="url(#ring)" stroke-width="7" stroke-linejoin="round" fill="rgba(46,230,214,0.05)"/>
+    <!-- shield -->
+    <path d="M100 52 L140 66 V104 C140 128 122 142 100 150 C78 142 60 128 60 104 V66 Z"
+          fill="rgba(15,38,58,0.7)" stroke="#1d3650" stroke-width="2"/>
+    <!-- lighthouse (Pharos) + beam = trust/guidance -->
+    <path d="M92 132 L96 86 L104 86 L108 132 Z" fill="#cfe0f5"/>
+    <rect x="93.5" y="98" width="13" height="6" fill="#0a1320"/>
+    <circle cx="100" cy="80" r="9" fill="url(#beam)"/>
+    <path d="M100 80 L150 66 L150 74 Z" fill="#2ee6d6" opacity="0.55"/>
+    <path d="M100 80 L50 66 L50 74 Z" fill="#2ee6d6" opacity="0.55"/>
+    <!-- check on the shield base -->
+    <path d="M86 122 l9 9 l20 -22" stroke="#37e29a" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </svg>
+  <div class="word">TRUST <span class="g">SUITE</span></div>
+  <div class="sub">PHAROS · AGENT&nbsp;ECONOMY</div>
+</div>
+</body></html>
