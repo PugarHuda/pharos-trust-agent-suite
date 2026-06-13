@@ -44,6 +44,17 @@ step('5. stylus-compute — risk model gates an action (BLOCK)', '05-stylus-comp
 step('6. pharos-bazaar — discover services ranked by on-chain reputation', '08-pharos-bazaar',
   `node scripts/bazaar.mjs discover --registry ${REG} --reputation ${REP} --tag price-feed`);
 
+// Opt-in live WRITE segment (broadcasts real txs; needs 01-agent-treasury/.env).
+// Default demo is read-only/safe; pass --write to include this on camera.
+if (process.argv.includes('--write')) {
+  const SVC = '0x000000000000000000000000000000000000C0DE';      // allow-listed service
+  const ATTACKER = '0x000000000000000000000000000000000000dEaD';  // NOT allow-listed
+  step('6b. agent-treasury — a policy-allowed spend EXECUTES (live write tx)', '01-agent-treasury',
+    `node scripts/treasury.mjs spend --treasury ${TREASURY} --token ${DEMO_TOKEN} --to ${SVC} --amount 1`);
+  step('6c. agent-treasury — an out-of-policy spend is BLOCKED before broadcast', '01-agent-treasury',
+    `node scripts/treasury.mjs spend --treasury ${TREASURY} --token ${DEMO_TOKEN} --to ${ATTACKER} --amount 1`);
+}
+
 console.log(`\n\x1b[1;36m=== 7. The full agent-commerce loop (already on-chain — open on Pharosscan) ===\x1b[0m`);
 for (const [label, tx] of [
   ['gasless x402 settle (EIP-3009)', '0x873f98cf344dcffb8268fba0673933091be9805d4944c693616c433306a5225b'],
