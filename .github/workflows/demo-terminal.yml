@@ -25,10 +25,15 @@ jobs:
           done
       - name: smoke-run demo.mjs (read-only)
         run: node demo.mjs > /dev/null
+      - name: install ffmpeg + ttyd + fonts
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg ttyd fontconfig fonts-dejavu-core
+      - name: install vhs
+        run: go install github.com/charmbracelet/vhs@v0.8.0
       - name: record terminal with VHS
-        uses: charmbracelet/vhs-action@v2
-        with:
-          path: video/demo.tape
+        run: |
+          export PATH="$PATH:$(go env GOPATH)/bin"
+          vhs --version
+          vhs video/demo.tape
       - name: upload terminal video
         uses: actions/upload-artifact@v4
         with:

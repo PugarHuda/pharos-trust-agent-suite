@@ -5,6 +5,7 @@
 Output video/out/pharos-terminal.mp4
 
 Set Shell bash
+Set FontFamily "DejaVu Sans Mono"
 Set FontSize 14
 Set Width 1320
 Set Height 780
